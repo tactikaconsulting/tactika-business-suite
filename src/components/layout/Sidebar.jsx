@@ -1,57 +1,45 @@
+import { NavLink } from "react-router-dom";
+
+const menu = [
+  { name: "Dashboard", path: "/" },
+  { name: "Clientes", path: "/clientes" },
+  { name: "Diagnósticos", path: "/diagnosticos" },
+  { name: "Planes de Acción", path: "/planes" },
+  { name: "Seguimiento", path: "/seguimiento" },
+  { name: "Reportes", path: "/reportes" },
+  { name: "Configuración", path: "/configuracion" },
+];
+
 export default function Sidebar() {
+  return (
+    <aside className="w-64 bg-slate-900 text-white min-h-screen">
+      <div className="p-6 border-b border-slate-700">
+        <h1 className="text-2xl font-bold">
+          Táctika
+        </h1>
 
-    return (
+        <p className="text-sm text-gray-400">
+          Business Suite
+        </p>
+      </div>
 
-        <aside className="w-64 h-screen bg-slate-900 text-white">
-
-            <div className="p-6 text-2xl font-bold border-b border-slate-700">
-
-                Táctika
-
-            </div>
-
-            <nav className="mt-6">
-
-                <ul className="space-y-2">
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Dashboard
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Clientes
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Diagnóstico
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Plan Acción
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Seguimiento
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Reportes
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        RRHH
-                    </li>
-
-                    <li className="px-6 py-3 hover:bg-slate-700 cursor-pointer">
-                        Configuración
-                    </li>
-
-                </ul>
-
-            </nav>
-
-        </aside>
-
-    );
-
+      <nav className="mt-6">
+        {menu.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `block px-6 py-3 ${
+                isActive
+                  ? "bg-blue-600"
+                  : "hover:bg-slate-700"
+              }`
+            }
+          >
+            {item.name}
+          </NavLink>
+        ))}
+      </nav>
+    </aside>
+  );
 }
