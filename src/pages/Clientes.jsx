@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
-import ClienteForm from "../components/clientes/ClienteForm";
-import ClienteStats from "../components/clientes/ClienteStats";
-import ClienteSearch from "../components/clientes/ClienteSearch";
-import ClienteTable from "../components/clientes/ClienteTable";
+import ClienteForm from "../components/Clientes/ClienteForm";
+import ClienteStats from "../components/Clientes/ClienteStats";
+import ClienteSearch from "../components/Clientes/ClienteSearch";
+import ClienteTable from "../components/Clientes/ClienteTable";
 
 import {
   obtenerClientes,
   guardarCliente,
   eliminarCliente,
-} from "../services/clienteService";
+} from "../services/ClienteService";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
