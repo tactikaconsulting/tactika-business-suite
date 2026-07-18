@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
-import {
-  obtenerPlanes,
-  guardarPlan,
-  eliminarPlan,
-  actualizarEstado,
-} from "../services/planAccionService";
-
+import { obtenerPlanes, guardarPlan, eliminarPlan, actualizarEstado } from "../services/PlanAccionService";
 export default function PlanAccion() {
   const [planes, setPlanes] = useState([]);
 
