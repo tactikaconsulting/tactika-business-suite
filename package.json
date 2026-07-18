@@ -2,9 +2,6 @@
   "name": "tactika-business-suite",
   "private": true,
   "version": "1.0.0",
-  "description": "Sistema ERP/CRM para Táctika Consulting",
-  "author": "Táctika Consulting",
-  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
