@@ -5,14 +5,13 @@ import {
   DashboardChart,
   RecentActivity,
   PendingPlans,
-} from "../components/dashboard";
+} from "../components/Dashboard";
 
-import { obtenerClientes } from "../services/clienteService";
-import { obtenerDiagnosticos } from "../services/diagnosticoService";
-import { obtenerPlanes } from "../services/planAccionService";
+import { obtenerClientes } from "../services/ClienteService";
+import { obtenerDiagnosticos } from "../services/DiagnosticoService";
+import { obtenerPlanes } from "../services/PlanAccionService";
 
 export default function Dashboard() {
-
   const [clientes, setClientes] = useState([]);
   const [diagnosticos, setDiagnosticos] = useState([]);
   const [planes, setPlanes] = useState([]);
@@ -36,7 +35,6 @@ export default function Dashboard() {
     <div className="space-y-8">
 
       <div>
-
         <h1 className="text-3xl font-bold text-slate-800">
           Dashboard Ejecutivo
         </h1>
@@ -44,7 +42,6 @@ export default function Dashboard() {
         <p className="text-slate-500 mt-2">
           Bienvenido a Táctika Business Suite
         </p>
-
       </div>
 
       <DashboardCards
