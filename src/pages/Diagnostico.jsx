@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
-import DiagnosticoForm from "../components/diagnostico/DiagnosticoForm";
+import DiagnosticoForm from "../components/Diagnostico/DiagnosticoForm";
 
 import { obtenerDiagnosticos, guardarDiagnostico, eliminarDiagnostico, obtenerResultado } from "../services/DiagnosticoService";
 
