@@ -1,57 +1,105 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+
 import ClienteForm from "../components/clientes/ClienteForm";
+import ClienteStats from "../components/clientes/ClienteStats";
+import ClienteSearch from "../components/clientes/ClienteSearch";
+import ClienteTable from "../components/clientes/ClienteTable";
+
 import {
   obtenerClientes,
   guardarCliente,
+  eliminarCliente,
 } from "../services/clienteService";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
+  const [buscar, setBuscar] = useState("");
 
   useEffect(() => {
-    setClientes(obtenerClientes());
+    cargarClientes();
   }, []);
 
-  const agregarCliente = (cliente) => {
-    guardarCliente(cliente);
+  function cargarClientes() {
     setClientes(obtenerClientes());
-  };
+  }
+
+  function agregarCliente(cliente) {
+    guardarCliente(cliente);
+    cargarClientes();
+
+    Swal.fire({
+      icon: "success",
+      title: "Empresa registrada",
+      text: "La empresa fue registrada correctamente.",
+      timer: 1800,
+      showConfirmButton: false,
+    });
+  }
+
+  function borrarCliente(id) {
+    Swal.fire({
+      title: "¿Eliminar empresa?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        eliminarCliente(id);
+        cargarClientes();
+
+        Swal.fire({
+          icon: "success",
+          title: "Empresa eliminada",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    });
+  }
+
+  function editarCliente(cliente) {
+    Swal.fire({
+      icon: "info",
+      title: "Próximamente",
+      text: `La edición de "${cliente.nombre}" estará disponible en el siguiente sprint.`,
+    });
+  }
+
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const texto = buscar.toLowerCase();
+
+    return (
+      cliente.nombre.toLowerCase().includes(texto) ||
+      cliente.contacto.toLowerCase().includes(texto) ||
+      cliente.email.toLowerCase().includes(texto)
+    );
+  });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+
+      <h1 className="text-3xl font-bold text-slate-800">
+        Gestión de Clientes
+      </h1>
+
+      <ClienteStats clientes={clientes} />
+
+      <ClienteSearch
+        buscar={buscar}
+        setBuscar={setBuscar}
+      />
+
       <ClienteForm onGuardar={agregarCliente} />
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-2xl font-bold mb-4">
-          Empresas Registradas
-        </h2>
+      <ClienteTable
+        clientes={clientesFiltrados}
+        onEliminar={borrarCliente}
+        onEditar={editarCliente}
+      />
 
-        {clientes.length === 0 ? (
-          <p>No hay empresas registradas.</p>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left p-2">Empresa</th>
-                <th className="text-left p-2">Contacto</th>
-                <th className="text-left p-2">Correo</th>
-                <th className="text-left p-2">Estado</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {clientes.map((cliente) => (
-                <tr key={cliente.id} className="border-b">
-                  <td className="p-2">{cliente.nombre}</td>
-                  <td className="p-2">{cliente.contacto}</td>
-                  <td className="p-2">{cliente.email}</td>
-                  <td className="p-2">{cliente.estado}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
     </div>
   );
 }

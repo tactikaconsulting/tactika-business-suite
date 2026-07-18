@@ -1,170 +1,219 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+
+import {
+  obtenerPlanes,
+  guardarPlan,
+  eliminarPlan,
+  actualizarEstado,
+} from "../services/planAccionService";
 
 export default function PlanAccion() {
-  const [empresas, setEmpresas] = useState([]);
-  const [empresaSeleccionadaId, setEmpresaSeleccionadaId] = useState('');
-  
-  // Campos para la nueva iniciativa estratégica
-  const [tituloAccion, setTituloAccion] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [prioridad, setPrioridad] = useState('Media');
-  const [plazo, setPlazo] = useState('');
+  const [planes, setPlanes] = useState([]);
 
-  // Estado para simular feedback
-  const [exito, setExito] = useState(false);
+  const [formulario, setFormulario] = useState({
+    empresa: "",
+    area: "",
+    accion: "",
+    responsable: "",
+    prioridad: "Media",
+  });
 
   useEffect(() => {
-    const guardadas = localStorage.getItem('tactika_empresas_clientes');
-    if (guardadas) setEmpresas(JSON.parse(guardadas));
+    cargarPlanes();
   }, []);
 
-  const handleCrearPlan = (e) => {
-    e.preventDefault();
-    if (!empresaSeleccionadaId) return alert('Por favor selecciona una empresa cliente.');
-    if (!tituloAccion) return alert('Por favor ingresa el título de la acción.');
+  function cargarPlanes() {
+    setPlanes(obtenerPlanes());
+  }
 
-    // Actualizar la empresa sumándole un plan activo y cambiando su estado global a "Activo"
-    const empresasActualizadas = empresas.map(emp => {
-      if (emp.id === empresaSeleccionadaId) {
-        return {
-          ...emp,
-          planesAccionActivos: (emp.planesAccionActivos || 0) + 1,
-          estado: 'Activo', // Sube el estado comercial a Activo (con estrategia corriendo)
-          ultimoPlanTitulo: tituloAccion,
-          ultimoPlanPlazo: plazo
-        };
-      }
-      return emp;
+  function cambiar(e) {
+    setFormulario({
+      ...formulario,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  function guardar(e) {
+    e.preventDefault();
+
+    guardarPlan(formulario);
+
+    cargarPlanes();
+
+    setFormulario({
+      empresa: "",
+      area: "",
+      accion: "",
+      responsable: "",
+      prioridad: "Media",
     });
 
-    // Guardar en el almacenamiento local
-    setEmpresas(empresasActualizadas);
-    localStorage.setItem('tactika_empresas_clientes', JSON.stringify(empresasActualizadas));
+    Swal.fire({
+      icon: "success",
+      title: "Plan guardado",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  }
 
-    // Feedback visual y limpiar formulario
-    setExito(true);
-    setTituloAccion('');
-    setDescripcion('');
-    setPlazo('');
-    setTimeout(() => setExito(false), 4000);
-  };
+  function borrar(id) {
+    Swal.fire({
+      title: "¿Eliminar plan?",
+      icon: "warning",
+      showCancelButton: true,
+    }).then((r) => {
+      if (r.isConfirmed) {
+        eliminarPlan(id);
+        cargarPlanes();
+      }
+    });
+  }
+
+  function cambiarEstado(id, estado) {
+    actualizarEstado(id, estado);
+    cargarPlanes();
+  }
 
   return (
-    <div className="space-y-6">
-      {/* ENCABEZADO */}
-      <div>
-        <h2 className="text-3xl font-bold text-slate-800">Planes de Acción</h2>
-        <p className="text-sm text-slate-500 mt-1">
-          Diseño de estrategias de mitigación, asignación de objetivos corporativos y plazos de ejecución técnica.
-        </p>
-      </div>
+    <div className="space-y-8">
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* FORMULARIO DE CREACIÓN */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-fit">
-          <h3 className="font-bold text-slate-800 text-base mb-4">Nueva Acción Correctiva</h3>
-          
-          <form onSubmit={handleCrearPlan} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Empresa Cliente</label>
-              <select
-                value={empresaSeleccionadaId}
-                onChange={(e) => setEmpresaSeleccionadaId(e.target.value)}
-                className="w-full p-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+      <h1 className="text-3xl font-bold">
+        Plan de Acción
+      </h1>
+
+      <form
+        onSubmit={guardar}
+        className="bg-white rounded-xl shadow p-6 grid grid-cols-2 gap-4"
+      >
+        <input
+          name="empresa"
+          placeholder="Empresa"
+          value={formulario.empresa}
+          onChange={cambiar}
+          className="border rounded-lg p-3"
+          required
+        />
+
+        <input
+          name="area"
+          placeholder="Área"
+          value={formulario.area}
+          onChange={cambiar}
+          className="border rounded-lg p-3"
+          required
+        />
+
+        <input
+          name="accion"
+          placeholder="Acción"
+          value={formulario.accion}
+          onChange={cambiar}
+          className="border rounded-lg p-3"
+          required
+        />
+
+        <input
+          name="responsable"
+          placeholder="Responsable"
+          value={formulario.responsable}
+          onChange={cambiar}
+          className="border rounded-lg p-3"
+          required
+        />
+
+        <select
+          name="prioridad"
+          value={formulario.prioridad}
+          onChange={cambiar}
+          className="border rounded-lg p-3"
+        >
+          <option>Alta</option>
+          <option>Media</option>
+          <option>Baja</option>
+        </select>
+
+        <button
+          className="bg-blue-600 text-white rounded-lg"
+        >
+          Guardar Plan
+        </button>
+      </form>
+
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+
+        <table className="w-full">
+
+          <thead className="bg-slate-800 text-white">
+
+            <tr>
+              <th className="p-3">Empresa</th>
+              <th>Área</th>
+              <th>Acción</th>
+              <th>Responsable</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {planes.map((plan) => (
+
+              <tr
+                key={plan.id}
+                className="border-b"
               >
-                <option value="">-- Seleccionar Empresa --</option>
-                {empresas.map(emp => (
-                  <option key={emp.id} value={emp.id}>{emp.razonSocial}</option>
-                ))}
-              </select>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Título de la Medida</label>
-              <input 
-                type="text" 
-                value={tituloAccion}
-                onChange={e => setTituloAccion(e.target.value)}
-                className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" 
-                placeholder="Ej: Implementar Software ERP o Comité Paritario"
-              />
-            </div>
+                <td className="p-3">{plan.empresa}</td>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Detalle / Objetivo</label>
-              <textarea 
-                value={descripcion}
-                onChange={e => setDescripcion(e.target.value)}
-                rows="3"
-                className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-slate-400" 
-                placeholder="Describe los pasos clave para concretar esta meta..."
-              ></textarea>
-            </div>
+                <td>{plan.area}</td>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Prioridad</label>
-                <select value={prioridad} onChange={e => setPrioridad(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                  <option value="Alta">Alta</option>
-                  <option value="Media">Media</option>
-                  <option value="Baja">Baja</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Fecha Límite</label>
-                <input 
-                  type="date" 
-                  value={plazo}
-                  onChange={e => setPlazo(e.target.value)}
-                  className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" 
-                />
-              </div>
-            </div>
+                <td>{plan.accion}</td>
 
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg transition-colors shadow-sm mt-2">
-              Lanzar Plan Estratégico
-            </button>
+                <td>{plan.responsable}</td>
 
-            {exito && (
-              <p className="text-xs text-center font-medium text-emerald-600 bg-emerald-50 p-2 rounded-lg border border-emerald-100 animate-fadeIn">
-                ✓ Plan vinculado y activado correctamente.
-              </p>
-            )}
-          </form>
-        </div>
+                <td>{plan.prioridad}</td>
 
-        {/* MONITOR DE PLANES ASIGNADOS */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-          <h3 className="font-bold text-slate-800 text-base mb-4">Estrategias en Ejecución</h3>
-          
-          <div className="space-y-4">
-            {empresas.filter(e => e.planesAccionActivos > 0).length === 0 ? (
-              <div className="p-12 text-center text-slate-400 text-sm border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                No hay planes de acción activos ejecutándose en este momento. Diseña uno usando el panel izquierdo.
-              </div>
-            ) : (
-              empresas.filter(e => e.planesAccionActivos > 0).map(emp => (
-                <div key={emp.id} className="p-4 border border-slate-100 bg-slate-50/50 rounded-xl flex justify-between items-start hover:border-slate-200 transition-all shadow-xs">
-                  <div className="space-y-1">
-                    <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">
-                      {emp.razonSocial}
-                    </span>
-                    <h4 className="text-sm font-semibold text-slate-800 pt-1">{emp.ultimoPlanTitulo}</h4>
-                    <p className="text-xs text-slate-500">
-                      Esta empresa tiene un total de <span className="font-semibold text-slate-700">{emp.planesAccionActivos}</span> iniciativa(s) en desarrollo.
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[11px] bg-amber-50 text-amber-700 font-medium px-2 py-1 rounded border border-amber-200">
-                      Plazo: {emp.ultimoPlanPlazo || 'Por definir'}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+                <td>
+
+                  <select
+                    value={plan.estado}
+                    onChange={(e) =>
+                      cambiarEstado(plan.id, e.target.value)
+                    }
+                    className="border rounded"
+                  >
+                    <option>Pendiente</option>
+                    <option>En Proceso</option>
+                    <option>Finalizado</option>
+                  </select>
+
+                </td>
+
+                <td>
+
+                  <button
+                    onClick={() => borrar(plan.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    Eliminar
+                  </button>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
+
       </div>
+
     </div>
   );
 }

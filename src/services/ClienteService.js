@@ -1,15 +1,14 @@
 const KEY = "clientes";
 
 export function obtenerClientes() {
-  const datos = localStorage.getItem(KEY);
-  return datos ? JSON.parse(datos) : [];
+  return JSON.parse(localStorage.getItem(KEY)) || [];
 }
 
 export function guardarCliente(cliente) {
   const clientes = obtenerClientes();
 
   clientes.push({
-    id: Date.now(),
+    id: crypto.randomUUID(),
     ...cliente,
   });
 
