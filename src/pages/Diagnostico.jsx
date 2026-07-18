@@ -3,12 +3,7 @@ import Swal from "sweetalert2";
 
 import DiagnosticoForm from "../components/diagnostico/DiagnosticoForm";
 
-import {
-  obtenerDiagnosticos,
-  guardarDiagnostico,
-  eliminarDiagnostico,
-  obtenerResultado,
-} from "../services/diagnosticoService";
+import { obtenerDiagnosticos, guardarDiagnostico, eliminarDiagnostico, obtenerResultado } from "../services/DiagnosticoService";
 
 export default function Diagnostico() {
   const [diagnosticos, setDiagnosticos] = useState([]);
