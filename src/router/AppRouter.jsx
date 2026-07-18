@@ -8,7 +8,11 @@ import Diagnostico from "../pages/Diagnostico";
 import PlanAccion from "../pages/PlanAccion";
 import Seguimientos from "../pages/Seguimientos";
 import Reportes from "../pages/Reportes";
-import Configuracion from "../pages/configuracion";
+import Configuracion from "../pages/Configuracion";
+
+// 1. NUEVAS IMPORTACIONES
+import GestionPersonal from "../pages/GestionPersonal";
+import MatrizRiesgos from "../pages/MatrizRiesgos";
 
 export default function AppRouter() {
   return (
@@ -21,6 +25,11 @@ export default function AppRouter() {
           <Route path="/planes" element={<PlanAccion />} />
           <Route path="/seguimiento" element={<Seguimientos />} />
           <Route path="/reportes" element={<Reportes />} />
+          
+          {/* 2. NUEVAS RUTAS CONECTADAS */}
+          <Route path="/personal" element={<GestionPersonal />} />
+          <Route path="/riesgos" element={<MatrizRiesgos />} />
+          
           <Route path="/configuracion" element={<Configuracion />} />
         </Route>
       </Routes>

@@ -7,6 +7,11 @@ const menu = [
   { name: "Planes de Acción", path: "/planes" },
   { name: "Seguimiento", path: "/seguimiento" },
   { name: "Reportes", path: "/reportes" },
+  
+  // 🏢 NUEVOS MÓDULOS OPERATIVOS PARA CLIENTES
+  { name: "Control de Personal", path: "/personal" },
+  { name: "Matriz de Riesgos", path: "/riesgos" },
+  
   { name: "Configuración", path: "/configuracion" },
 ];
 
@@ -17,7 +22,6 @@ export default function Sidebar() {
         <h1 className="text-2xl font-bold">
           Táctika
         </h1>
-
         <p className="text-sm text-gray-400">
           Business Suite
         </p>
@@ -29,10 +33,10 @@ export default function Sidebar() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `block px-6 py-3 ${
+              `block px-6 py-3 transition-colors ${
                 isActive
-                  ? "bg-blue-600"
-                  : "hover:bg-slate-700"
+                  ? "bg-blue-600 font-semibold"
+                  : "hover:bg-slate-700 text-gray-300 hover:text-white"
               }`
             }
           >
