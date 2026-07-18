@@ -42,7 +42,7 @@ export default function Dashboard() {
       <div className="bg-slate-900 text-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-400">Panel de Control General</span>
-          <h2 className="text-2xl font-black text-white">Tactika consulting.</h2>
+          <h2 className="text-2xl font-black text-white">Tactika Consulting</h2>
           <p className="text-xs text-slate-400 mt-0.5">RUT: 78.224.832-4| Auditoría Activa por Táctika Consulting</p>
         </div>
         <div className="bg-slate-800 border border-slate-700 px-6 py-3 rounded-lg text-center w-full md:w-auto">
