@@ -54,8 +54,8 @@ export default function DashboardCards({
           className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-slate-100"
         >
           <div className="flex justify-between items-center">
-            <div>
-              <p className="text-gray-500 text-sm font-medium">
+            <div className="min-w-0 pr-3">
+              <p className="text-gray-500 text-sm font-medium truncate">
                 {card.titulo}
               </p>
 
@@ -64,7 +64,7 @@ export default function DashboardCards({
               </h2>
             </div>
 
-            <div className={`${card.color} text-white rounded-xl p-4`}>
+            <div className={`${card.color} text-white rounded-xl p-4 shrink-0`}>
               {card.icono}
             </div>
           </div>
