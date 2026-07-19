@@ -10,16 +10,17 @@ import {
 import { obtenerClientes } from "../services/ClienteService";
 import { obtenerDiagnosticos } from "../services/DiagnosticoService";
 import { obtenerPlanes } from "../services/PlanAccionService";
-
+import { obtenerSeguimientos } from "../services/SeguimientoService";
 export default function Dashboard() {
   const [clientes, setClientes] = useState([]);
   const [diagnosticos, setDiagnosticos] = useState([]);
   const [planes, setPlanes] = useState([]);
-
+  const [seguimientos, setSeguimientos] = useState([]);
   useEffect(() => {
     setClientes(obtenerClientes());
     setDiagnosticos(obtenerDiagnosticos());
     setPlanes(obtenerPlanes());
+    setSeguimientos(obtenerSeguimientos());
   }, []);
 
   const planesFinalizados = planes.filter(
@@ -45,11 +46,12 @@ export default function Dashboard() {
       </div>
 
       <DashboardCards
-        clientes={clientes.length}
-        diagnosticos={diagnosticos.length}
-        planes={planes.length}
-        cumplimiento={cumplimiento}
-      />
+  clientes={clientes.length}
+  diagnosticos={diagnosticos.length}
+  planes={planes.length}
+  seguimientos={seguimientos.length}
+  cumplimiento={cumplimiento}
+/>
 
       <DashboardChart
         clientes={clientes.length}

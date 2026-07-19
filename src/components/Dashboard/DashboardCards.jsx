@@ -1,9 +1,16 @@
-import { FaUsers, FaClipboardCheck, FaTasks, FaChartLine } from "react-icons/fa";
+import {
+  FaUsers,
+  FaClipboardCheck,
+  FaTasks,
+  FaChartLine,
+  FaCalendarCheck,
+} from "react-icons/fa";
 
 export default function DashboardCards({
   clientes = 0,
   diagnosticos = 0,
   planes = 0,
+  seguimientos = 0,
   cumplimiento = 0,
 }) {
   const cards = [
@@ -20,10 +27,16 @@ export default function DashboardCards({
       color: "bg-green-500",
     },
     {
-      titulo: "Planes",
+      titulo: "Planes de Acción",
       valor: planes,
       icono: <FaTasks size={30} />,
       color: "bg-orange-500",
+    },
+    {
+      titulo: "Seguimientos",
+      valor: seguimientos,
+      icono: <FaCalendarCheck size={30} />,
+      color: "bg-cyan-500",
     },
     {
       titulo: "Cumplimiento",
@@ -34,24 +47,24 @@ export default function DashboardCards({
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
       {cards.map((card) => (
         <div
           key={card.titulo}
-          className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-all duration-300"
+          className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-slate-100"
         >
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-gray-500">{card.titulo}</p>
+              <p className="text-gray-500 text-sm font-medium">
+                {card.titulo}
+              </p>
 
-              <h2 className="text-3xl font-bold mt-2">
+              <h2 className="text-3xl font-bold mt-2 text-slate-800">
                 {card.valor}
               </h2>
             </div>
 
-            <div
-              className={`${card.color} text-white rounded-full p-4`}
-            >
+            <div className={`${card.color} text-white rounded-xl p-4`}>
               {card.icono}
             </div>
           </div>
