@@ -4,7 +4,7 @@ import {
   SeguimientoForm,
   SeguimientoStats,
   SeguimientoTable,
-} from "../components/seguimiento";
+} from "../components/Seguimiento";
 
 import {
   obtenerSeguimientos,
