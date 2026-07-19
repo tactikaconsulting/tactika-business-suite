@@ -24,19 +24,30 @@ export default function DashboardChart({
   seguimientos = 0,
 }) {
   const data = {
-    labels: ["Clientes", "Diagnósticos", "Planes", "Seguimientos"],
+    labels: [
+      "Clientes",
+      "Diagnósticos",
+      "Planes",
+      "Seguimientos",
+    ],
     datasets: [
       {
         label: "Registros",
-        data: [clientes, diagnosticos, planes, seguimientos],
+        data: [
+          clientes,
+          diagnosticos,
+          planes,
+          seguimientos,
+        ],
         backgroundColor: [
-          "#3B82F6",
+          "#2563EB",
           "#10B981",
           "#F59E0B",
           "#06B6D4",
         ],
-        borderRadius: 8,
-        maxBarThickness: 60,
+        borderRadius: 12,
+        borderSkipped: false,
+        maxBarThickness: 55,
       },
     ],
   };
@@ -44,14 +55,17 @@ export default function DashboardChart({
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1200,
+    },
     plugins: {
       legend: {
         display: false,
       },
       tooltip: {
-        backgroundColor: "#1e293b",
-        padding: 10,
-        cornerRadius: 8,
+        backgroundColor: "#0F172A",
+        padding: 12,
+        cornerRadius: 10,
       },
     },
     scales: {
@@ -62,31 +76,39 @@ export default function DashboardChart({
         ticks: {
           color: "#475569",
           font: {
-            weight: "500",
+            size: 13,
+            weight: "bold",
           },
         },
       },
       y: {
         beginAtZero: true,
-        suggestedMax: 5,
-        grid: {
-          color: "#f1f5f9",
-        },
         ticks: {
-          color: "#94a3b8",
           stepSize: 1,
+          color: "#64748B",
+        },
+        grid: {
+          color: "#E2E8F0",
         },
       },
     },
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 border border-slate-100">
-      <h2 className="text-xl font-bold mb-6 text-slate-800">
-        Resumen General
-      </h2>
+    <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800">
+            Resumen General
+          </h2>
 
-      <div style={{ height: "300px" }}>
+          <p className="text-slate-500 text-sm">
+            Estado general del sistema
+          </p>
+        </div>
+      </div>
+
+      <div className="h-80">
         <Bar data={data} options={options} />
       </div>
     </div>
