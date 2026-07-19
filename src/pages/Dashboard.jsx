@@ -54,10 +54,11 @@ export default function Dashboard() {
 />
 
       <DashboardChart
-        clientes={clientes.length}
-        diagnosticos={diagnosticos.length}
-        planes={planes.length}
-      />
+  clientes={clientes.length}
+  diagnosticos={diagnosticos.length}
+  planes={planes.length}
+  seguimientos={seguimientos.length}
+/>
 
       <div className="grid lg:grid-cols-2 gap-6">
 
