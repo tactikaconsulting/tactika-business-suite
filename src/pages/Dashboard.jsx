@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 
 import {
+  WelcomeBanner,
   DashboardCards,
   DashboardChart,
+  QuickActions,
   RecentActivity,
   PendingPlans,
-  QuickActions,
 } from "../components/Dashboard";
 
 import { obtenerClientes } from "../services/ClienteService";
@@ -38,15 +39,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
 
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800">
-          Dashboard Ejecutivo
-        </h1>
-
-        <p className="text-slate-500 mt-2">
-          Bienvenido a Táctika Business Suite
-        </p>
-      </div>
+      <WelcomeBanner />
 
       <DashboardCards
         clientes={clientes.length}
@@ -65,9 +58,12 @@ export default function Dashboard() {
 
       <QuickActions />
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid xl:grid-cols-2 gap-6">
+
         <RecentActivity />
+
         <PendingPlans />
+
       </div>
 
     </div>
