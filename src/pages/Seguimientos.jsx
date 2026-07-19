@@ -11,10 +11,13 @@ import {
   guardarSeguimiento,
   eliminarSeguimiento,
   obtenerEstadisticasSeguimiento,
-} from "../services/seguimientoService";
+} from "../services/SeguimientoService";
+
 
 export default function Seguimientos() {
+
   const [seguimientos, setSeguimientos] = useState([]);
+
   const [estadisticas, setEstadisticas] = useState({
     total: 0,
     pendientes: 0,
@@ -22,17 +25,21 @@ export default function Seguimientos() {
     completados: 0,
   });
 
+
   const [seguimientoSeleccionado, setSeguimientoSeleccionado] =
     useState(null);
+
 
   const cargarDatos = () => {
     setSeguimientos(obtenerSeguimientos());
     setEstadisticas(obtenerEstadisticasSeguimiento());
   };
 
+
   useEffect(() => {
     cargarDatos();
   }, []);
+
 
   const guardar = (seguimiento) => {
     guardarSeguimiento(seguimiento);
@@ -40,14 +47,17 @@ export default function Seguimientos() {
     setSeguimientoSeleccionado(null);
   };
 
+
   const editar = (seguimiento) => {
     setSeguimientoSeleccionado(seguimiento);
   };
+
 
   const eliminar = (id) => {
     eliminarSeguimiento(id);
     cargarDatos();
   };
+
 
   return (
     <div className="space-y-6">
@@ -62,18 +72,24 @@ export default function Seguimientos() {
         </p>
       </div>
 
-      <SeguimientoStats estadisticas={estadisticas} />
+
+      <SeguimientoStats 
+        estadisticas={estadisticas} 
+      />
+
 
       <SeguimientoForm
         onGuardar={guardar}
         seguimientoSeleccionado={seguimientoSeleccionado}
       />
 
+
       <SeguimientoTable
         seguimientos={seguimientos}
         onEditar={editar}
         onEliminar={eliminar}
       />
+
 
     </div>
   );
