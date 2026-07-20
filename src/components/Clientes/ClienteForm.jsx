@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function ClienteForm({ onGuardar }) {
-  const [cliente, setCliente] = useState({
+export default function ClienteForm({ onGuardar, clienteEditar }) {
+  const vacio = {
     nombre: "",
     rut: "",
     giro: "",
@@ -9,7 +9,17 @@ export default function ClienteForm({ onGuardar }) {
     email: "",
     telefono: "",
     estado: "Prospecto",
-  });
+  };
+
+  const [cliente, setCliente] = useState(vacio);
+
+  useEffect(() => {
+    if (clienteEditar) {
+      setCliente(clienteEditar);
+    } else {
+      setCliente(vacio);
+    }
+  }, [clienteEditar]);
 
   const cambiarValor = (e) => {
     setCliente({
@@ -23,15 +33,7 @@ export default function ClienteForm({ onGuardar }) {
 
     onGuardar(cliente);
 
-    setCliente({
-      nombre: "",
-      rut: "",
-      giro: "",
-      contacto: "",
-      email: "",
-      telefono: "",
-      estado: "Prospecto",
-    });
+    setCliente(vacio);
   };
 
   return (
@@ -40,7 +42,7 @@ export default function ClienteForm({ onGuardar }) {
       className="bg-white rounded-xl shadow p-6 space-y-4"
     >
       <h2 className="text-2xl font-bold">
-        Nueva Empresa Cliente
+        {clienteEditar ? "Editar Empresa Cliente" : "Nueva Empresa Cliente"}
       </h2>
 
       <input
@@ -106,7 +108,7 @@ export default function ClienteForm({ onGuardar }) {
       <button
         className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
       >
-        Guardar Empresa
+        {clienteEditar ? "Actualizar Empresa" : "Guardar Empresa"}
       </button>
     </form>
   );

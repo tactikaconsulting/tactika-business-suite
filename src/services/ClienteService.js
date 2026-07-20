@@ -48,4 +48,30 @@ export async function guardarCliente(cliente) {
 
   if (error) {
     console.error(error);
-    throw
+    throw error;
+  }
+}
+
+export async function actualizarCliente(id, cliente) {
+  const { error } = await supabase
+    .from("clientes")
+    .update(aColumnasDB(cliente))
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function eliminarCliente(id) {
+  const { error } = await supabase
+    .from("clientes")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+}

@@ -1,27 +1,55 @@
-const KEY = "diagnosticos";
+import { supabase } from "../lib/supabase";
 
-export function obtenerDiagnosticos() {
-  return JSON.parse(localStorage.getItem(KEY)) || [];
+export async function obtenerDiagnosticos() {
+  const { data, error } = await supabase
+    .from("diagnosticos")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map((d) => ({
+    id: d.id,
+    clienteId: d.cliente_id,
+    empresa: d.empresa,
+    preguntas: d.preguntas,
+    resultado: d.resultado,
+    fecha: d.fecha,
+  }));
 }
 
-export function guardarDiagnostico(diagnostico) {
-  const diagnosticos = obtenerDiagnosticos();
+export async function guardarDiagnostico(diagnostico) {
+  const { error } = await supabase
+    .from("diagnosticos")
+    .insert([
+      {
+        cliente_id: diagnostico.clienteId,
+        empresa: diagnostico.empresa,
+        preguntas: diagnostico.preguntas,
+        resultado: diagnostico.resultado,
+        fecha: new Date().toLocaleDateString("es-CL"),
+      },
+    ]);
 
-  diagnosticos.push({
-    id: crypto.randomUUID(),
-    fecha: new Date().toLocaleDateString("es-CL"),
-    ...diagnostico,
-  });
-
-  localStorage.setItem(KEY, JSON.stringify(diagnosticos));
+  if (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-export function eliminarDiagnostico(id) {
-  const diagnosticos = obtenerDiagnosticos().filter(
-    (d) => d.id !== id
-  );
+export async function eliminarDiagnostico(id) {
+  const { error } = await supabase
+    .from("diagnosticos")
+    .delete()
+    .eq("id", id);
 
-  localStorage.setItem(KEY, JSON.stringify(diagnosticos));
+  if (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export function obtenerResultado(preguntas) {

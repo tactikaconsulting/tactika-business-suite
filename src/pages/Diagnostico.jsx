@@ -17,30 +17,44 @@ export default function Diagnostico() {
 
   useEffect(() => {
     cargarDiagnosticos();
-    setClientes(obtenerClientes());
+    cargarClientes();
   }, []);
 
-  function cargarDiagnosticos() {
-    setDiagnosticos(obtenerDiagnosticos());
+  async function cargarDiagnosticos() {
+    const data = await obtenerDiagnosticos();
+    setDiagnosticos(data);
   }
 
-  function guardar(datos) {
+  async function cargarClientes() {
+    const data = await obtenerClientes();
+    setClientes(data);
+  }
+
+  async function guardar(datos) {
     const resultado = obtenerResultado(datos.preguntas);
 
-    guardarDiagnostico({
-      ...datos,
-      resultado,
-    });
+    try {
+      await guardarDiagnostico({
+        ...datos,
+        resultado,
+      });
 
-    cargarDiagnosticos();
+      await cargarDiagnosticos();
 
-    Swal.fire({
-      icon: "success",
-      title: "Diagnóstico guardado",
-      text: "El diagnóstico fue registrado correctamente.",
-      timer: 1800,
-      showConfirmButton: false,
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Diagnóstico guardado",
+        text: "El diagnóstico fue registrado correctamente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar",
+        text: error.message,
+      });
+    }
   }
 
   function eliminar(id) {
@@ -51,17 +65,25 @@ export default function Diagnostico() {
       showCancelButton: true,
       confirmButtonText: "Eliminar",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        eliminarDiagnostico(id);
-        cargarDiagnosticos();
+        try {
+          await eliminarDiagnostico(id);
+          await cargarDiagnosticos();
 
-        Swal.fire({
-          icon: "success",
-          title: "Diagnóstico eliminado",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+          Swal.fire({
+            icon: "success",
+            title: "Diagnóstico eliminado",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error al eliminar",
+            text: error.message,
+          });
+        }
       }
     });
   }
