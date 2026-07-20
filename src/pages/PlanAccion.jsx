@@ -18,11 +18,17 @@ export default function PlanAccion() {
 
   useEffect(() => {
     cargarPlanes();
-    setClientes(obtenerClientes());
+    cargarClientes();
   }, []);
 
-  function cargarPlanes() {
-    setPlanes(obtenerPlanes());
+  async function cargarPlanes() {
+    const data = await obtenerPlanes();
+    setPlanes(data);
+  }
+
+  async function cargarClientes() {
+    const data = await obtenerClientes();
+    setClientes(data);
   }
 
   function cambiar(e) {
@@ -32,32 +38,40 @@ export default function PlanAccion() {
     });
   }
 
-  function guardar(e) {
+  async function guardar(e) {
     e.preventDefault();
 
     const cliente = clientes.find((c) => c.id === formulario.clienteId);
 
-    guardarPlan({
-      ...formulario,
-      empresa: cliente ? cliente.nombre : "",
-    });
+    try {
+      await guardarPlan({
+        ...formulario,
+        empresa: cliente ? cliente.nombre : "",
+      });
 
-    cargarPlanes();
+      await cargarPlanes();
 
-    setFormulario({
-      clienteId: "",
-      area: "",
-      accion: "",
-      responsable: "",
-      prioridad: "Media",
-    });
+      setFormulario({
+        clienteId: "",
+        area: "",
+        accion: "",
+        responsable: "",
+        prioridad: "Media",
+      });
 
-    Swal.fire({
-      icon: "success",
-      title: "Plan guardado",
-      timer: 1500,
-      showConfirmButton: false,
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Plan guardado",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar",
+        text: error.message,
+      });
+    }
   }
 
   function borrar(id) {
@@ -65,17 +79,33 @@ export default function PlanAccion() {
       title: "¿Eliminar plan?",
       icon: "warning",
       showCancelButton: true,
-    }).then((r) => {
+    }).then(async (r) => {
       if (r.isConfirmed) {
-        eliminarPlan(id);
-        cargarPlanes();
+        try {
+          await eliminarPlan(id);
+          await cargarPlanes();
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error al eliminar",
+            text: error.message,
+          });
+        }
       }
     });
   }
 
-  function cambiarEstado(id, estado) {
-    actualizarEstado(id, estado);
-    cargarPlanes();
+  async function cambiarEstado(id, estado) {
+    try {
+      await actualizarEstado(id, estado);
+      await cargarPlanes();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al actualizar estado",
+        text: error.message,
+      });
+    }
   }
 
   return (

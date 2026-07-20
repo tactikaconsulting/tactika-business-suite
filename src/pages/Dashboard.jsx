@@ -21,11 +21,23 @@ export default function Dashboard() {
   const [seguimientos, setSeguimientos] = useState([]);
 
   useEffect(() => {
-    setClientes(obtenerClientes());
-    setDiagnosticos(obtenerDiagnosticos());
-    setPlanes(obtenerPlanes());
-    setSeguimientos(obtenerSeguimientos());
+    cargarDatos();
   }, []);
+
+  async function cargarDatos() {
+    const [dataClientes, dataDiagnosticos, dataPlanes, dataSeguimientos] =
+      await Promise.all([
+        obtenerClientes(),
+        obtenerDiagnosticos(),
+        obtenerPlanes(),
+        obtenerSeguimientos(),
+      ]);
+
+    setClientes(dataClientes);
+    setDiagnosticos(dataDiagnosticos);
+    setPlanes(dataPlanes);
+    setSeguimientos(dataSeguimientos);
+  }
 
   const planesFinalizados = planes.filter(
     (plan) => plan.estado === "Finalizado"
