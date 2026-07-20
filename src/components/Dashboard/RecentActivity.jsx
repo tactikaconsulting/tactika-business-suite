@@ -6,33 +6,46 @@ import {
   Activity,
 } from "lucide-react";
 
-export default function RecentActivity() {
-  const actividades = [
-    {
+export default function RecentActivity({
+  clientes = [],
+  diagnosticos = [],
+  planes = [],
+  seguimientos = [],
+}) {
+
+  const actividades = [];
+
+  clientes.slice(0, 2).forEach((cliente) => {
+    actividades.push({
       icono: <Building2 className="text-blue-600" size={20} />,
-      titulo: "Nuevo cliente registrado",
-      descripcion: "Empresa incorporada al sistema.",
-      hora: "Hace 5 min",
-    },
-    {
+      titulo: "Nuevo cliente",
+      descripcion: cliente.nombre || cliente.empresa,
+    });
+  });
+
+  diagnosticos.slice(0, 2).forEach((item) => {
+    actividades.push({
       icono: <ClipboardCheck className="text-green-600" size={20} />,
-      titulo: "Diagnóstico completado",
-      descripcion: "Se registró un nuevo diagnóstico.",
-      hora: "Hace 20 min",
-    },
-    {
+      titulo: "Diagnóstico registrado",
+      descripcion: item.nombre || item.empresa || "",
+    });
+  });
+
+  planes.slice(0, 2).forEach((plan) => {
+    actividades.push({
       icono: <Target className="text-orange-500" size={20} />,
-      titulo: "Plan de acción creado",
-      descripcion: "Nuevo plan disponible.",
-      hora: "Hace 1 hora",
-    },
-    {
+      titulo: "Plan creado",
+      descripcion: plan.accion || plan.plan || "",
+    });
+  });
+
+  seguimientos.slice(0, 2).forEach((seg) => {
+    actividades.push({
       icono: <CalendarCheck className="text-cyan-600" size={20} />,
       titulo: "Seguimiento actualizado",
-      descripcion: "Se modificó el estado de una tarea.",
-      hora: "Hace 2 horas",
-    },
-  ];
+      descripcion: seg.accion || seg.descripcion || "",
+    });
+  });
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
@@ -45,44 +58,46 @@ export default function RecentActivity() {
         </h2>
       </div>
 
-      <div className="space-y-4">
+      {actividades.length === 0 ? (
 
-        {actividades.map((item, index) => (
+        <div className="text-center py-10 text-slate-400">
+          No hay actividad registrada.
+        </div>
 
-          <div
-            key={index}
-            className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition"
-          >
+      ) : (
 
-            <div className="bg-slate-100 p-3 rounded-xl">
-              {item.icono}
-            </div>
+        <div className="space-y-4">
 
-            <div className="flex-1">
+          {actividades.map((item, index) => (
 
-              <div className="flex justify-between">
+            <div
+              key={index}
+              className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition"
+            >
+
+              <div className="bg-slate-100 p-3 rounded-xl">
+                {item.icono}
+              </div>
+
+              <div>
 
                 <h3 className="font-semibold text-slate-800">
                   {item.titulo}
                 </h3>
 
-                <span className="text-xs text-slate-400">
-                  {item.hora}
-                </span>
+                <p className="text-sm text-slate-500 mt-1">
+                  {item.descripcion}
+                </p>
 
               </div>
 
-              <p className="text-sm text-slate-500 mt-1">
-                {item.descripcion}
-              </p>
-
             </div>
 
-          </div>
+          ))}
 
-        ))}
+        </div>
 
-      </div>
+      )}
 
     </div>
   );

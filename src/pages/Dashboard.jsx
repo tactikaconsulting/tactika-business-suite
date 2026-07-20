@@ -25,18 +25,22 @@ export default function Dashboard() {
   }, []);
 
   async function cargarDatos() {
-    const [dataClientes, dataDiagnosticos, dataPlanes, dataSeguimientos] =
-      await Promise.all([
-        obtenerClientes(),
-        obtenerDiagnosticos(),
-        obtenerPlanes(),
-        obtenerSeguimientos(),
-      ]);
+    const [
+      dataClientes,
+      dataDiagnosticos,
+      dataPlanes,
+      dataSeguimientos,
+    ] = await Promise.all([
+      obtenerClientes(),
+      obtenerDiagnosticos(),
+      obtenerPlanes(),
+      obtenerSeguimientos(),
+    ]);
 
-    setClientes(dataClientes);
-    setDiagnosticos(dataDiagnosticos);
-    setPlanes(dataPlanes);
-    setSeguimientos(dataSeguimientos);
+    setClientes(dataClientes || []);
+    setDiagnosticos(dataDiagnosticos || []);
+    setPlanes(dataPlanes || []);
+    setSeguimientos(dataSeguimientos || []);
   }
 
   const planesFinalizados = planes.filter(
@@ -72,9 +76,16 @@ export default function Dashboard() {
 
       <div className="grid xl:grid-cols-2 gap-6">
 
-        <RecentActivity />
+        <RecentActivity
+          clientes={clientes}
+          diagnosticos={diagnosticos}
+          planes={planes}
+          seguimientos={seguimientos}
+        />
 
-        <PendingPlans />
+        <PendingPlans
+          planes={planes}
+        />
 
       </div>
 
