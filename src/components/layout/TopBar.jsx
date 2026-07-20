@@ -2,9 +2,13 @@ import {
   Bell,
   Search,
   UserCircle,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Topbar() {
+  const { perfil, cerrarSesion } = useAuth();
+
   return (
     <header className="bg-white shadow px-8 h-16 flex items-center justify-between">
 
@@ -30,16 +34,24 @@ export default function Topbar() {
           <div>
 
             <p className="font-semibold">
-              Claudio Urra
+              {perfil?.nombre || "Usuario"}
             </p>
 
-            <p className="text-sm text-gray-500">
-              Administrador
+            <p className="text-sm text-gray-500 capitalize">
+              {perfil?.rol || "..."}
             </p>
 
           </div>
 
         </div>
+
+        <button
+          onClick={cerrarSesion}
+          className="text-gray-500 hover:text-red-600 flex items-center gap-1"
+          title="Cerrar sesión"
+        >
+          <LogOut size={20} />
+        </button>
 
       </div>
 
