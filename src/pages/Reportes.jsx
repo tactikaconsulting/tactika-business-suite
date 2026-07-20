@@ -22,10 +22,20 @@ export default function Reportes() {
   const [clienteSeleccionadoId, setClienteSeleccionadoId] = useState("");
 
   useEffect(() => {
-    setClientes(obtenerClientes());
-    setDiagnosticos(obtenerDiagnosticos());
-    setPlanes(obtenerPlanes());
+    cargarDatos();
   }, []);
+
+  async function cargarDatos() {
+    const [dataClientes, dataDiagnosticos, dataPlanes] = await Promise.all([
+      obtenerClientes(),
+      obtenerDiagnosticos(),
+      obtenerPlanes(),
+    ]);
+
+    setClientes(dataClientes);
+    setDiagnosticos(dataDiagnosticos);
+    setPlanes(dataPlanes);
+  }
 
   const cliente = clientes.find((c) => c.id === clienteSeleccionadoId) || null;
 
