@@ -30,9 +30,12 @@ export default function Seguimientos() {
     useState(null);
 
 
-  const cargarDatos = () => {
-    setSeguimientos(obtenerSeguimientos());
-    setEstadisticas(obtenerEstadisticasSeguimiento());
+  const cargarDatos = async () => {
+    const dataSeguimientos = await obtenerSeguimientos();
+    const dataEstadisticas = await obtenerEstadisticasSeguimiento();
+
+    setSeguimientos(dataSeguimientos);
+    setEstadisticas(dataEstadisticas);
   };
 
 
@@ -41,10 +44,14 @@ export default function Seguimientos() {
   }, []);
 
 
-  const guardar = (seguimiento) => {
-    guardarSeguimiento(seguimiento);
-    cargarDatos();
-    setSeguimientoSeleccionado(null);
+  const guardar = async (seguimiento) => {
+    try {
+      await guardarSeguimiento(seguimiento);
+      await cargarDatos();
+      setSeguimientoSeleccionado(null);
+    } catch (error) {
+      alert("Error al guardar: " + error.message);
+    }
   };
 
 
@@ -53,9 +60,13 @@ export default function Seguimientos() {
   };
 
 
-  const eliminar = (id) => {
-    eliminarSeguimiento(id);
-    cargarDatos();
+  const eliminar = async (id) => {
+    try {
+      await eliminarSeguimiento(id);
+      await cargarDatos();
+    } catch (error) {
+      alert("Error al eliminar: " + error.message);
+    }
   };
 
 
