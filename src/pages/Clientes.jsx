@@ -1,105 +1,106 @@
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-
+import { useState, useEffect } from "react";
 import ClienteForm from "../components/Clientes/ClienteForm";
-import ClienteStats from "../components/Clientes/ClienteStats";
-import ClienteSearch from "../components/Clientes/ClienteSearch";
-import ClienteTable from "../components/Clientes/ClienteTable";
-
 import {
   obtenerClientes,
   guardarCliente,
+  actualizarCliente,
   eliminarCliente,
 } from "../services/ClienteService";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
-  const [buscar, setBuscar] = useState("");
+  const [cargando, setCargando] = useState(true);
+  const [clienteEditar, setClienteEditar] = useState(null);
+
+  const cargarClientes = async () => {
+    setCargando(true);
+    try {
+      const data = await obtenerClientes();
+      setClientes(data);
+    } catch (error) {
+      alert("Error al cargar clientes: " + error.message);
+    } finally {
+      setCargando(false);
+    }
+  };
 
   useEffect(() => {
     cargarClientes();
   }, []);
 
-  function cargarClientes() {
-    setClientes(obtenerClientes());
-  }
-
-  function agregarCliente(cliente) {
-    guardarCliente(cliente);
-    cargarClientes();
-
-    Swal.fire({
-      icon: "success",
-      title: "Empresa registrada",
-      text: "La empresa fue registrada correctamente.",
-      timer: 1800,
-      showConfirmButton: false,
-    });
-  }
-
-  function borrarCliente(id) {
-    Swal.fire({
-      title: "¿Eliminar empresa?",
-      text: "Esta acción no se puede deshacer.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        eliminarCliente(id);
-        cargarClientes();
-
-        Swal.fire({
-          icon: "success",
-          title: "Empresa eliminada",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+  const guardarClienteForm = async (cliente) => {
+    try {
+      if (cliente.id) {
+        await actualizarCliente(cliente.id, cliente);
+      } else {
+        await guardarCliente(cliente);
       }
-    });
-  }
+      setClienteEditar(null);
+      await cargarClientes();
+    } catch (error) {
+      alert("Error al guardar: " + error.message);
+    }
+  };
 
-  function editarCliente(cliente) {
-    Swal.fire({
-      icon: "info",
-      title: "Próximamente",
-      text: `La edición de "${cliente.nombre}" estará disponible en el siguiente sprint.`,
-    });
-  }
-
-  const clientesFiltrados = clientes.filter((cliente) => {
-    const texto = buscar.toLowerCase();
-
-    return (
-      cliente.nombre.toLowerCase().includes(texto) ||
-      cliente.contacto.toLowerCase().includes(texto) ||
-      cliente.email.toLowerCase().includes(texto)
-    );
-  });
+  const eliminar = async (id) => {
+    if (!confirm("¿Eliminar este cliente?")) return;
+    try {
+      await eliminarCliente(id);
+      await cargarClientes();
+    } catch (error) {
+      alert("Error al eliminar: " + error.message);
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Clientes</h1>
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        Gestión de Clientes
-      </h1>
+      <ClienteForm onGuardar={guardarClienteForm} clienteEditar={clienteEditar} />
 
-      <ClienteStats clientes={clientes} />
-
-      <ClienteSearch
-        buscar={buscar}
-        setBuscar={setBuscar}
-      />
-
-      <ClienteForm onGuardar={agregarCliente} />
-
-      <ClienteTable
-        clientes={clientesFiltrados}
-        onEliminar={borrarCliente}
-        onEditar={editarCliente}
-      />
-
+      {cargando ? (
+        <p>Cargando clientes...</p>
+      ) : (
+        <div className="bg-white rounded-xl shadow overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b bg-gray-50">
+                <th className="p-3">Empresa</th>
+                <th className="p-3">RUT</th>
+                <th className="p-3">Giro</th>
+                <th className="p-3">Contacto</th>
+                <th className="p-3">Estado</th>
+                <th className="p-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientes.map((c) => (
+                <tr key={c.id} className="border-b">
+                  <td className="p-3">{c.nombre}</td>
+                  <td className="p-3">{c.rut}</td>
+                  <td className="p-3">{c.giro}</td>
+                  <td className="p-3">{c.contacto}</td>
+                  <td className="p-3">{c.estado}</td>
+                  <td className="p-3 space-x-2">
+                    <button
+                      className="text-blue-600 hover:underline"
+                      onClick={() => setClienteEditar(c)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className="text-red-600 hover:underline"
+                      onClick={() => eliminar(c.id)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,24 +1,51 @@
-const KEY = "clientes";
+import { supabase } from "../lib/supabase";
 
-export function obtenerClientes() {
-  return JSON.parse(localStorage.getItem(KEY)) || [];
+// Traduce del formulario (JS) hacia las columnas reales de Supabase
+function aColumnasDB(cliente) {
+  return {
+    empresa: cliente.nombre,
+    rut: cliente.rut,
+    rubro: cliente.giro,
+    contacto: cliente.contacto,
+    correo: cliente.email,
+    telefono: cliente.telefono,
+    estado: cliente.estado,
+  };
 }
 
-export function guardarCliente(cliente) {
-  const clientes = obtenerClientes();
-
-  clientes.push({
-    id: crypto.randomUUID(),
-    ...cliente,
-  });
-
-  localStorage.setItem(KEY, JSON.stringify(clientes));
+// Traduce de las columnas reales de Supabase hacia el formulario (JS)
+function aCliente(fila) {
+  return {
+    id: fila.id,
+    nombre: fila.empresa,
+    rut: fila.rut,
+    giro: fila.rubro,
+    contacto: fila.contacto,
+    email: fila.correo,
+    telefono: fila.telefono,
+    estado: fila.estado,
+  };
 }
 
-export function eliminarCliente(id) {
-  const clientes = obtenerClientes().filter(
-    (cliente) => cliente.id !== id
-  );
+export async function obtenerClientes() {
+  const { data, error } = await supabase
+    .from("clientes")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  localStorage.setItem(KEY, JSON.stringify(clientes));
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map(aCliente);
 }
+
+export async function guardarCliente(cliente) {
+  const { error } = await supabase
+    .from("clientes")
+    .insert([aColumnasDB(cliente)]);
+
+  if (error) {
+    console.error(error);
+    throw
