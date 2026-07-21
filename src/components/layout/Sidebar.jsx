@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   BarChart3,
   Settings,
+  Briefcase,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -47,6 +48,12 @@ export default function Sidebar() {
           to="/seguimiento"
           icon={CalendarCheck}
           text="Seguimiento"
+        />
+
+        <SidebarItem
+          to="/crm"
+          icon={Briefcase}
+          text="CRM Comercial"
         />
 
         <SidebarItem

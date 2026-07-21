@@ -14,6 +14,7 @@ import Configuracion from "../pages/Configuracion";
 
 import GestionPersonal from "../pages/GestionPersonal";
 import MatrizRiesgos from "../pages/MatrizRiesgos";
+import CRMComercial from "../pages/CRMComercial"; // ⬅ NUEVO
 
 export default function AppRouter() {
   return (
@@ -31,6 +32,7 @@ export default function AppRouter() {
             <Route path="/reportes" element={<Reportes />} />
             <Route path="/personal" element={<GestionPersonal />} />
             <Route path="/riesgos" element={<MatrizRiesgos />} />
+            <Route path="/crm" element={<CRMComercial />} /> {/* ⬅ NUEVO */}
             <Route path="/configuracion" element={<Configuracion />} />
           </Route>
         </Route>
