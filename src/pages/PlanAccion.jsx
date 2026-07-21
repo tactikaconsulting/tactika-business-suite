@@ -14,6 +14,7 @@ export default function PlanAccion() {
     accion: "",
     responsable: "",
     prioridad: "Media",
+    fechaLimite: "",
   });
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function PlanAccion() {
         accion: "",
         responsable: "",
         prioridad: "Media",
+        fechaLimite: "",
       });
 
       Swal.fire({
@@ -169,7 +171,20 @@ export default function PlanAccion() {
           <option>Baja</option>
         </select>
 
-        <button className="bg-blue-600 text-white rounded-lg">
+        <div>
+          <label className="block text-sm text-slate-500 mb-1">
+            Fecha límite
+          </label>
+          <input
+            type="date"
+            name="fechaLimite"
+            value={formulario.fechaLimite}
+            onChange={cambiar}
+            className="border rounded-lg p-3 w-full"
+          />
+        </div>
+
+        <button className="bg-blue-600 text-white rounded-lg col-span-2">
           Guardar Plan
         </button>
       </form>
@@ -189,6 +204,7 @@ export default function PlanAccion() {
               <th>Acción</th>
               <th>Responsable</th>
               <th>Prioridad</th>
+              <th>Fecha límite</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -202,6 +218,7 @@ export default function PlanAccion() {
                 <td>{plan.accion}</td>
                 <td>{plan.responsable}</td>
                 <td>{plan.prioridad}</td>
+                <td>{plan.fechaLimite || "—"}</td>
 
                 <td>
                   <select

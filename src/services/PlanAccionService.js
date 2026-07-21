@@ -21,6 +21,8 @@ export async function obtenerPlanes() {
     prioridad: p.prioridad,
     estado: p.estado,
     fecha: p.fecha,
+    fechaLimite: p.fecha_limite,
+    createdAt: p.created_at,
   }));
 }
 
@@ -37,6 +39,7 @@ export async function guardarPlan(plan) {
         prioridad: plan.prioridad,
         estado: "Pendiente",
         fecha: new Date().toLocaleDateString("es-CL"),
+        fecha_limite: plan.fechaLimite || null,
       },
     ]);
 

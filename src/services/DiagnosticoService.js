@@ -18,6 +18,7 @@ export async function obtenerDiagnosticos() {
     preguntas: d.preguntas,
     resultado: d.resultado,
     fecha: d.fecha,
+    createdAt: d.created_at,
   }));
 }
 

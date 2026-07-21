@@ -24,6 +24,7 @@ function aCliente(fila) {
     email: fila.correo,
     telefono: fila.telefono,
     estado: fila.estado,
+    createdAt: fila.created_at,
   };
 }
 

@@ -8,6 +8,7 @@ function aSeguimiento(fila) {
     fecha: fila.fecha,
     estado: fila.estado,
     fechaCreacion: fila.fecha_creacion,
+    createdAt: fila.created_at,
   };
 }
 

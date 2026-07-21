@@ -4,13 +4,17 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export default function PendingPlans({ planes = [] }) {
+const estilosPorEstado = {
+  Pendiente: { color: "bg-red-100 text-red-700", icono: <AlertTriangle size={18} /> },
+  "En Proceso": { color: "bg-yellow-100 text-yellow-700", icono: <Clock3 size={18} /> },
+  Finalizado: { color: "bg-green-100 text-green-700", icono: <CheckCircle2 size={18} /> },
+};
 
-  const pendientes = planes.filter(
-    (plan) =>
-      plan.estado === "Pendiente" ||
-      plan.estado === "En proceso"
-  );
+export default function PendingPlans({ planes = [] }) {
+  const proximos = planes
+    .filter((p) => p.estado !== "Finalizado" && p.fechaLimite)
+    .sort((a, b) => new Date(a.fechaLimite) - new Date(b.fechaLimite))
+    .slice(0, 5);
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
@@ -19,67 +23,48 @@ export default function PendingPlans({ planes = [] }) {
         Próximos Planes
       </h2>
 
-      {pendientes.length === 0 ? (
-
-        <div className="text-center py-10 text-slate-400">
-          No existen planes pendientes.
-        </div>
-
+      {proximos.length === 0 ? (
+        <p className="text-sm text-slate-400">
+          No hay planes pendientes con fecha límite registrada.
+        </p>
       ) : (
-
         <div className="space-y-4">
+          {proximos.map((plan) => {
+            const estilo = estilosPorEstado[plan.estado] || estilosPorEstado.Pendiente;
 
-          {pendientes.map((plan) => (
+            return (
+              <div
+                key={plan.id}
+                className="border border-slate-100 rounded-xl p-4 hover:shadow-md transition"
+              >
+                <div className="flex justify-between items-center">
 
-            <div
-              key={plan.id}
-              className="border border-slate-100 rounded-xl p-4 hover:shadow-md transition"
-            >
+                  <div>
+                    <h3 className="font-semibold text-slate-800">
+                      {plan.accion}
+                    </h3>
 
-              <div className="flex justify-between items-center">
+                    <p className="text-sm text-slate-500">
+                      {plan.empresa}
+                    </p>
 
-                <div>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Fecha límite: {plan.fechaLimite}
+                    </p>
+                  </div>
 
-                  <h3 className="font-semibold text-slate-800">
-                    {plan.accion || plan.plan}
-                  </h3>
-
-                  <p className="text-sm text-slate-500">
-                    {plan.responsable || "-"}
-                  </p>
-
-                  <p className="text-xs text-slate-400 mt-1">
-                    Fecha: {plan.fecha || "-"}
-                  </p>
+                  <span
+                    className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium ${estilo.color}`}
+                  >
+                    {estilo.icono}
+                    {plan.estado}
+                  </span>
 
                 </div>
-
-                <span
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium ${
-                    plan.estado === "Pendiente"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-
-                  {plan.estado === "Pendiente" ? (
-                    <AlertTriangle size={18} />
-                  ) : (
-                    <Clock3 size={18} />
-                  )}
-
-                  {plan.estado}
-
-                </span>
-
               </div>
-
-            </div>
-
-          ))}
-
+            );
+          })}
         </div>
-
       )}
 
     </div>
