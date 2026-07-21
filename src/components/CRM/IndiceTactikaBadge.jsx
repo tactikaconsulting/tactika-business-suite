@@ -1,4 +1,4 @@
-import { categoriaIndiceTactika } from "../../services/indiceTactika";
+import { categoriaIndiceTactika } from "../../services/IndiceTactika";
 
 const estilos = {
   gray: "bg-gray-100 text-gray-700",

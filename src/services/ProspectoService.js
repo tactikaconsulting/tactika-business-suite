@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase";
-import { calcularIndiceTactika } from "./indiceTactika";
+import { calcularIndiceTactika } from "./IndiceTactika";
 
 function aColumnasDB(p) {
   return {
