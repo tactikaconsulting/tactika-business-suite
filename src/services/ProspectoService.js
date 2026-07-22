@@ -206,4 +206,7 @@ export async function convertirProspectoACliente(prospecto) {
   }
 
   return nuevoClienteId;
+  clienteId: fila.cliente_id,
+    recomendacionIA: fila.recomendacion_ia, // ⬅ NUEVO
+    createdAt: fila.created_at,
 }

@@ -47,6 +47,9 @@ export default function KanbanCard({ prospecto, index, onClick }) {
               {atrasado ? "⚠ Atrasado" : "Próximo contacto"}: {prospecto.fechaProximoContacto}
             </div>
           )}
+
+          {/* Espacio reservado para IA — no activo todavía */}
+          {/* <RecomendacionIA prospecto={prospecto} /> */}
         </div>
       )}
     </Draggable>
