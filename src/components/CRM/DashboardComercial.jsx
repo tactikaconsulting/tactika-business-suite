@@ -1,4 +1,4 @@
-import { calcularMetricasComerciales } from "../../services/metricasComerciales";
+import { calcularMetricasComerciales } from "../../services/MetricasComerciales";
 
 function formatoCLP(valor) {
   return "$" + Number(valor || 0).toLocaleString("es-CL");
