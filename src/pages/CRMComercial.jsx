@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import ProspectoForm from "../components/CRM/ProspectoForm";
 import ProspectoTable from "../components/CRM/ProspectoTable";
 import KanbanBoard from "../components/CRM/KanbanBoard";
+import DashboardComercial from "../components/CRM/DashboardComercial";
 
 import {
   obtenerProspectos,
@@ -11,10 +12,12 @@ import {
   actualizarProspecto,
   eliminarProspecto,
   cambiarEstadoProspecto,
+  obtenerHistorial,
 } from "../services/ProspectoService";
 
 export default function CRMComercial() {
   const [prospectos, setProspectos] = useState([]);
+  const [historial, setHistorial] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [vista, setVista] = useState("kanban");
 
@@ -23,8 +26,12 @@ export default function CRMComercial() {
   }, []);
 
   async function cargar() {
-    const data = await obtenerProspectos();
-    setProspectos(data);
+    const [dataProspectos, dataHistorial] = await Promise.all([
+      obtenerProspectos(),
+      obtenerHistorial(),
+    ]);
+    setProspectos(dataProspectos);
+    setHistorial(dataHistorial);
   }
 
   async function guardar(datos) {
@@ -74,18 +81,24 @@ export default function CRMComercial() {
   }
 
   async function moverEnKanban(id, estadoAnterior, estadoNuevo) {
-    // Actualización optimista: cambia en pantalla al instante
     setProspectos((prev) =>
       prev.map((p) => (p.id === id ? { ...p, estado: estadoNuevo } : p))
     );
 
     try {
       await cambiarEstadoProspecto(id, estadoAnterior, estadoNuevo);
+      await cargar();
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo mover el prospecto", text: error.message });
-      await cargar(); // revierte si falló
+      await cargar();
     }
   }
+
+  const tabs = [
+    { id: "kanban", label: "Kanban" },
+    { id: "lista", label: "Lista" },
+    { id: "dashboard", label: "Dashboard" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -96,32 +109,29 @@ export default function CRMComercial() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-lg p-1 flex gap-1">
-          <button
-            onClick={() => setVista("kanban")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-              vista === "kanban" ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
-            }`}
-          >
-            Kanban
-          </button>
-          <button
-            onClick={() => setVista("lista")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-              vista === "lista" ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
-            }`}
-          >
-            Lista
-          </button>
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setVista(t.id)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                vista === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {vista === "kanban" ? (
+      {vista === "kanban" && (
         <KanbanBoard
           prospectos={prospectos}
           onCambiarEstado={moverEnKanban}
           onEditar={editarDesdeKanban}
         />
-      ) : (
+      )}
+
+      {vista === "lista" && (
         <>
           <ProspectoForm
             onGuardar={guardar}
@@ -134,6 +144,10 @@ export default function CRMComercial() {
             onEliminar={eliminar}
           />
         </>
+      )}
+
+      {vista === "dashboard" && (
+        <DashboardComercial prospectos={prospectos} historial={historial} />
       )}
     </div>
   );

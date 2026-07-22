@@ -147,3 +147,22 @@ export async function eliminarProspecto(id) {
     throw error;
   }
 }
+
+export async function obtenerHistorial() {
+  const { data, error } = await supabase
+    .from("prospecto_historial")
+    .select("*")
+    .order("fecha", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map((h) => ({
+    prospectoId: h.prospecto_id,
+    estadoAnterior: h.estado_anterior,
+    estadoNuevo: h.estado_nuevo,
+    fecha: h.fecha,
+  }));
+}
