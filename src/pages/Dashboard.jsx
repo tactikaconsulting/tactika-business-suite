@@ -8,35 +8,40 @@ import {
   RecentActivity,
   PendingPlans,
 } from "../components/Dashboard";
+import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
 
 import { obtenerClientes } from "../services/ClienteService";
 import { obtenerDiagnosticos } from "../services/DiagnosticoService";
 import { obtenerPlanes } from "../services/PlanAccionService";
 import { obtenerSeguimientos } from "../services/SeguimientoService";
+import { obtenerProspectos } from "../services/ProspectoService";
 
 export default function Dashboard() {
   const [clientes, setClientes] = useState([]);
   const [diagnosticos, setDiagnosticos] = useState([]);
   const [planes, setPlanes] = useState([]);
   const [seguimientos, setSeguimientos] = useState([]);
+  const [prospectos, setProspectos] = useState([]);
 
   useEffect(() => {
     cargarDatos();
   }, []);
 
   async function cargarDatos() {
-    const [dataClientes, dataDiagnosticos, dataPlanes, dataSeguimientos] =
+    const [dataClientes, dataDiagnosticos, dataPlanes, dataSeguimientos, dataProspectos] =
       await Promise.all([
         obtenerClientes(),
         obtenerDiagnosticos(),
         obtenerPlanes(),
         obtenerSeguimientos(),
+        obtenerProspectos(),
       ]);
 
     setClientes(dataClientes);
     setDiagnosticos(dataDiagnosticos);
     setPlanes(dataPlanes);
     setSeguimientos(dataSeguimientos);
+    setProspectos(dataProspectos);
   }
 
   const planesFinalizados = planes.filter(
@@ -52,6 +57,8 @@ export default function Dashboard() {
     <div className="space-y-8">
 
       <WelcomeBanner />
+
+      <AlertasSeguimiento prospectos={prospectos} onEditar={() => {}} />
 
       <DashboardCards
         clientes={clientes.length}

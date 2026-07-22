@@ -5,6 +5,7 @@ import ProspectoForm from "../components/CRM/ProspectoForm";
 import ProspectoTable from "../components/CRM/ProspectoTable";
 import KanbanBoard from "../components/CRM/KanbanBoard";
 import DashboardComercial from "../components/CRM/DashboardComercial";
+import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
 
 import {
   obtenerProspectos,
@@ -122,6 +123,8 @@ export default function CRMComercial() {
           ))}
         </div>
       </div>
+
+      <AlertasSeguimiento prospectos={prospectos} onEditar={editarDesdeKanban} />
 
       {vista === "kanban" && (
         <KanbanBoard
