@@ -166,3 +166,44 @@ export async function obtenerHistorial() {
     fecha: h.fecha,
   }));
 }
+/**
+ * Crea el registro real en la tabla `clientes` a partir de un prospecto,
+ * y vincula al prospecto con ese cliente (cliente_id). Es idempotente:
+ * si el prospecto ya tiene un cliente vinculado, no crea uno duplicado.
+ */
+export async function convertirProspectoACliente(prospecto) {
+  if (prospecto.clienteId) return prospecto.clienteId;
+
+  const { data, error } = await supabase
+    .from("clientes")
+    .insert([
+      {
+        empresa: prospecto.empresa,
+        rut: prospecto.rut,
+        contacto: prospecto.contactoNombre,
+        correo: prospecto.correo,
+        telefono: prospecto.telefono,
+        rubro: prospecto.giro,
+        estado: "Activo",
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  const nuevoClienteId = data[0].id;
+
+  const { error: errorLink } = await supabase
+    .from("prospectos")
+    .update({ cliente_id: nuevoClienteId })
+    .eq("id", prospecto.id);
+
+  if (errorLink) {
+    console.error(errorLink);
+  }
+
+  return nuevoClienteId;
+}

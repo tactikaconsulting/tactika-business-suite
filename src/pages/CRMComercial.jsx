@@ -14,6 +14,7 @@ import {
   eliminarProspecto,
   cambiarEstadoProspecto,
   obtenerHistorial,
+  convertirProspectoACliente,
 } from "../services/ProspectoService";
 
 export default function CRMComercial() {
@@ -39,6 +40,11 @@ export default function CRMComercial() {
     try {
       if (prospectoEditar) {
         await actualizarProspecto(prospectoEditar.id, datos);
+
+        // Si al editar se marcó como "Cliente" y aún no tiene cliente vinculado, lo creamos
+        if (datos.estado === "Cliente" && !prospectoEditar.clienteId) {
+          await convertirProspectoACliente({ ...datos, id: prospectoEditar.id });
+        }
       } else {
         await crearProspecto(datos);
       }
@@ -82,13 +88,29 @@ export default function CRMComercial() {
   }
 
   async function moverEnKanban(id, estadoAnterior, estadoNuevo) {
+    const prospecto = prospectos.find((p) => p.id === id);
+
     setProspectos((prev) =>
       prev.map((p) => (p.id === id ? { ...p, estado: estadoNuevo } : p))
     );
 
     try {
+      if (estadoNuevo === "Cliente" && prospecto && !prospecto.clienteId) {
+        await convertirProspectoACliente(prospecto);
+      }
+
       await cambiarEstadoProspecto(id, estadoAnterior, estadoNuevo);
       await cargar();
+
+      if (estadoNuevo === "Cliente") {
+        Swal.fire({
+          icon: "success",
+          title: "¡Nuevo cliente! 🎉",
+          text: `${prospecto?.empresa} fue agregado automáticamente a tu cartera de Clientes.`,
+          timer: 2500,
+          showConfirmButton: false,
+        });
+      }
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo mover el prospecto", text: error.message });
       await cargar();
