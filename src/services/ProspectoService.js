@@ -69,6 +69,7 @@ function aProspecto(fila) {
     necesidadUrgente: fila.necesidad_urgente,
     indiceTactika: fila.indice_tactika,
     clienteId: fila.cliente_id,
+    recomendacionIA: fila.recomendacion_ia,
     createdAt: fila.created_at,
   };
 }
@@ -166,11 +167,7 @@ export async function obtenerHistorial() {
     fecha: h.fecha,
   }));
 }
-/**
- * Crea el registro real en la tabla `clientes` a partir de un prospecto,
- * y vincula al prospecto con ese cliente (cliente_id). Es idempotente:
- * si el prospecto ya tiene un cliente vinculado, no crea uno duplicado.
- */
+
 export async function convertirProspectoACliente(prospecto) {
   if (prospecto.clienteId) return prospecto.clienteId;
 
@@ -206,7 +203,4 @@ export async function convertirProspectoACliente(prospecto) {
   }
 
   return nuevoClienteId;
-  clienteId: fila.cliente_id,
-    recomendacionIA: fila.recomendacion_ia,
-    createdAt: fila.created_at,,
 }
