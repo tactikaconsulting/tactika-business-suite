@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { obtenerClientes } from "../services/ClienteService";
 import { obtenerDiagnosticos } from "../services/DiagnosticoService";
@@ -9,7 +12,6 @@ function coincidePorNombre(nombreCliente, textoEmpresa) {
   return nombreCliente.trim().toLowerCase() === textoEmpresa.trim().toLowerCase();
 }
 
-// Usa clienteId si el registro lo tiene (nuevos); si no, cae al nombre (registros antiguos).
 function perteneceACliente(registro, cliente) {
   if (registro.clienteId) return registro.clienteId === cliente.id;
   return coincidePorNombre(cliente.nombre, registro.empresa);
@@ -76,6 +78,109 @@ export default function Reportes() {
     });
   }
 
+  function exportarExcel() {
+    if (!cliente) return;
+
+    const libro = XLSX.utils.book_new();
+
+    const resumen = [
+      ["Informe de Cliente", ""],
+      ["Empresa", cliente.nombre],
+      ["RUT", cliente.rut || "—"],
+      ["Giro", cliente.giro || "—"],
+      ["Contacto", cliente.contacto || "—"],
+      ["Estado", cliente.estado || "—"],
+      ["", ""],
+      ["Diagnósticos realizados", diagnosticosCliente.length],
+      ["Resultado promedio", diagnosticosCliente.length > 0 ? `${promedioResultado}%` : "Sin mediciones"],
+      ["Planes activos", planesActivos],
+    ];
+    const hojaResumen = XLSX.utils.aoa_to_sheet(resumen);
+    XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen");
+
+    if (pilares.length > 0) {
+      const filasPilares = [["Área", "Promedio (1-5)"], ...pilares.map((p) => [p.area, p.valor])];
+      const hojaPilares = XLSX.utils.aoa_to_sheet(filasPilares);
+      XLSX.utils.book_append_sheet(libro, hojaPilares, "Análisis por Pilar");
+    }
+
+    if (planesCliente.length > 0) {
+      const filasPlanes = [
+        ["Área", "Acción", "Responsable", "Prioridad", "Fecha límite", "Estado"],
+        ...planesCliente.map((p) => [
+          p.area,
+          p.accion,
+          p.responsable,
+          p.prioridad,
+          p.fechaLimite || "—",
+          p.estado,
+        ]),
+      ];
+      const hojaPlanes = XLSX.utils.aoa_to_sheet(filasPlanes);
+      XLSX.utils.book_append_sheet(libro, hojaPlanes, "Planes de Acción");
+    }
+
+    XLSX.writeFile(libro, `Informe_${cliente.nombre.replace(/\s+/g, "_")}.xlsx`);
+  }
+
+  function exportarPDF() {
+    if (!cliente) return;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Informe de Cliente — Táctika Consulting", 14, 18);
+
+    doc.setFontSize(11);
+    doc.text(`Empresa: ${cliente.nombre}`, 14, 30);
+    doc.text(`RUT: ${cliente.rut || "—"}`, 14, 37);
+    doc.text(`Giro: ${cliente.giro || "—"}`, 14, 44);
+    doc.text(`Contacto: ${cliente.contacto || "—"}`, 14, 51);
+    doc.text(`Estado: ${cliente.estado || "—"}`, 14, 58);
+    doc.text(
+      `Resultado promedio de diagnósticos: ${diagnosticosCliente.length > 0 ? promedioResultado + "%" : "Sin mediciones"}`,
+      14,
+      65
+    );
+
+    let y = 75;
+
+    if (pilares.length > 0) {
+      doc.setFontSize(13);
+      doc.text("Análisis por Pilar de Negocio", 14, y);
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Área", "Promedio (1-5)"]],
+        body: pilares.map((p) => [p.area, p.valor]),
+        theme: "grid",
+        headStyles: { fillColor: [30, 41, 59] },
+      });
+      y = doc.lastAutoTable.finalY + 12;
+    }
+
+    if (planesCliente.length > 0) {
+      doc.setFontSize(13);
+      doc.text("Planes de Acción", 14, y);
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Área", "Acción", "Responsable", "Prioridad", "Fecha límite", "Estado"]],
+        body: planesCliente.map((p) => [
+          p.area,
+          p.accion,
+          p.responsable,
+          p.prioridad,
+          p.fechaLimite || "—",
+          p.estado,
+        ]),
+        theme: "grid",
+        headStyles: { fillColor: [30, 41, 59] },
+        styles: { fontSize: 8 },
+      });
+    }
+
+    doc.save(`Informe_${cliente.nombre.replace(/\s+/g, "_")}.pdf`);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -86,19 +191,38 @@ export default function Reportes() {
           </p>
         </div>
 
-        <div className="w-64">
-          <select
-            value={clienteSeleccionadoId}
-            onChange={(e) => setClienteSeleccionadoId(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white font-medium text-slate-700 shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="">-- Seleccionar Cliente --</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center gap-3">
+          {cliente && (
+            <>
+              <button
+                onClick={exportarExcel}
+                className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition"
+              >
+                Descargar Excel
+              </button>
+              <button
+                onClick={exportarPDF}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium transition"
+              >
+                Descargar PDF
+              </button>
+            </>
+          )}
+
+          <div className="w-64">
+            <select
+              value={clienteSeleccionadoId}
+              onChange={(e) => setClienteSeleccionadoId(e.target.value)}
+              className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white font-medium text-slate-700 shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="">-- Seleccionar Cliente --</option>
+              {clientes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
