@@ -6,7 +6,7 @@ import ProspectoTable from "../components/CRM/ProspectoTable";
 import KanbanBoard from "../components/CRM/KanbanBoard";
 import DashboardComercial from "../components/CRM/DashboardComercial";
 import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
-import ImportarArchivo from "../components/shared/ImportarArchivo";
+import ImportarArchivo from "../components/Shared/ImportarArchivo";
 
 import {
   obtenerProspectos,
