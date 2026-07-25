@@ -6,6 +6,7 @@ import ProspectoTable from "../components/CRM/ProspectoTable";
 import KanbanBoard from "../components/CRM/KanbanBoard";
 import DashboardComercial from "../components/CRM/DashboardComercial";
 import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
+import ImportarArchivo from "../components/shared/ImportarArchivo";
 
 import {
   obtenerProspectos,
@@ -16,6 +17,20 @@ import {
   obtenerHistorial,
   convertirProspectoACliente,
 } from "../services/ProspectoService";
+
+const columnasImportacion = [
+  { clave: "empresa", etiqueta: "Empresa", requerido: true },
+  { clave: "rut", etiqueta: "RUT", requerido: false },
+  { clave: "giro", etiqueta: "Rubro / Giro", requerido: false },
+  { clave: "comuna", etiqueta: "Comuna", requerido: false },
+  { clave: "region", etiqueta: "Región", requerido: false },
+  { clave: "contactoNombre", etiqueta: "Contacto", requerido: false },
+  { clave: "telefono", etiqueta: "Teléfono", requerido: false },
+  { clave: "correo", etiqueta: "Correo", requerido: false },
+  { clave: "sitioWeb", etiqueta: "Sitio Web", requerido: false },
+  { clave: "origen", etiqueta: "Origen", requerido: false },
+  { clave: "observaciones", etiqueta: "Observaciones", requerido: false },
+];
 
 export default function CRMComercial() {
   const [prospectos, setProspectos] = useState([]);
@@ -40,8 +55,6 @@ export default function CRMComercial() {
     try {
       if (prospectoEditar) {
         await actualizarProspecto(prospectoEditar.id, datos);
-
-        // Si al editar se marcó como "Cliente" y aún no tiene cliente vinculado, lo creamos
         if (datos.estado === "Cliente" && !prospectoEditar.clienteId) {
           await convertirProspectoACliente({ ...datos, id: prospectoEditar.id });
         }
@@ -60,6 +73,38 @@ export default function CRMComercial() {
       });
     } catch (error) {
       Swal.fire({ icon: "error", title: "Error al guardar", text: error.message });
+    }
+  }
+
+  async function importarProspectos(filas) {
+    let exitosos = 0;
+    let fallidos = 0;
+
+    for (const fila of filas) {
+      if (!fila.empresa) {
+        fallidos++;
+        continue;
+      }
+      try {
+        await crearProspecto({
+          ...fila,
+          estado: fila.estado || "Prospecto",
+          origen: fila.origen || "Importación Excel/CSV",
+        });
+        exitosos++;
+      } catch (error) {
+        fallidos++;
+      }
+    }
+
+    await cargar();
+
+    if (fallidos > 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Importación con observaciones",
+        text: `${exitosos} prospectos creados correctamente, ${fallidos} no se pudieron crear (revisa que tengan al menos el nombre de la empresa).`,
+      });
     }
   }
 
@@ -131,18 +176,26 @@ export default function CRMComercial() {
           <p className="text-slate-500 mt-1">Prospección y seguimiento comercial de nuevos clientes.</p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-lg p-1 flex gap-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setVista(t.id)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                vista === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <ImportarArchivo
+            columnas={columnasImportacion}
+            onImportar={importarProspectos}
+            nombreEntidad="prospectos"
+          />
+
+          <div className="bg-white border border-slate-200 rounded-lg p-1 flex gap-1">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setVista(t.id)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                  vista === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
