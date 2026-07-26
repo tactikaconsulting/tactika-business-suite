@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import ClienteForm from "../components/Clientes/ClienteForm";
+import ImportarArchivo from "../components/shared/ImportarArchivo";
+import Swal from "sweetalert2";
 import {
   obtenerClientes,
   guardarCliente,
   actualizarCliente,
   eliminarCliente,
 } from "../services/ClienteService";
+
+const columnasImportacion = [
+  { clave: "nombre", etiqueta: "Empresa", requerido: true },
+  { clave: "rut", etiqueta: "RUT", requerido: false },
+  { clave: "giro", etiqueta: "Giro", requerido: false },
+  { clave: "contacto", etiqueta: "Contacto", requerido: false },
+  { clave: "email", etiqueta: "Correo", requerido: false },
+  { clave: "telefono", etiqueta: "Teléfono", requerido: false },
+  { clave: "estado", etiqueta: "Estado", requerido: false },
+];
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
@@ -42,6 +54,45 @@ export default function Clientes() {
     }
   };
 
+  async function importarClientes(filas) {
+    let exitosos = 0;
+    let fallidos = 0;
+
+    for (const fila of filas) {
+      if (!fila.nombre) {
+        fallidos++;
+        continue;
+      }
+      try {
+        await guardarCliente({
+          ...fila,
+          estado: fila.estado || "Prospecto",
+        });
+        exitosos++;
+      } catch (error) {
+        fallidos++;
+      }
+    }
+
+    await cargarClientes();
+
+    if (fallidos > 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Importación con observaciones",
+        text: `${exitosos} clientes creados correctamente, ${fallidos} no se pudieron crear (revisa que tengan al menos el nombre de la empresa).`,
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Importación completa",
+        text: `${exitosos} clientes creados correctamente.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  }
+
   const eliminar = async (id) => {
     if (!confirm("¿Eliminar este cliente?")) return;
     try {
@@ -54,7 +105,14 @@ export default function Clientes() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Clientes</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-3xl font-bold">Clientes</h1>
+        <ImportarArchivo
+          columnas={columnasImportacion}
+          onImportar={importarClientes}
+          nombreEntidad="clientes"
+        />
+      </div>
 
       <ClienteForm onGuardar={guardarClienteForm} clienteEditar={clienteEditar} />
 
