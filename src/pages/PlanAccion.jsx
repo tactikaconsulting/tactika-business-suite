@@ -3,6 +3,17 @@ import Swal from "sweetalert2";
 
 import { obtenerPlanes, guardarPlan, eliminarPlan, actualizarEstado } from "../services/PlanAccionService";
 import { obtenerClientes } from "../services/ClienteService";
+import ImportarArchivo from "../components/Shared/ImportarArchivo";
+
+const columnasImportacion = [
+  { clave: "empresa", etiqueta: "Empresa", requerido: true },
+  { clave: "area", etiqueta: "Área", requerido: false },
+  { clave: "accion", etiqueta: "Acción", requerido: true },
+  { clave: "responsable", etiqueta: "Responsable", requerido: false },
+  { clave: "prioridad", etiqueta: "Prioridad", requerido: false },
+  { clave: "fechaLimite", etiqueta: "Fecha límite", requerido: false },
+  { clave: "estado", etiqueta: "Estado", requerido: false },
+];
 
 export default function PlanAccion() {
   const [planes, setPlanes] = useState([]);
@@ -76,6 +87,45 @@ export default function PlanAccion() {
     }
   }
 
+  async function importarPlanes(filas) {
+    let exitosos = 0;
+    let fallidos = 0;
+
+    for (const fila of filas) {
+      if (!fila.empresa || !fila.accion) {
+        fallidos++;
+        continue;
+      }
+
+      const cliente = clientes.find(
+        (c) => c.nombre?.trim().toLowerCase() === fila.empresa.trim().toLowerCase()
+      );
+
+      try {
+        await guardarPlan({
+          clienteId: cliente ? cliente.id : "",
+          empresa: fila.empresa,
+          area: fila.area || "",
+          accion: fila.accion,
+          responsable: fila.responsable || "",
+          prioridad: fila.prioridad || "Media",
+          fechaLimite: fila.fechaLimite || "",
+        });
+        exitosos++;
+      } catch (error) {
+        fallidos++;
+      }
+    }
+
+    await cargarPlanes();
+
+    Swal.fire({
+      icon: fallidos > 0 ? "warning" : "success",
+      title: "Importación completa",
+      text: `${exitosos} planes creados. ${fallidos > 0 ? `${fallidos} no se pudieron crear (falta empresa o acción).` : ""}`,
+    });
+  }
+
   function borrar(id) {
     Swal.fire({
       title: "¿Eliminar plan?",
@@ -112,7 +162,14 @@ export default function PlanAccion() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Plan de Acción</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-3xl font-bold">Plan de Acción</h1>
+        <ImportarArchivo
+          columnas={columnasImportacion}
+          onImportar={importarPlanes}
+          nombreEntidad="planes de acción"
+        />
+      </div>
 
       <form
         onSubmit={guardar}

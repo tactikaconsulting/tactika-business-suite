@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ClienteForm from "../components/Clientes/ClienteForm";
-import ImportarArchivo from "../components/shared/ImportarArchivo";
+import ImportarArchivo from "../components/Shared/ImportarArchivo";
 import Swal from "sweetalert2";
 import {
   obtenerClientes,
