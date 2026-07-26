@@ -1,4 +1,27 @@
-<<<<<<< HEAD
+# Dependencias
+node_modules
+
+# Build
+dist
+dist-ssr
+
+# Variables de entorno (nunca subir claves/API keys)
+.env
+.env.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Sistema
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # Logs
 logs
 *.log
@@ -8,33 +31,5 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-=======
-node_modules
-
-dist
-
-.vscode
-
-.env
-
-.env.local
-
-.DS_Store
-
+# Cobertura de tests
 coverage
->>>>>>> e59636c4198b941f3f83d331cabd3784db6e4cfb
