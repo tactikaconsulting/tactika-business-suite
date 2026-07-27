@@ -10,6 +10,14 @@ import {
   obtenerResultado,
 } from "../services/DiagnosticoService";
 import { obtenerClientes } from "../services/ClienteService";
+import ImportarArchivo from "../components/Shared/ImportarArchivo";
+
+const columnasImportacion = [
+  { clave: "empresa", etiqueta: "Empresa", requerido: true },
+  { clave: "categoria", etiqueta: "Categoría", requerido: true },
+  { clave: "pregunta", etiqueta: "Pregunta", requerido: true },
+  { clave: "valor", etiqueta: "Valor (1-5)", requerido: true },
+];
 
 export default function Diagnostico() {
   const [diagnosticos, setDiagnosticos] = useState([]);
@@ -57,6 +65,51 @@ export default function Diagnostico() {
     }
   }
 
+  async function importarDiagnosticos(filas) {
+    // Agrupa las filas por empresa (varias filas = varias preguntas de un mismo diagnóstico)
+    const grupos = {};
+    filas.forEach((fila) => {
+      if (!fila.empresa || !fila.pregunta) return;
+      const clave = fila.empresa.trim();
+      if (!grupos[clave]) grupos[clave] = [];
+      grupos[clave].push({
+        categoria: fila.categoria || "General",
+        pregunta: fila.pregunta,
+        valor: Number(fila.valor) || 3,
+      });
+    });
+
+    let exitosos = 0;
+    let fallidos = 0;
+
+    for (const [empresa, preguntas] of Object.entries(grupos)) {
+      const cliente = clientes.find(
+        (c) => c.nombre?.trim().toLowerCase() === empresa.toLowerCase()
+      );
+
+      try {
+        const resultado = obtenerResultado(preguntas);
+        await guardarDiagnostico({
+          clienteId: cliente ? cliente.id : "",
+          empresa,
+          preguntas,
+          resultado,
+        });
+        exitosos++;
+      } catch (error) {
+        fallidos++;
+      }
+    }
+
+    await cargarDiagnosticos();
+
+    Swal.fire({
+      icon: fallidos > 0 ? "warning" : "success",
+      title: "Importación completa",
+      text: `${exitosos} diagnóstico(s) creados (agrupados por empresa). ${fallidos > 0 ? `${fallidos} fallaron.` : ""}`,
+    });
+  }
+
   function eliminar(id) {
     Swal.fire({
       title: "¿Eliminar diagnóstico?",
@@ -90,9 +143,16 @@ export default function Diagnostico() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-slate-800">
-        Diagnóstico Empresarial
-      </h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-3xl font-bold text-slate-800">
+          Diagnóstico Empresarial
+        </h1>
+        <ImportarArchivo
+          columnas={columnasImportacion}
+          onImportar={importarDiagnosticos}
+          nombreEntidad="respuestas de diagnóstico"
+        />
+      </div>
 
       <DiagnosticoForm onGuardar={guardar} clientes={clientes} />
 
