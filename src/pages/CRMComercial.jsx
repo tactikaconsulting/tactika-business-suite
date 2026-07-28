@@ -10,6 +10,7 @@ import ImportarArchivo from "../components/Shared/ImportarArchivo";
 import EnriquecimientoProspectos from "../components/CRM/EnriquecimientoProspectos";
 import KpisComerciales from "../components/CRM/KpisComerciales";
 import ProspectoHistorialPanel from "../components/CRM/ProspectoHistorialPanel";
+import TareasRecordatorios from "../components/CRM/TareasRecordatorios";
 
 import {
   obtenerProspectos,
@@ -134,6 +135,26 @@ export default function CRMComercial() {
     }
   }
 
+  async function reprogramarSeguimiento(prospecto, fechaProximoContacto) {
+    try {
+      await actualizarProspecto(prospecto.id, {
+        ...prospecto,
+        fechaProximoContacto,
+      });
+      await cargar();
+
+      Swal.fire({
+        icon: "success",
+        title: "Seguimiento reprogramado",
+        text: `${prospecto.empresa} quedó programado para ${fechaProximoContacto}.`,
+        timer: 1600,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo reprogramar", text: error.message });
+    }
+  }
+
   function eliminar(id) {
     Swal.fire({
       title: "¿Eliminar prospecto?",
@@ -235,6 +256,12 @@ export default function CRMComercial() {
       <KpisComerciales prospectos={prospectos} historial={historial} />
 
       <AlertasSeguimiento prospectos={prospectos} onEditar={editarDesdeKanban} />
+
+      <TareasRecordatorios
+        prospectos={prospectos}
+        onEditar={editarDesdeKanban}
+        onReprogramar={reprogramarSeguimiento}
+      />
 
       {vista === "kanban" && (
         <KanbanBoard
