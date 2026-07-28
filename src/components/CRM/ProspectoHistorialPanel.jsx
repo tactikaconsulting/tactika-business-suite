@@ -16,7 +16,15 @@ function estadoLabel(valor) {
   return valor || "Sin estado";
 }
 
-export default function ProspectoHistorialPanel({ prospecto, historial, onCerrar }) {
+const tipoInteraccion = {
+  llamada: "Llamada",
+  whatsapp: "WhatsApp",
+  correo: "Correo",
+  reunion: "Reunion",
+  nota: "Nota interna",
+};
+
+export default function ProspectoHistorialPanel({ prospecto, historial, interacciones = [], onCerrar }) {
   const eventosEstado = historial
     .filter((h) => h.prospectoId === prospecto.id)
     .map((h) => ({
@@ -25,6 +33,16 @@ export default function ProspectoHistorialPanel({ prospecto, historial, onCerrar
       titulo: `${estadoLabel(h.estadoAnterior)} -> ${estadoLabel(h.estadoNuevo)}`,
       detalle: "Movimiento registrado en el pipeline comercial.",
       fecha: h.fecha,
+    }));
+
+  const eventosInteraccion = interacciones
+    .filter((i) => i.prospectoId === prospecto.id)
+    .map((i) => ({
+      id: i.id,
+      tipo: tipoInteraccion[i.tipo] || "Interaccion",
+      titulo: i.titulo,
+      detalle: [i.resultado, i.detalle].filter(Boolean).join(" · "),
+      fecha: i.fechaInteraccion,
     }));
 
   const eventos = [
@@ -36,6 +54,7 @@ export default function ProspectoHistorialPanel({ prospecto, historial, onCerrar
       fecha: prospecto.createdAt,
     },
     ...eventosEstado,
+    ...eventosInteraccion,
   ].sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 
   return (

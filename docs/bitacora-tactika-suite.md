@@ -190,6 +190,34 @@ Proximo paso sugerido:
 
 - Registrar interacciones comerciales: llamada, correo, WhatsApp, reunion y nota interna.
 
+### 2026-07-28 - Registro de interacciones comerciales
+
+Objetivo:
+
+- Permitir registrar interacciones vinculadas a cada prospecto.
+- Incluir llamadas, WhatsApp, correos, reuniones y notas internas.
+- Mostrar estas interacciones dentro del historial comercial del prospecto.
+
+Resultado:
+
+- Se agrego el formulario "Registrar interaccion" en el CRM.
+- Se creo el servicio `InteraccionComercialService`.
+- Se agrego la migracion SQL para la tabla `prospecto_interacciones`.
+- El historial del prospecto ahora mezcla cambios de estado e interacciones comerciales en una linea de tiempo.
+
+Archivos modificados:
+
+- `src/components/CRM/RegistrarInteraccion.jsx`
+- `src/components/CRM/ProspectoHistorialPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `src/services/InteraccionComercialService.js`
+- `supabase/migrations/202607280001_prospecto_interacciones.sql`
+- `docs/bitacora-tactika-suite.md`
+
+Nota operativa:
+
+- Antes de usar esta funcion en produccion, ejecutar la migracion SQL en Supabase.
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

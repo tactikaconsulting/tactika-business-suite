@@ -12,6 +12,7 @@ import KpisComerciales from "../components/CRM/KpisComerciales";
 import ProspectoHistorialPanel from "../components/CRM/ProspectoHistorialPanel";
 import TareasRecordatorios from "../components/CRM/TareasRecordatorios";
 import PlantillasMensajes from "../components/CRM/PlantillasMensajes";
+import RegistrarInteraccion from "../components/CRM/RegistrarInteraccion";
 
 import {
   obtenerProspectos,
@@ -22,6 +23,10 @@ import {
   obtenerHistorial,
   convertirProspectoACliente,
 } from "../services/ProspectoService";
+import {
+  crearInteraccionComercial,
+  obtenerInteraccionesComerciales,
+} from "../services/InteraccionComercialService";
 
 const columnasImportacion = [
   { clave: "empresa", etiqueta: "Empresa", requerido: true },
@@ -40,23 +45,27 @@ const columnasImportacion = [
 export default function CRMComercial() {
   const [prospectos, setProspectos] = useState([]);
   const [historial, setHistorial] = useState([]);
+  const [interacciones, setInteracciones] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [vista, setVista] = useState("kanban");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
+  const [mostrarInteraccion, setMostrarInteraccion] = useState(false);
 
   useEffect(() => {
     cargar();
   }, []);
 
   async function cargar() {
-    const [dataProspectos, dataHistorial] = await Promise.all([
+    const [dataProspectos, dataHistorial, dataInteracciones] = await Promise.all([
       obtenerProspectos(),
       obtenerHistorial(),
+      obtenerInteraccionesComerciales(),
     ]);
     setProspectos(dataProspectos);
     setHistorial(dataHistorial);
+    setInteracciones(dataInteracciones);
   }
 
   async function guardar(datos) {
@@ -157,6 +166,28 @@ export default function CRMComercial() {
     }
   }
 
+  async function guardarInteraccion(interaccion) {
+    try {
+      await crearInteraccionComercial(interaccion);
+      await cargar();
+      setMostrarInteraccion(false);
+
+      Swal.fire({
+        icon: "success",
+        title: "Interaccion registrada",
+        text: "Quedo guardada en el historial comercial del prospecto.",
+        timer: 1700,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo guardar",
+        text: error.message || "Revisa que la tabla prospecto_interacciones exista en Supabase.",
+      });
+    }
+  }
+
   function eliminar(id) {
     Swal.fire({
       title: "¿Eliminar prospecto?",
@@ -226,6 +257,13 @@ export default function CRMComercial() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMostrarInteraccion(true)}
+            className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
+          >
+            Registrar interaccion
+          </button>
+
           <button
             onClick={() => setMostrarPlantillas(true)}
             className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
@@ -316,10 +354,19 @@ export default function CRMComercial() {
         />
       )}
 
+      {mostrarInteraccion && (
+        <RegistrarInteraccion
+          prospectos={prospectos}
+          onGuardar={guardarInteraccion}
+          onCerrar={() => setMostrarInteraccion(false)}
+        />
+      )}
+
       {prospectoHistorial && (
         <ProspectoHistorialPanel
           prospecto={prospectoHistorial}
           historial={historial}
+          interacciones={interacciones}
           onCerrar={() => setProspectoHistorial(null)}
         />
       )}
