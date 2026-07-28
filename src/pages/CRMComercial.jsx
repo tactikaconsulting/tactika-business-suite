@@ -275,6 +275,16 @@ export default function CRMComercial() {
     }
   }
 
+  async function cambiarEstadoRapido(prospecto, estadoNuevo) {
+    if (!prospecto || prospecto.estado === estadoNuevo) return;
+
+    setProspectoResumen((actual) =>
+      actual?.id === prospecto.id ? { ...actual, estado: estadoNuevo } : actual
+    );
+
+    await moverEnKanban(prospecto.id, prospecto.estado, estadoNuevo);
+  }
+
   const tabs = [
     { id: "kanban", label: "Kanban" },
     { id: "lista", label: "Lista" },
@@ -431,6 +441,7 @@ export default function CRMComercial() {
             abrirPlantillas(prospecto);
           }}
           onReprogramar={reprogramarSeguimiento}
+          onCambiarEstadoRapido={cambiarEstadoRapido}
         />
       )}
     </div>

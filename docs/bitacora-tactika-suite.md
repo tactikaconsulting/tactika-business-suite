@@ -268,6 +268,32 @@ Archivos modificados:
 - `src/components/CRM/RegistrarInteraccion.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Acciones rapidas desde ficha lateral
+
+Objetivo:
+
+- Permitir avanzar un prospecto desde la ficha lateral sin abrir el formulario completo.
+- Reducir pasos operativos en el CRM comercial.
+- Mantener el pipeline actualizado desde una vista ejecutiva.
+
+Resultado:
+
+- Se agrego una seccion "Acciones rapidas" en la ficha lateral del prospecto.
+- Las acciones disponibles permiten:
+  - Marcar como contactado.
+  - Agendar diagnostico.
+  - Marcar propuesta enviada.
+  - Convertir a cliente.
+  - Marcar como perdido.
+- Cada accion actualiza el estado del prospecto usando la misma logica del Kanban.
+- Si se convierte en cliente, se mantiene la conversion automatica existente.
+
+Archivos modificados:
+
+- `src/components/CRM/ProspectoResumenPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

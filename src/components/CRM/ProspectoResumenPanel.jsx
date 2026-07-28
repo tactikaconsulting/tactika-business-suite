@@ -1,5 +1,6 @@
 import {
   CalendarClock,
+  CheckCircle2,
   Edit3,
   FileText,
   History,
@@ -18,6 +19,14 @@ function dato(valor, fallback = "Sin registrar") {
   return valor || fallback;
 }
 
+const accionesEstado = [
+  { estado: "Contactado", label: "Marcar contactado" },
+  { estado: "Diagnóstico Agendado", label: "Agendar diagnostico" },
+  { estado: "Propuesta Enviada", label: "Propuesta enviada" },
+  { estado: "Cliente", label: "Convertir a cliente" },
+  { estado: "Perdido", label: "Marcar perdido" },
+];
+
 export default function ProspectoResumenPanel({
   prospecto,
   interacciones = [],
@@ -27,6 +36,7 @@ export default function ProspectoResumenPanel({
   onRegistrarInteraccion,
   onPlantillas,
   onReprogramar,
+  onCambiarEstadoRapido,
 }) {
   const ultimasInteracciones = interacciones
     .filter((i) => i.prospectoId === prospecto.id)
@@ -135,6 +145,35 @@ export default function ProspectoResumenPanel({
               <Edit3 size={16} />
               Editar
             </button>
+          </div>
+
+          <div className="border border-slate-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <CheckCircle2 size={16} className="text-slate-500" />
+              <h3 className="text-sm font-bold text-slate-700">Acciones rapidas</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {accionesEstado.map((accion) => {
+                const activo = prospecto.estado === accion.estado;
+                return (
+                  <button
+                    key={accion.estado}
+                    onClick={() => onCambiarEstadoRapido(prospecto, accion.estado)}
+                    disabled={activo}
+                    className={`px-3 py-2 rounded-lg border text-left text-xs font-semibold transition ${
+                      activo
+                        ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {accion.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-slate-400 mt-3">
+              Estas acciones actualizan el estado del prospecto en el pipeline.
+            </p>
           </div>
 
           <div className="border border-slate-200 rounded-lg p-4">
