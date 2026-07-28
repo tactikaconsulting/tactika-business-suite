@@ -483,6 +483,34 @@ Archivos modificados:
 - `src/components/CRM/KanbanBoard.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Agente de venta conectado al CRM
+
+Objetivo:
+
+- Automatizar la captura de prospectos desde la landing page.
+- Hacer que el agente de venta registre interesados directamente en el CRM.
+- Mantener una version segura, sin envios masivos ni cierre automatico de ventas.
+
+Resultado:
+
+- Se fortalecio la funcion `agente-venta`.
+- El agente ahora solo registra un prospecto cuando tiene empresa, dato de contacto y autorizacion del visitante.
+- Se evita duplicar prospectos buscando coincidencias por correo o telefono.
+- Si el prospecto ya existe, se actualiza su ficha en vez de crear otro registro.
+- Se programa seguimiento para el dia siguiente cuando el prospecto viene desde la landing.
+- Se registra una interaccion comercial con resumen de la conversacion.
+- La landing muestra confirmacion cuando los datos fueron registrados.
+
+Archivos modificados:
+
+- `supabase/functions/agente-venta/index.ts`
+- `/Users/claudioandresurrairarrazabal/Downloads/tactika-landing-repo/index.html`
+- `docs/bitacora-tactika-suite.md`
+
+Nota operativa:
+
+- Para activar esta mejora en produccion, desplegar nuevamente la funcion Supabase `agente-venta` y publicar la landing.
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
