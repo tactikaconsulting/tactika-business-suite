@@ -60,7 +60,7 @@ export default function CRMComercial() {
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [prospectoResumen, setProspectoResumen] = useState(null);
   const [prospectoAccionId, setProspectoAccionId] = useState(null);
-  const [vista, setVista] = useState("kanban");
+  const [vista, setVista] = useState("pipeline");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
   const [mostrarInteraccion, setMostrarInteraccion] = useState(false);
@@ -244,7 +244,7 @@ export default function CRMComercial() {
   function editarDesdeKanban(prospecto) {
     setProspectoResumen(null);
     setProspectoEditar(prospecto);
-    setVista("lista");
+    setVista("pipeline");
   }
 
   function abrirInteraccion(prospecto) {
@@ -375,8 +375,9 @@ export default function CRMComercial() {
   }
 
   const tabs = [
-    { id: "kanban", label: "Kanban" },
-    { id: "lista", label: "Lista" },
+    { id: "pipeline", label: "Pipeline" },
+    { id: "tareas", label: "Tareas" },
+    { id: "propuestas", label: "Propuestas" },
     { id: "dashboard", label: "Dashboard" },
   ];
 
@@ -438,36 +439,23 @@ export default function CRMComercial() {
         </div>
       </div>
 
-      <KpisComerciales prospectos={prospectos} historial={historial} />
-
-      <AlertasSeguimiento prospectos={prospectos} onEditar={editarDesdeKanban} />
-
-      <TareasRecordatorios
-        prospectos={prospectos}
-        onEditar={editarDesdeKanban}
-        onReprogramar={reprogramarSeguimiento}
-      />
-
-      <SeguimientoPropuestas
-        propuestas={propuestas}
-        prospectos={prospectos}
-        onActualizarEstado={actualizarEstadoPropuesta}
-        onDescargarPDF={descargarPropuestaPDF}
-        onRegistrarSeguimiento={abrirInteraccion}
-        onAbrirProspecto={setProspectoResumen}
-      />
-
-      {vista === "kanban" && (
-        <KanbanBoard
-          prospectos={prospectos}
-          onCambiarEstado={moverEnKanban}
-          onEditar={setProspectoResumen}
-          onVerHistorial={setProspectoHistorial}
-        />
-      )}
-
-      {vista === "lista" && (
-        <>
+      {vista === "pipeline" && (
+        <div className="space-y-6">
+          <KpisComerciales prospectos={prospectos} historial={historial} />
+          <AlertasSeguimiento prospectos={prospectos} onEditar={editarDesdeKanban} />
+          <KanbanBoard
+            prospectos={prospectos}
+            onCambiarEstado={moverEnKanban}
+            onEditar={setProspectoResumen}
+            onVerHistorial={setProspectoHistorial}
+          />
+          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-700">Lista de prospectos</h3>
+              <p className="text-sm text-slate-400 mt-1">
+                Gestion operativa y edicion completa de prospectos.
+              </p>
+            </div>
           <ProspectoForm
             onGuardar={guardar}
             prospectoEditar={prospectoEditar}
@@ -479,11 +467,36 @@ export default function CRMComercial() {
             onEliminar={eliminar}
             onVerHistorial={setProspectoHistorial}
           />
-        </>
+          </div>
+        </div>
+      )}
+
+      {vista === "tareas" && (
+        <div className="space-y-6">
+          <TareasRecordatorios
+            prospectos={prospectos}
+            onEditar={editarDesdeKanban}
+            onReprogramar={reprogramarSeguimiento}
+          />
+        </div>
+      )}
+
+      {vista === "propuestas" && (
+        <SeguimientoPropuestas
+          propuestas={propuestas}
+          prospectos={prospectos}
+          onActualizarEstado={actualizarEstadoPropuesta}
+          onDescargarPDF={descargarPropuestaPDF}
+          onRegistrarSeguimiento={abrirInteraccion}
+          onAbrirProspecto={setProspectoResumen}
+        />
       )}
 
       {vista === "dashboard" && (
-        <DashboardComercial prospectos={prospectos} historial={historial} />
+        <div className="space-y-6">
+          <KpisComerciales prospectos={prospectos} historial={historial} />
+          <DashboardComercial prospectos={prospectos} historial={historial} />
+        </div>
       )}
 
       {mostrarEnriquecimiento && (

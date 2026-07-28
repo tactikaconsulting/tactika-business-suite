@@ -404,6 +404,32 @@ Archivos modificados:
 - `src/services/PropuestaComercialService.js`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - CRM ordenado por secciones
+
+Objetivo:
+
+- Evitar que la pantalla del CRM quede saturada con demasiada informacion apilada.
+- Separar las funciones principales por area de trabajo.
+- Mejorar la experiencia de uso diaria del CRM.
+
+Resultado:
+
+- Se reorganizo el CRM en pestañas principales:
+  - Pipeline.
+  - Tareas.
+  - Propuestas.
+  - Dashboard.
+- La vista Pipeline concentra KPIs, alertas, Kanban y lista operativa de prospectos.
+- La vista Tareas concentra seguimientos y recordatorios.
+- La vista Propuestas concentra el control de propuestas comerciales.
+- La vista Dashboard queda enfocada en indicadores y analisis.
+- No se cambio la base de datos ni la logica comercial existente.
+
+Archivos modificados:
+
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
