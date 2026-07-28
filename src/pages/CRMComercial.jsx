@@ -8,6 +8,7 @@ import DashboardComercial from "../components/CRM/DashboardComercial";
 import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
 import ImportarArchivo from "../components/Shared/ImportarArchivo";
 import EnriquecimientoProspectos from "../components/CRM/EnriquecimientoProspectos";
+import KpisComerciales from "../components/CRM/KpisComerciales";
 
 import {
   obtenerProspectos,
@@ -225,6 +226,8 @@ export default function CRMComercial() {
           </div>
         </div>
       </div>
+
+      <KpisComerciales prospectos={prospectos} historial={historial} />
 
       <AlertasSeguimiento prospectos={prospectos} onEditar={editarDesdeKanban} />
 
