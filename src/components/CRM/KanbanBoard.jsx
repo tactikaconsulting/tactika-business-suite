@@ -24,49 +24,60 @@ export default function KanbanBoard({ prospectos, onCambiarEstado, onEditar, onV
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {columnas.map((col) => {
-          const items = prospectos.filter((p) => p.estado === col.estado);
+      <div className="bg-white border border-slate-200 rounded-xl p-4">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-700">Pipeline comercial</h3>
+            <p className="text-sm text-slate-400 mt-1">
+              Arrastra las tarjetas para avanzar cada oportunidad.
+            </p>
+          </div>
+        </div>
 
-          return (
-            <div key={col.estado} className="flex-shrink-0 w-72">
-              <div className={`bg-white rounded-t-lg border-t-4 ${col.color} border-x border-slate-200 p-3`}>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-700">{col.estado}</h3>
-                  <span className="text-xs bg-slate-100 text-slate-500 rounded-full px-2 py-0.5 font-mono">
-                    {items.length}
-                  </span>
-                </div>
-              </div>
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {columnas.map((col) => {
+            const items = prospectos.filter((p) => p.estado === col.estado);
 
-              <Droppable droppableId={col.estado}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className={`border-x border-b border-slate-200 rounded-b-lg p-3 min-h-[120px] ${
-                      snapshot.isDraggingOver ? "bg-blue-50" : "bg-slate-50"
-                    }`}
-                  >
-                    {items.length === 0 && !snapshot.isDraggingOver && (
-                      <p className="text-xs text-slate-300 text-center py-4">Sin prospectos</p>
-                    )}
-                    {items.map((p, index) => (
-                      <KanbanCard
-                        key={p.id}
-                        prospecto={p}
-                        index={index}
-                        onClick={onEditar}
-                        onVerHistorial={onVerHistorial}
-                      />
-                    ))}
-                    {provided.placeholder}
+            return (
+              <div key={col.estado} className="flex-shrink-0 w-72">
+                <div className={`bg-white rounded-t-lg border-t-4 ${col.color} border-x border-slate-200 p-3`}>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-slate-700">{col.estado}</h3>
+                    <span className="text-xs bg-slate-100 text-slate-500 rounded-full px-2 py-0.5 font-mono">
+                      {items.length}
+                    </span>
                   </div>
-                )}
-              </Droppable>
-            </div>
-          );
-        })}
+                </div>
+
+                <Droppable droppableId={col.estado}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`border-x border-b border-slate-200 rounded-b-lg p-3 min-h-[120px] ${
+                        snapshot.isDraggingOver ? "bg-blue-50" : "bg-slate-50"
+                      }`}
+                    >
+                      {items.length === 0 && !snapshot.isDraggingOver && (
+                        <p className="text-xs text-slate-300 text-center py-4">Sin prospectos</p>
+                      )}
+                      {items.map((p, index) => (
+                        <KanbanCard
+                          key={p.id}
+                          prospecto={p}
+                          index={index}
+                          onClick={onEditar}
+                          onVerHistorial={onVerHistorial}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </DragDropContext>
   );

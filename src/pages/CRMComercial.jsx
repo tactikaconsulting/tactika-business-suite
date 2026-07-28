@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FileText, MessageSquareText, Search, Sparkles } from "lucide-react";
 import Swal from "sweetalert2";
 
 import ProspectoForm from "../components/CRM/ProspectoForm";
@@ -385,53 +386,67 @@ export default function CRMComercial() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800">CRM Comercial</h1>
-          <p className="text-slate-500 mt-1">Prospección y seguimiento comercial de nuevos clientes.</p>
+      <section className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-5 flex-wrap">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase text-blue-600">Tactika Suite</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mt-1">CRM Comercial</h1>
+            <p className="text-sm text-slate-500 mt-1 max-w-2xl">
+              Prospeccion, seguimiento, propuestas y cierre comercial desde un solo lugar.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-start md:justify-end gap-2 w-full lg:w-auto">
+            <button
+              onClick={() => {
+                setProspectoAccionId(null);
+                setMostrarInteraccion(true);
+              }}
+              className="min-h-10 px-3.5 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition flex items-center gap-2"
+            >
+              <MessageSquareText size={16} />
+              Registrar interaccion
+            </button>
+
+            <button
+              onClick={() => {
+                setProspectoAccionId(null);
+                setMostrarPlantillas(true);
+              }}
+              className="min-h-10 px-3.5 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition flex items-center gap-2"
+            >
+              <FileText size={16} />
+              Plantillas
+            </button>
+
+            <button
+              onClick={() => setMostrarEnriquecimiento(true)}
+              className="min-h-10 px-3.5 py-2 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-2"
+            >
+              <Search size={16} />
+              Enriquecer
+            </button>
+
+            <div className="min-h-10">
+              <ImportarArchivo
+                columnas={columnasImportacion}
+                onImportar={importarProspectos}
+                nombreEntidad="prospectos"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              setProspectoAccionId(null);
-              setMostrarInteraccion(true);
-            }}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
-          >
-            Registrar interaccion
-          </button>
-
-          <button
-            onClick={() => {
-              setProspectoAccionId(null);
-              setMostrarPlantillas(true);
-            }}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
-          >
-            Plantillas
-          </button>
-
-          <button
-            onClick={() => setMostrarEnriquecimiento(true)}
-            className="px-4 py-2.5 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
-          >
-            Enriquecer prospectos
-          </button>
-
-          <ImportarArchivo
-            columnas={columnasImportacion}
-            onImportar={importarProspectos}
-            nombreEntidad="prospectos"
-          />
-
-          <div className="bg-white border border-slate-200 rounded-lg p-1 flex gap-1">
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-1 flex gap-1 overflow-x-auto">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setVista(t.id)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                  vista === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:bg-slate-50"
+                className={`min-h-9 px-4 py-2 rounded-md text-sm font-semibold transition whitespace-nowrap ${
+                  vista === t.id
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-slate-500 hover:bg-white hover:text-slate-800"
                 }`}
               >
                 {t.label}
@@ -439,7 +454,7 @@ export default function CRMComercial() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {vista === "inicio" && (
         <InicioCRM
@@ -464,22 +479,25 @@ export default function CRMComercial() {
           />
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
             <div>
-              <h3 className="text-sm font-bold text-slate-700">Lista de prospectos</h3>
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-slate-500" />
+                <h3 className="text-sm font-bold text-slate-700">Lista de prospectos</h3>
+              </div>
               <p className="text-sm text-slate-400 mt-1">
                 Gestion operativa y edicion completa de prospectos.
               </p>
             </div>
-          <ProspectoForm
-            onGuardar={guardar}
-            prospectoEditar={prospectoEditar}
-            onCancelar={() => setProspectoEditar(null)}
-          />
-          <ProspectoTable
-            prospectos={prospectos}
-            onEditar={setProspectoEditar}
-            onEliminar={eliminar}
-            onVerHistorial={setProspectoHistorial}
-          />
+            <ProspectoForm
+              onGuardar={guardar}
+              prospectoEditar={prospectoEditar}
+              onCancelar={() => setProspectoEditar(null)}
+            />
+            <ProspectoTable
+              prospectos={prospectos}
+              onEditar={setProspectoEditar}
+              onEliminar={eliminar}
+              onVerHistorial={setProspectoHistorial}
+            />
           </div>
         </div>
       )}

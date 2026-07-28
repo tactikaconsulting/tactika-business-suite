@@ -459,6 +459,30 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Pulido visual del CRM
+
+Objetivo:
+
+- Mejorar la presentacion general del CRM para uso diario y demostraciones comerciales.
+- Evitar que botones, pestañas y secciones se vean apretadas.
+- Mejorar respuesta visual en pantallas pequenas.
+
+Resultado:
+
+- Se rediseño el encabezado del CRM como bloque principal con titulo, descripcion, acciones y pestañas.
+- Los botones superiores ahora tienen iconos, mejor altura y distribucion responsiva.
+- Las pestañas principales quedaron en una barra horizontal con scroll cuando sea necesario.
+- El inicio CRM ajusta mejor sus tarjetas, textos y botones en desktop y movil.
+- El Kanban ahora vive dentro de un contenedor con titulo y descripcion, para verse mas profesional.
+- Se corrigio la estructura visual de la seccion Lista de prospectos.
+
+Archivos modificados:
+
+- `src/pages/CRMComercial.jsx`
+- `src/components/CRM/InicioCRM.jsx`
+- `src/components/CRM/KanbanBoard.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
