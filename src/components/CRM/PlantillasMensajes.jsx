@@ -50,8 +50,8 @@ function crearWhatsAppUrl(prospecto, mensaje) {
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 }
 
-export default function PlantillasMensajes({ prospectos, onCerrar }) {
-  const [prospectoId, setProspectoId] = useState(prospectos[0]?.id || "");
+export default function PlantillasMensajes({ prospectos, prospectoInicialId, onCerrar }) {
+  const [prospectoId, setProspectoId] = useState(prospectoInicialId || prospectos[0]?.id || "");
   const [plantillaId, setPlantillaId] = useState("primer-contacto");
   const [canal, setCanal] = useState("whatsapp");
 

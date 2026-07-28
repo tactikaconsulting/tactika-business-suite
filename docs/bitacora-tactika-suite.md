@@ -240,6 +240,34 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Mini ficha lateral del prospecto
+
+Objetivo:
+
+- Abrir una ficha rapida al hacer clic en una tarjeta del Kanban.
+- Evitar que el usuario tenga que ir directo al formulario de edicion.
+- Centralizar acciones comerciales desde una vista lateral.
+
+Resultado:
+
+- Se agrego el panel `ProspectoResumenPanel`.
+- La tarjeta del Kanban ahora abre la ficha del prospecto.
+- La ficha muestra contacto, estado, indice Tactika, valor estimado, probabilidad, proximo seguimiento, ultimas interacciones y observaciones.
+- La ficha permite ejecutar acciones rapidas:
+  - Registrar interaccion.
+  - Abrir plantillas.
+  - Ver historial.
+  - Editar prospecto.
+  - Reprogramar seguimiento.
+
+Archivos modificados:
+
+- `src/components/CRM/ProspectoResumenPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `src/components/CRM/PlantillasMensajes.jsx`
+- `src/components/CRM/RegistrarInteraccion.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

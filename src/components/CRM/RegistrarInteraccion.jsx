@@ -31,8 +31,8 @@ function sumarDias(dias) {
   return fecha.toISOString().slice(0, 10);
 }
 
-export default function RegistrarInteraccion({ prospectos, onGuardar, onCerrar }) {
-  const [prospectoId, setProspectoId] = useState(prospectos[0]?.id || "");
+export default function RegistrarInteraccion({ prospectos, prospectoInicialId, onGuardar, onCerrar }) {
+  const [prospectoId, setProspectoId] = useState(prospectoInicialId || prospectos[0]?.id || "");
   const [tipo, setTipo] = useState("llamada");
   const [titulo, setTitulo] = useState(titulosPorTipo.llamada);
   const [resultado, setResultado] = useState("");

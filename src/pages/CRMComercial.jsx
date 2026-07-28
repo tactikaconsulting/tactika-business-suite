@@ -13,6 +13,7 @@ import ProspectoHistorialPanel from "../components/CRM/ProspectoHistorialPanel";
 import TareasRecordatorios from "../components/CRM/TareasRecordatorios";
 import PlantillasMensajes from "../components/CRM/PlantillasMensajes";
 import RegistrarInteraccion from "../components/CRM/RegistrarInteraccion";
+import ProspectoResumenPanel from "../components/CRM/ProspectoResumenPanel";
 
 import {
   obtenerProspectos,
@@ -48,6 +49,8 @@ export default function CRMComercial() {
   const [interacciones, setInteracciones] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
+  const [prospectoResumen, setProspectoResumen] = useState(null);
+  const [prospectoAccionId, setProspectoAccionId] = useState(null);
   const [vista, setVista] = useState("kanban");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
@@ -227,8 +230,19 @@ export default function CRMComercial() {
   }
 
   function editarDesdeKanban(prospecto) {
+    setProspectoResumen(null);
     setProspectoEditar(prospecto);
     setVista("lista");
+  }
+
+  function abrirInteraccion(prospecto) {
+    setProspectoAccionId(prospecto.id);
+    setMostrarInteraccion(true);
+  }
+
+  function abrirPlantillas(prospecto) {
+    setProspectoAccionId(prospecto.id);
+    setMostrarPlantillas(true);
   }
 
   async function moverEnKanban(id, estadoAnterior, estadoNuevo) {
@@ -277,14 +291,20 @@ export default function CRMComercial() {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setMostrarInteraccion(true)}
+            onClick={() => {
+              setProspectoAccionId(null);
+              setMostrarInteraccion(true);
+            }}
             className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
           >
             Registrar interaccion
           </button>
 
           <button
-            onClick={() => setMostrarPlantillas(true)}
+            onClick={() => {
+              setProspectoAccionId(null);
+              setMostrarPlantillas(true);
+            }}
             className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
           >
             Plantillas
@@ -333,7 +353,7 @@ export default function CRMComercial() {
         <KanbanBoard
           prospectos={prospectos}
           onCambiarEstado={moverEnKanban}
-          onEditar={editarDesdeKanban}
+          onEditar={setProspectoResumen}
           onVerHistorial={setProspectoHistorial}
         />
       )}
@@ -369,6 +389,7 @@ export default function CRMComercial() {
       {mostrarPlantillas && (
         <PlantillasMensajes
           prospectos={prospectos}
+          prospectoInicialId={prospectoAccionId}
           onCerrar={() => setMostrarPlantillas(false)}
         />
       )}
@@ -376,6 +397,7 @@ export default function CRMComercial() {
       {mostrarInteraccion && (
         <RegistrarInteraccion
           prospectos={prospectos}
+          prospectoInicialId={prospectoAccionId}
           onGuardar={guardarInteraccion}
           onCerrar={() => setMostrarInteraccion(false)}
         />
@@ -387,6 +409,28 @@ export default function CRMComercial() {
           historial={historial}
           interacciones={interacciones}
           onCerrar={() => setProspectoHistorial(null)}
+        />
+      )}
+
+      {prospectoResumen && (
+        <ProspectoResumenPanel
+          prospecto={prospectoResumen}
+          interacciones={interacciones}
+          onCerrar={() => setProspectoResumen(null)}
+          onEditar={editarDesdeKanban}
+          onVerHistorial={(prospecto) => {
+            setProspectoResumen(null);
+            setProspectoHistorial(prospecto);
+          }}
+          onRegistrarInteraccion={(prospecto) => {
+            setProspectoResumen(null);
+            abrirInteraccion(prospecto);
+          }}
+          onPlantillas={(prospecto) => {
+            setProspectoResumen(null);
+            abrirPlantillas(prospecto);
+          }}
+          onReprogramar={reprogramarSeguimiento}
         />
       )}
     </div>
