@@ -430,6 +430,35 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Inicio ejecutivo del CRM
+
+Objetivo:
+
+- Crear una vista inicial para comenzar el trabajo comercial del dia.
+- Mostrar prioridades sin obligar al usuario a revisar todas las pestañas.
+- Convertir el CRM en una herramienta de gestion diaria.
+
+Resultado:
+
+- Se agrego la pestaña "Inicio" como primera vista del CRM.
+- El inicio muestra:
+  - Pipeline activo.
+  - Seguimientos vencidos.
+  - Monto de propuestas enviadas.
+  - Propuestas sin respuesta.
+  - Prospectos prioritarios.
+  - Seguimientos vencidos o para hoy.
+  - Propuestas pendientes.
+  - Oportunidades de mayor valor.
+- Desde Inicio se puede abrir ficha, registrar interaccion, crear propuesta o navegar a Pipeline, Tareas y Propuestas.
+- No se agregaron tablas ni cambios en Supabase.
+
+Archivos modificados:
+
+- `src/components/CRM/InicioCRM.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

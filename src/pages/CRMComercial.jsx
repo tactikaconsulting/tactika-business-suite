@@ -16,6 +16,7 @@ import RegistrarInteraccion from "../components/CRM/RegistrarInteraccion";
 import ProspectoResumenPanel from "../components/CRM/ProspectoResumenPanel";
 import CrearPropuestaComercial from "../components/CRM/CrearPropuestaComercial";
 import SeguimientoPropuestas from "../components/CRM/SeguimientoPropuestas";
+import InicioCRM from "../components/CRM/InicioCRM";
 
 import {
   obtenerProspectos,
@@ -60,7 +61,7 @@ export default function CRMComercial() {
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [prospectoResumen, setProspectoResumen] = useState(null);
   const [prospectoAccionId, setProspectoAccionId] = useState(null);
-  const [vista, setVista] = useState("pipeline");
+  const [vista, setVista] = useState("inicio");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
   const [mostrarInteraccion, setMostrarInteraccion] = useState(false);
@@ -375,6 +376,7 @@ export default function CRMComercial() {
   }
 
   const tabs = [
+    { id: "inicio", label: "Inicio" },
     { id: "pipeline", label: "Pipeline" },
     { id: "tareas", label: "Tareas" },
     { id: "propuestas", label: "Propuestas" },
@@ -438,6 +440,17 @@ export default function CRMComercial() {
           </div>
         </div>
       </div>
+
+      {vista === "inicio" && (
+        <InicioCRM
+          prospectos={prospectos}
+          propuestas={propuestas}
+          onAbrirProspecto={setProspectoResumen}
+          onRegistrarInteraccion={abrirInteraccion}
+          onCrearPropuesta={abrirPropuesta}
+          onIrA={setVista}
+        />
+      )}
 
       {vista === "pipeline" && (
         <div className="space-y-6">
