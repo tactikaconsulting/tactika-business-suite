@@ -9,6 +9,7 @@ import AlertasSeguimiento from "../components/CRM/AlertasSeguimiento";
 import ImportarArchivo from "../components/Shared/ImportarArchivo";
 import EnriquecimientoProspectos from "../components/CRM/EnriquecimientoProspectos";
 import KpisComerciales from "../components/CRM/KpisComerciales";
+import ProspectoHistorialPanel from "../components/CRM/ProspectoHistorialPanel";
 
 import {
   obtenerProspectos,
@@ -38,6 +39,7 @@ export default function CRMComercial() {
   const [prospectos, setProspectos] = useState([]);
   const [historial, setHistorial] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
+  const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [vista, setVista] = useState("kanban");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
 
@@ -58,6 +60,9 @@ export default function CRMComercial() {
     try {
       if (prospectoEditar) {
         await actualizarProspecto(prospectoEditar.id, datos);
+        if (datos.estado !== prospectoEditar.estado) {
+          await cambiarEstadoProspecto(prospectoEditar.id, prospectoEditar.estado, datos.estado);
+        }
         if (datos.estado === "Cliente" && !prospectoEditar.clienteId) {
           await convertirProspectoACliente({ ...datos, id: prospectoEditar.id });
         }
@@ -236,6 +241,7 @@ export default function CRMComercial() {
           prospectos={prospectos}
           onCambiarEstado={moverEnKanban}
           onEditar={editarDesdeKanban}
+          onVerHistorial={setProspectoHistorial}
         />
       )}
 
@@ -250,6 +256,7 @@ export default function CRMComercial() {
             prospectos={prospectos}
             onEditar={setProspectoEditar}
             onEliminar={eliminar}
+            onVerHistorial={setProspectoHistorial}
           />
         </>
       )}
@@ -263,6 +270,14 @@ export default function CRMComercial() {
           prospectos={prospectos}
           onGuardar={guardarEnriquecimiento}
           onCerrar={() => setMostrarEnriquecimiento(false)}
+        />
+      )}
+
+      {prospectoHistorial && (
+        <ProspectoHistorialPanel
+          prospecto={prospectoHistorial}
+          historial={historial}
+          onCerrar={() => setProspectoHistorial(null)}
         />
       )}
     </div>

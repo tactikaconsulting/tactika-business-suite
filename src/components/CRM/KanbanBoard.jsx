@@ -12,7 +12,7 @@ const columnas = [
   { estado: "Perdido", color: "border-t-red-400" },
 ];
 
-export default function KanbanBoard({ prospectos, onCambiarEstado, onEditar }) {
+export default function KanbanBoard({ prospectos, onCambiarEstado, onEditar, onVerHistorial }) {
   function handleDragEnd(result) {
     const { source, destination, draggableId } = result;
 
@@ -52,7 +52,13 @@ export default function KanbanBoard({ prospectos, onCambiarEstado, onEditar }) {
                       <p className="text-xs text-slate-300 text-center py-4">Sin prospectos</p>
                     )}
                     {items.map((p, index) => (
-                      <KanbanCard key={p.id} prospecto={p} index={index} onClick={onEditar} />
+                      <KanbanCard
+                        key={p.id}
+                        prospecto={p}
+                        index={index}
+                        onClick={onEditar}
+                        onVerHistorial={onVerHistorial}
+                      />
                     ))}
                     {provided.placeholder}
                   </div>

@@ -1,7 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import IndiceTactikaBadge from "./IndiceTactikaBadge";
 
-export default function KanbanCard({ prospecto, index, onClick }) {
+export default function KanbanCard({ prospecto, index, onClick, onVerHistorial }) {
   const atrasado =
     prospecto.fechaProximoContacto &&
     new Date(prospecto.fechaProximoContacto) < new Date() &&
@@ -44,8 +44,21 @@ export default function KanbanCard({ prospecto, index, onClick }) {
 
           {prospecto.fechaProximoContacto && (
             <div className={`mt-2 text-xs font-medium ${atrasado ? "text-red-600" : "text-slate-400"}`}>
-              {atrasado ? "⚠ Atrasado" : "Próximo contacto"}: {prospecto.fechaProximoContacto}
+              {atrasado ? "Atrasado" : "Próximo contacto"}: {prospecto.fechaProximoContacto}
             </div>
+          )}
+
+          {onVerHistorial && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onVerHistorial(prospecto);
+              }}
+              className="mt-3 w-full border border-slate-200 rounded-md py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+            >
+              Ver historial
+            </button>
           )}
 
           {/* Espacio reservado para IA — no activo todavía */}

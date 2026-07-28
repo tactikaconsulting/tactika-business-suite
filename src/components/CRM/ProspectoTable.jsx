@@ -11,7 +11,7 @@ const estadoColor = {
   "Perdido": "bg-red-100 text-red-700",
 };
 
-export default function ProspectoTable({ prospectos, onEditar, onEliminar }) {
+export default function ProspectoTable({ prospectos, onEditar, onEliminar, onVerHistorial }) {
   if (prospectos.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow p-8 text-center text-slate-400">
@@ -56,6 +56,11 @@ export default function ProspectoTable({ prospectos, onEditar, onEliminar }) {
                   ) : "—"}
                 </td>
                 <td className="p-3 text-center space-x-3 whitespace-nowrap">
+                  {onVerHistorial && (
+                    <button onClick={() => onVerHistorial(p)} className="text-slate-600 hover:underline">
+                      Historial
+                    </button>
+                  )}
                   <button onClick={() => onEditar(p)} className="text-blue-600 hover:underline">Editar</button>
                   <button onClick={() => onEliminar(p.id)} className="text-red-600 hover:underline">Eliminar</button>
                 </td>
