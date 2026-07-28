@@ -169,13 +169,32 @@ export default function CRMComercial() {
   async function guardarInteraccion(interaccion) {
     try {
       await crearInteraccionComercial(interaccion);
+      const prospecto = prospectos.find((p) => p.id === interaccion.prospectoId);
+
+      if (prospecto && interaccion.proximoSeguimiento?.fechaProximoContacto) {
+        const notaSeguimiento = [
+          prospecto.observaciones,
+          `Proximo paso sugerido (${new Date().toLocaleDateString("es-CL")}): ${interaccion.proximoSeguimiento.proximoPaso}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+
+        await actualizarProspecto(prospecto.id, {
+          ...prospecto,
+          fechaProximoContacto: interaccion.proximoSeguimiento.fechaProximoContacto,
+          observaciones: notaSeguimiento,
+        });
+      }
+
       await cargar();
       setMostrarInteraccion(false);
 
       Swal.fire({
         icon: "success",
         title: "Interaccion registrada",
-        text: "Quedo guardada en el historial comercial del prospecto.",
+        text: interaccion.proximoSeguimiento
+          ? "Quedo guardada y se actualizo el proximo seguimiento."
+          : "Quedo guardada en el historial comercial del prospecto.",
         timer: 1700,
         showConfirmButton: false,
       });

@@ -17,6 +17,20 @@ const titulosPorTipo = {
   nota: "Nota interna",
 };
 
+const sugerenciasPorTipo = {
+  llamada: { dias: 1, accion: "Realizar seguimiento telefonico" },
+  whatsapp: { dias: 2, accion: "Revisar respuesta por WhatsApp" },
+  correo: { dias: 3, accion: "Hacer seguimiento del correo enviado" },
+  reunion: { dias: 2, accion: "Enviar resumen y siguiente paso" },
+  nota: { dias: 7, accion: "Revisar avance del prospecto" },
+};
+
+function sumarDias(dias) {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha.toISOString().slice(0, 10);
+}
+
 export default function RegistrarInteraccion({ prospectos, onGuardar, onCerrar }) {
   const [prospectoId, setProspectoId] = useState(prospectos[0]?.id || "");
   const [tipo, setTipo] = useState("llamada");
@@ -24,12 +38,19 @@ export default function RegistrarInteraccion({ prospectos, onGuardar, onCerrar }
   const [resultado, setResultado] = useState("");
   const [detalle, setDetalle] = useState("");
   const [fechaInteraccion, setFechaInteraccion] = useState(new Date().toISOString().slice(0, 16));
+  const [actualizarSeguimiento, setActualizarSeguimiento] = useState(true);
+  const [proximoPaso, setProximoPaso] = useState(sugerenciasPorTipo.llamada.accion);
+  const [fechaProximoContacto, setFechaProximoContacto] = useState(
+    sumarDias(sugerenciasPorTipo.llamada.dias)
+  );
 
   const prospecto = prospectos.find((p) => p.id === prospectoId) || prospectos[0];
 
   function cambiarTipo(nuevoTipo) {
     setTipo(nuevoTipo);
     setTitulo(titulosPorTipo[nuevoTipo]);
+    setProximoPaso(sugerenciasPorTipo[nuevoTipo].accion);
+    setFechaProximoContacto(sumarDias(sugerenciasPorTipo[nuevoTipo].dias));
   }
 
   function guardar(e) {
@@ -43,6 +64,12 @@ export default function RegistrarInteraccion({ prospectos, onGuardar, onCerrar }
       resultado,
       detalle,
       fechaInteraccion: new Date(fechaInteraccion).toISOString(),
+      proximoSeguimiento: actualizarSeguimiento
+        ? {
+            fechaProximoContacto,
+            proximoPaso,
+          }
+        : null,
     });
   }
 
@@ -163,6 +190,39 @@ export default function RegistrarInteraccion({ prospectos, onGuardar, onCerrar }
               className="mt-2 w-full border border-slate-200 rounded-lg p-3 text-sm leading-relaxed"
             />
           </label>
+
+          <div className="border border-blue-100 bg-blue-50 rounded-xl p-4 space-y-4">
+            <label className="flex items-center gap-2 text-sm font-semibold text-blue-900">
+              <input
+                type="checkbox"
+                checked={actualizarSeguimiento}
+                onChange={(e) => setActualizarSeguimiento(e.target.checked)}
+              />
+              Actualizar proximo seguimiento del prospecto
+            </label>
+
+            {actualizarSeguimiento && (
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_180px] gap-4">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Proximo paso sugerido</span>
+                  <input
+                    value={proximoPaso}
+                    onChange={(e) => setProximoPaso(e.target.value)}
+                    className="mt-2 w-full border border-blue-200 rounded-lg p-2.5 text-sm bg-white"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Fecha seguimiento</span>
+                  <input
+                    type="date"
+                    value={fechaProximoContacto}
+                    onChange={(e) => setFechaProximoContacto(e.target.value)}
+                    className="mt-2 w-full border border-blue-200 rounded-lg p-2.5 text-sm bg-white"
+                  />
+                </label>
+              </div>
+            )}
+          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <button

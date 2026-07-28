@@ -218,6 +218,28 @@ Nota operativa:
 
 - Antes de usar esta funcion en produccion, ejecutar la migracion SQL en Supabase.
 
+### 2026-07-28 - Proximo paso sugerido
+
+Objetivo:
+
+- Al registrar una interaccion comercial, sugerir automaticamente un siguiente paso.
+- Permitir definir fecha de seguimiento sin obligar al usuario.
+- Actualizar el prospecto para que aparezca en tareas y recordatorios.
+
+Resultado:
+
+- El formulario de interacciones ahora muestra "Proximo paso sugerido".
+- La sugerencia cambia segun el tipo de interaccion: llamada, WhatsApp, correo, reunion o nota.
+- El usuario puede activar o desactivar la actualizacion del seguimiento.
+- Si se confirma, se actualiza `fechaProximoContacto` del prospecto.
+- La sugerencia queda registrada en observaciones del prospecto.
+
+Archivos modificados:
+
+- `src/components/CRM/RegistrarInteraccion.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
