@@ -37,6 +37,7 @@ export default function ProspectoResumenPanel({
   onRegistrarInteraccion,
   onPlantillas,
   onCrearPropuesta,
+  onDescargarPropuesta,
   onReprogramar,
   onCambiarEstadoRapido,
 }) {
@@ -183,6 +184,12 @@ export default function ProspectoResumenPanel({
                       {formatoCLP(propuesta.valorImplementacion)} implementacion ·{" "}
                       {formatoCLP(propuesta.valorMensual)} mensual
                     </p>
+                    <button
+                      onClick={() => onDescargarPropuesta(prospecto, propuesta)}
+                      className="mt-3 px-3 py-1.5 rounded-md border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                    >
+                      Descargar PDF
+                    </button>
                   </div>
                 ))}
               </div>

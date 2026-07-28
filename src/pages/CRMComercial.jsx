@@ -33,6 +33,7 @@ import {
   crearPropuestaComercial,
   obtenerPropuestasComerciales,
 } from "../services/PropuestaComercialService";
+import { descargarPropuestaPDF } from "../services/PropuestaPDFService";
 
 const columnasImportacion = [
   { clave: "empresa", etiqueta: "Empresa", requerido: true },
@@ -500,6 +501,7 @@ export default function CRMComercial() {
             setProspectoResumen(null);
             abrirPropuesta(prospecto);
           }}
+          onDescargarPropuesta={descargarPropuestaPDF}
           onReprogramar={reprogramarSeguimiento}
           onCambiarEstadoRapido={cambiarEstadoRapido}
         />

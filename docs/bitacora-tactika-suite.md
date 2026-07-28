@@ -324,6 +324,28 @@ Nota operativa:
 - Antes de usar esta funcion en produccion, ejecutar la migracion SQL en Supabase.
 - La generacion formal de propuesta en PDF queda como siguiente mejora.
 
+### 2026-07-28 - PDF de propuesta comercial
+
+Objetivo:
+
+- Permitir descargar una propuesta comercial en PDF desde la ficha del prospecto.
+- Reutilizar las librerias existentes de reportes para no agregar dependencias nuevas.
+- Entregar un documento simple con identidad Tactika para enviar al cliente.
+
+Resultado:
+
+- Se agrego el servicio `PropuestaPDFService`.
+- Cada propuesta guardada muestra un boton "Descargar PDF".
+- El PDF incluye datos del prospecto, plan sugerido, valor de implementacion, mensualidad, alcance y condiciones.
+- El documento usa encabezado oscuro con marca Tactika Consulting y pie de pagina.
+
+Archivos modificados:
+
+- `src/services/PropuestaPDFService.js`
+- `src/components/CRM/ProspectoResumenPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
