@@ -58,3 +58,28 @@ export async function crearPropuestaComercial(propuesta) {
 
   return aPropuesta(data);
 }
+
+export async function actualizarEstadoPropuestaComercial(id, estado, fechaEnvio = null) {
+  const cambios = {
+    estado,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (estado === "Enviada") {
+    cambios.fecha_envio = fechaEnvio || new Date().toISOString().slice(0, 10);
+  }
+
+  const { data, error } = await supabase
+    .from("prospecto_propuestas")
+    .update(cambios)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return aPropuesta(data);
+}

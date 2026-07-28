@@ -15,6 +15,7 @@ import PlantillasMensajes from "../components/CRM/PlantillasMensajes";
 import RegistrarInteraccion from "../components/CRM/RegistrarInteraccion";
 import ProspectoResumenPanel from "../components/CRM/ProspectoResumenPanel";
 import CrearPropuestaComercial from "../components/CRM/CrearPropuestaComercial";
+import SeguimientoPropuestas from "../components/CRM/SeguimientoPropuestas";
 
 import {
   obtenerProspectos,
@@ -30,6 +31,7 @@ import {
   obtenerInteraccionesComerciales,
 } from "../services/InteraccionComercialService";
 import {
+  actualizarEstadoPropuestaComercial,
   crearPropuestaComercial,
   obtenerPropuestasComerciales,
 } from "../services/PropuestaComercialService";
@@ -292,6 +294,46 @@ export default function CRMComercial() {
     }
   }
 
+  async function actualizarEstadoPropuesta(propuesta, estadoNuevo) {
+    try {
+      await actualizarEstadoPropuestaComercial(propuesta.id, estadoNuevo);
+
+      const prospecto = prospectos.find((p) => p.id === propuesta.prospectoId);
+      if (prospecto) {
+        if (estadoNuevo === "Enviada" && prospecto.estado !== "Propuesta Enviada") {
+          await cambiarEstadoProspecto(prospecto.id, prospecto.estado, "Propuesta Enviada");
+        }
+
+        if (estadoNuevo === "Aceptada" && prospecto.estado !== "Cliente") {
+          if (!prospecto.clienteId) {
+            await convertirProspectoACliente(prospecto);
+          }
+          await cambiarEstadoProspecto(prospecto.id, prospecto.estado, "Cliente");
+        }
+
+        if (estadoNuevo === "Rechazada" && prospecto.estado !== "Perdido") {
+          await cambiarEstadoProspecto(prospecto.id, prospecto.estado, "Perdido");
+        }
+      }
+
+      await cargar();
+
+      Swal.fire({
+        icon: "success",
+        title: "Propuesta actualizada",
+        text: `La propuesta quedo como ${estadoNuevo}.`,
+        timer: 1700,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo actualizar la propuesta",
+        text: error.message || "Revisa la tabla prospecto_propuestas en Supabase.",
+      });
+    }
+  }
+
   async function moverEnKanban(id, estadoAnterior, estadoNuevo) {
     const prospecto = prospectos.find((p) => p.id === id);
 
@@ -404,6 +446,15 @@ export default function CRMComercial() {
         prospectos={prospectos}
         onEditar={editarDesdeKanban}
         onReprogramar={reprogramarSeguimiento}
+      />
+
+      <SeguimientoPropuestas
+        propuestas={propuestas}
+        prospectos={prospectos}
+        onActualizarEstado={actualizarEstadoPropuesta}
+        onDescargarPDF={descargarPropuestaPDF}
+        onRegistrarSeguimiento={abrirInteraccion}
+        onAbrirProspecto={setProspectoResumen}
       />
 
       {vista === "kanban" && (

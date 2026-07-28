@@ -373,6 +373,37 @@ Archivos modificados:
 - `src/services/PropuestaPDFService.js`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Seguimiento de propuestas comerciales
+
+Objetivo:
+
+- Controlar las propuestas comerciales despues de crearlas.
+- Ver rapidamente cuantas estan en borrador, enviadas, aceptadas o rechazadas.
+- Detectar propuestas enviadas que requieren seguimiento.
+
+Resultado:
+
+- Se agrego el panel `SeguimientoPropuestas`.
+- El CRM muestra resumen por estado de propuesta y monto asociado.
+- Las propuestas enviadas hace 3 dias o mas aparecen como pendientes de seguimiento.
+- Desde el panel se puede:
+  - Ver la ficha del prospecto.
+  - Descargar PDF.
+  - Registrar seguimiento.
+  - Marcar una propuesta como enviada.
+  - Marcar una propuesta como aceptada.
+  - Marcar una propuesta como rechazada.
+- Si una propuesta se marca como enviada, el prospecto pasa a "Propuesta Enviada".
+- Si una propuesta se marca como aceptada, el prospecto pasa a "Cliente".
+- Si una propuesta se marca como rechazada, el prospecto pasa a "Perdido".
+
+Archivos modificados:
+
+- `src/components/CRM/SeguimientoPropuestas.jsx`
+- `src/pages/CRMComercial.jsx`
+- `src/services/PropuestaComercialService.js`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
