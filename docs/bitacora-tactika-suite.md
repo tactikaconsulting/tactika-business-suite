@@ -294,6 +294,36 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Propuestas comerciales en CRM
+
+Objetivo:
+
+- Crear una primera version del modulo de propuestas comerciales dentro del CRM.
+- Permitir registrar una propuesta desde la ficha lateral del prospecto.
+- Dejar trazabilidad del plan, valor y alcance ofrecido.
+
+Resultado:
+
+- Se agrego el formulario `CrearPropuestaComercial`.
+- Cada propuesta registra prospecto, titulo, plan, valor de implementacion, mensualidad, alcance, condiciones, estado y fecha de envio.
+- La ficha lateral del prospecto muestra las ultimas propuestas asociadas.
+- Si una propuesta se guarda como "Enviada", el prospecto pasa automaticamente a "Propuesta Enviada".
+- Se agrego una migracion SQL para crear la tabla `prospecto_propuestas` en Supabase.
+
+Archivos modificados:
+
+- `src/components/CRM/CrearPropuestaComercial.jsx`
+- `src/components/CRM/ProspectoResumenPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `src/services/PropuestaComercialService.js`
+- `supabase/migrations/202607280002_prospecto_propuestas.sql`
+- `docs/bitacora-tactika-suite.md`
+
+Nota operativa:
+
+- Antes de usar esta funcion en produccion, ejecutar la migracion SQL en Supabase.
+- La generacion formal de propuesta en PDF queda como siguiente mejora.
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

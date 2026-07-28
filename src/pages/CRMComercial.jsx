@@ -14,6 +14,7 @@ import TareasRecordatorios from "../components/CRM/TareasRecordatorios";
 import PlantillasMensajes from "../components/CRM/PlantillasMensajes";
 import RegistrarInteraccion from "../components/CRM/RegistrarInteraccion";
 import ProspectoResumenPanel from "../components/CRM/ProspectoResumenPanel";
+import CrearPropuestaComercial from "../components/CRM/CrearPropuestaComercial";
 
 import {
   obtenerProspectos,
@@ -28,6 +29,10 @@ import {
   crearInteraccionComercial,
   obtenerInteraccionesComerciales,
 } from "../services/InteraccionComercialService";
+import {
+  crearPropuestaComercial,
+  obtenerPropuestasComerciales,
+} from "../services/PropuestaComercialService";
 
 const columnasImportacion = [
   { clave: "empresa", etiqueta: "Empresa", requerido: true },
@@ -47,6 +52,7 @@ export default function CRMComercial() {
   const [prospectos, setProspectos] = useState([]);
   const [historial, setHistorial] = useState([]);
   const [interacciones, setInteracciones] = useState([]);
+  const [propuestas, setPropuestas] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [prospectoResumen, setProspectoResumen] = useState(null);
@@ -55,20 +61,23 @@ export default function CRMComercial() {
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
   const [mostrarInteraccion, setMostrarInteraccion] = useState(false);
+  const [mostrarPropuesta, setMostrarPropuesta] = useState(false);
 
   useEffect(() => {
     cargar();
   }, []);
 
   async function cargar() {
-    const [dataProspectos, dataHistorial, dataInteracciones] = await Promise.all([
+    const [dataProspectos, dataHistorial, dataInteracciones, dataPropuestas] = await Promise.all([
       obtenerProspectos(),
       obtenerHistorial(),
       obtenerInteraccionesComerciales(),
+      obtenerPropuestasComerciales(),
     ]);
     setProspectos(dataProspectos);
     setHistorial(dataHistorial);
     setInteracciones(dataInteracciones);
+    setPropuestas(dataPropuestas);
   }
 
   async function guardar(datos) {
@@ -245,6 +254,43 @@ export default function CRMComercial() {
     setMostrarPlantillas(true);
   }
 
+  function abrirPropuesta(prospecto) {
+    setProspectoAccionId(prospecto.id);
+    setMostrarPropuesta(true);
+  }
+
+  async function guardarPropuesta(propuesta) {
+    try {
+      await crearPropuestaComercial(propuesta);
+
+      const prospecto = prospectos.find((p) => p.id === propuesta.prospectoId);
+      if (
+        prospecto &&
+        propuesta.estado === "Enviada" &&
+        prospecto.estado !== "Propuesta Enviada"
+      ) {
+        await cambiarEstadoProspecto(prospecto.id, prospecto.estado, "Propuesta Enviada");
+      }
+
+      await cargar();
+      setMostrarPropuesta(false);
+
+      Swal.fire({
+        icon: "success",
+        title: "Propuesta guardada",
+        text: "La propuesta comercial quedo registrada en el CRM.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo guardar la propuesta",
+        text: error.message || "Revisa que la tabla prospecto_propuestas exista en Supabase.",
+      });
+    }
+  }
+
   async function moverEnKanban(id, estadoAnterior, estadoNuevo) {
     const prospecto = prospectos.find((p) => p.id === id);
 
@@ -413,6 +459,15 @@ export default function CRMComercial() {
         />
       )}
 
+      {mostrarPropuesta && (
+        <CrearPropuestaComercial
+          prospectos={prospectos}
+          prospectoInicialId={prospectoAccionId}
+          onGuardar={guardarPropuesta}
+          onCerrar={() => setMostrarPropuesta(false)}
+        />
+      )}
+
       {prospectoHistorial && (
         <ProspectoHistorialPanel
           prospecto={prospectoHistorial}
@@ -426,6 +481,7 @@ export default function CRMComercial() {
         <ProspectoResumenPanel
           prospecto={prospectoResumen}
           interacciones={interacciones}
+          propuestas={propuestas}
           onCerrar={() => setProspectoResumen(null)}
           onEditar={editarDesdeKanban}
           onVerHistorial={(prospecto) => {
@@ -439,6 +495,10 @@ export default function CRMComercial() {
           onPlantillas={(prospecto) => {
             setProspectoResumen(null);
             abrirPlantillas(prospecto);
+          }}
+          onCrearPropuesta={(prospecto) => {
+            setProspectoResumen(null);
+            abrirPropuesta(prospecto);
           }}
           onReprogramar={reprogramarSeguimiento}
           onCambiarEstadoRapido={cambiarEstadoRapido}

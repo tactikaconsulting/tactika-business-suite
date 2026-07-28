@@ -30,16 +30,21 @@ const accionesEstado = [
 export default function ProspectoResumenPanel({
   prospecto,
   interacciones = [],
+  propuestas = [],
   onCerrar,
   onEditar,
   onVerHistorial,
   onRegistrarInteraccion,
   onPlantillas,
+  onCrearPropuesta,
   onReprogramar,
   onCambiarEstadoRapido,
 }) {
   const ultimasInteracciones = interacciones
     .filter((i) => i.prospectoId === prospecto.id)
+    .slice(0, 3);
+  const ultimasPropuestas = propuestas
+    .filter((p) => p.prospectoId === prospecto.id)
     .slice(0, 3);
 
   return (
@@ -132,6 +137,13 @@ export default function ProspectoResumenPanel({
               Plantillas
             </button>
             <button
+              onClick={() => onCrearPropuesta(prospecto)}
+              className="border border-blue-200 rounded-lg p-3 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 flex items-center gap-2"
+            >
+              <FileText size={16} />
+              Crear propuesta
+            </button>
+            <button
               onClick={() => onVerHistorial(prospecto)}
               className="border border-slate-200 rounded-lg p-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
             >
@@ -145,6 +157,36 @@ export default function ProspectoResumenPanel({
               <Edit3 size={16} />
               Editar
             </button>
+          </div>
+
+          <div className="border border-slate-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText size={16} className="text-slate-500" />
+              <h3 className="text-sm font-bold text-slate-700">Propuestas comerciales</h3>
+            </div>
+            {ultimasPropuestas.length === 0 ? (
+              <p className="text-sm text-slate-400">Sin propuestas registradas.</p>
+            ) : (
+              <div className="space-y-3">
+                {ultimasPropuestas.map((propuesta) => (
+                  <div key={propuesta.id} className="border-b last:border-0 pb-3 last:pb-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">{propuesta.titulo}</p>
+                        <p className="text-xs text-slate-400 mt-1">{propuesta.plan}</p>
+                      </div>
+                      <span className="px-2 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                        {propuesta.estado}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-600 mt-2">
+                      {formatoCLP(propuesta.valorImplementacion)} implementacion ·{" "}
+                      {formatoCLP(propuesta.valorMensual)} mensual
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="border border-slate-200 rounded-lg p-4">
