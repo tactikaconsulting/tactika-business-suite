@@ -38,6 +38,7 @@ export default function CRMComercial() {
   const [historial, setHistorial] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [vista, setVista] = useState("kanban");
+  const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
 
   useEffect(() => {
     cargar();
@@ -93,7 +94,7 @@ export default function CRMComercial() {
           origen: fila.origen || "Importación Excel/CSV",
         });
         exitosos++;
-      } catch (error) {
+      } catch {
         fallidos++;
       }
     }
@@ -106,6 +107,24 @@ export default function CRMComercial() {
         title: "Importación con observaciones",
         text: `${exitosos} prospectos creados correctamente, ${fallidos} no se pudieron crear (revisa que tengan al menos el nombre de la empresa).`,
       });
+    }
+  }
+
+  async function guardarEnriquecimiento(id, datos) {
+    try {
+      await actualizarProspecto(id, datos);
+      await cargar();
+      setMostrarEnriquecimiento(false);
+
+      Swal.fire({
+        icon: "success",
+        title: "Datos actualizados",
+        text: "La ficha del prospecto fue enriquecida correctamente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "Error al enriquecer", text: error.message });
     }
   }
 
@@ -178,6 +197,13 @@ export default function CRMComercial() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMostrarEnriquecimiento(true)}
+            className="px-4 py-2.5 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
+          >
+            Enriquecer prospectos
+          </button>
+
           <ImportarArchivo
             columnas={columnasImportacion}
             onImportar={importarProspectos}
@@ -227,6 +253,14 @@ export default function CRMComercial() {
 
       {vista === "dashboard" && (
         <DashboardComercial prospectos={prospectos} historial={historial} />
+      )}
+
+      {mostrarEnriquecimiento && (
+        <EnriquecimientoProspectos
+          prospectos={prospectos}
+          onGuardar={guardarEnriquecimiento}
+          onCerrar={() => setMostrarEnriquecimiento(false)}
+        />
       )}
     </div>
   );
