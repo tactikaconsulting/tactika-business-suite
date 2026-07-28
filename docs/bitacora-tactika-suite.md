@@ -150,6 +150,46 @@ Regla:
 - El usuario revisa antes de enviar.
 - No se enviaran mensajes automaticos en esta etapa.
 
+## Sesiones de trabajo
+
+### 2026-07-28 - Plantillas de mensajes comerciales
+
+Objetivo:
+
+- Crear un panel de plantillas comerciales dentro del CRM.
+- Permitir seleccionar un prospecto y generar mensajes personalizados.
+- Permitir copiar mensajes para WhatsApp o correo.
+- Mantener revision manual antes de enviar.
+
+Estado inicial:
+
+- CRM estable con KPIs, historial, tareas y recordatorios.
+- No se tocara Supabase en esta primera version.
+
+Resultado:
+
+- Se creo el panel de plantillas comerciales dentro del CRM.
+- Se agregaron cinco plantillas iniciales:
+  - Primer contacto.
+  - Seguimiento despues de llamada.
+  - Envio de propuesta.
+  - Recordatorio de propuesta pendiente.
+  - Reactivacion de prospecto frio.
+- Se permite seleccionar prospecto y canal: WhatsApp o correo.
+- Se permite editar y copiar el mensaje antes de enviarlo.
+- Se agregaron accesos para abrir WhatsApp o preparar correo, sin envio automatico.
+- Se valido `npm run build` correctamente.
+
+Archivos modificados:
+
+- `src/components/CRM/PlantillasMensajes.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
+Proximo paso sugerido:
+
+- Registrar interacciones comerciales: llamada, correo, WhatsApp, reunion y nota interna.
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

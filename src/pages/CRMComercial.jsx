@@ -11,6 +11,7 @@ import EnriquecimientoProspectos from "../components/CRM/EnriquecimientoProspect
 import KpisComerciales from "../components/CRM/KpisComerciales";
 import ProspectoHistorialPanel from "../components/CRM/ProspectoHistorialPanel";
 import TareasRecordatorios from "../components/CRM/TareasRecordatorios";
+import PlantillasMensajes from "../components/CRM/PlantillasMensajes";
 
 import {
   obtenerProspectos,
@@ -43,6 +44,7 @@ export default function CRMComercial() {
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [vista, setVista] = useState("kanban");
   const [mostrarEnriquecimiento, setMostrarEnriquecimiento] = useState(false);
+  const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
 
   useEffect(() => {
     cargar();
@@ -225,6 +227,13 @@ export default function CRMComercial() {
 
         <div className="flex items-center gap-3">
           <button
+            onClick={() => setMostrarPlantillas(true)}
+            className="px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition"
+          >
+            Plantillas
+          </button>
+
+          <button
             onClick={() => setMostrarEnriquecimiento(true)}
             className="px-4 py-2.5 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
           >
@@ -297,6 +306,13 @@ export default function CRMComercial() {
           prospectos={prospectos}
           onGuardar={guardarEnriquecimiento}
           onCerrar={() => setMostrarEnriquecimiento(false)}
+        />
+      )}
+
+      {mostrarPlantillas && (
+        <PlantillasMensajes
+          prospectos={prospectos}
+          onCerrar={() => setMostrarPlantillas(false)}
         />
       )}
 
