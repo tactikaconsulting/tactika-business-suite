@@ -9,9 +9,61 @@ const planes = [
   "Proyecto a medida",
 ];
 
+const plantillasPorPlan = {
+  "Diagnostico Empresarial": {
+    titulo: "Diagnostico Empresarial Tactika",
+    implementacion: "29990",
+    mensualidad: "0",
+    alcance:
+      "Reunion de levantamiento, revision de procesos principales, identificacion de problemas de gestion, analisis de oportunidades de mejora e informe ejecutivo con plan de accion inicial.",
+    condiciones:
+      "Servicio de diagnostico de pago unico. No incluye implementacion de plataforma ni acompanamiento mensual. Si el cliente decide avanzar con Tactika Suite, este valor puede descontarse del proyecto de implementacion.",
+  },
+  "Sistema Tactika Base": {
+    titulo: "Implementacion Sistema Tactika Base",
+    implementacion: "199990",
+    mensualidad: "49900",
+    alcance:
+      "Configuracion inicial de Tactika Suite para una empresa pequena, modulo CRM basico, carga inicial de informacion, capacitacion de uso y una reunion de puesta en marcha.",
+    condiciones:
+      "Incluye configuracion base y soporte mensual esencial. Ajustes mayores, nuevos modulos o integraciones se cotizan por separado.",
+  },
+  "Sistema Tactika Profesional": {
+    titulo: "Implementacion Sistema Tactika Profesional",
+    implementacion: "490000",
+    mensualidad: "89900",
+    alcance:
+      "Diagnostico inicial, configuracion del sistema, adaptacion de modulos comerciales, carga base de informacion, capacitacion, reportes iniciales, seguimiento de puesta en marcha y acompanamiento mensual.",
+    condiciones:
+      "Incluye mejoras menores, soporte y reuniones de seguimiento segun plan. Nuevos desarrollos a medida se evaluan y cotizan segun alcance.",
+  },
+  "Sistema Tactika Enterprise": {
+    titulo: "Implementacion Sistema Tactika Enterprise",
+    implementacion: "990000",
+    mensualidad: "149900",
+    alcance:
+      "Implementacion avanzada de Tactika Suite con diagnostico, configuracion de multiples modulos, reportería gerencial, flujos de seguimiento, capacitacion por areas, soporte prioritario y preparacion para automatizaciones e inteligencia artificial.",
+    condiciones:
+      "Valor desde el monto indicado. Integraciones, desarrollos especiales, IA avanzada o requerimientos fuera del alcance inicial se cotizan como proyecto adicional.",
+  },
+  "Proyecto a medida": {
+    titulo: "Proyecto Tactika a medida",
+    implementacion: "0",
+    mensualidad: "0",
+    alcance:
+      "Diseno de una solucion personalizada segun los procesos, necesidades, usuarios, modulos, reportes e integraciones requeridas por la empresa.",
+    condiciones:
+      "El valor final se define despues del levantamiento tecnico y comercial. La propuesta definitiva queda sujeta a validacion de alcance, tiempos y recursos necesarios.",
+  },
+};
+
 function numero(valor) {
   const limpio = String(valor || "").replace(/\D/g, "");
   return limpio ? Number(limpio) : 0;
+}
+
+function formatoCLP(valor) {
+  return "$" + Number(numero(valor)).toLocaleString("es-CL");
 }
 
 export default function CrearPropuestaComercial({
@@ -21,20 +73,27 @@ export default function CrearPropuestaComercial({
   onCerrar,
 }) {
   const [prospectoId, setProspectoId] = useState(prospectoInicialId || prospectos[0]?.id || "");
-  const [titulo, setTitulo] = useState("Propuesta comercial Tactika");
   const [plan, setPlan] = useState("Sistema Tactika Profesional");
-  const [valorImplementacion, setValorImplementacion] = useState("490000");
-  const [valorMensual, setValorMensual] = useState("89900");
-  const [alcance, setAlcance] = useState(
-    "Diagnostico inicial, configuracion del sistema, carga base de informacion, capacitacion y puesta en marcha."
-  );
-  const [condiciones, setCondiciones] = useState(
-    "Valores referenciales sujetos al alcance final validado con el cliente."
-  );
+  const plantillaInicial = plantillasPorPlan["Sistema Tactika Profesional"];
+  const [titulo, setTitulo] = useState(plantillaInicial.titulo);
+  const [valorImplementacion, setValorImplementacion] = useState(plantillaInicial.implementacion);
+  const [valorMensual, setValorMensual] = useState(plantillaInicial.mensualidad);
+  const [alcance, setAlcance] = useState(plantillaInicial.alcance);
+  const [condiciones, setCondiciones] = useState(plantillaInicial.condiciones);
   const [estado, setEstado] = useState("Borrador");
   const [fechaEnvio, setFechaEnvio] = useState(new Date().toISOString().slice(0, 10));
 
   const prospecto = prospectos.find((p) => p.id === prospectoId) || prospectos[0];
+
+  function aplicarPlantilla(nuevoPlan) {
+    const plantilla = plantillasPorPlan[nuevoPlan];
+    setPlan(nuevoPlan);
+    setTitulo(plantilla.titulo);
+    setValorImplementacion(plantilla.implementacion);
+    setValorMensual(plantilla.mensualidad);
+    setAlcance(plantilla.alcance);
+    setCondiciones(plantilla.condiciones);
+  }
 
   function guardar(e) {
     e.preventDefault();
@@ -118,7 +177,7 @@ export default function CrearPropuestaComercial({
               <span className="text-sm font-semibold text-slate-700">Plan sugerido</span>
               <select
                 value={plan}
-                onChange={(e) => setPlan(e.target.value)}
+                onChange={(e) => aplicarPlantilla(e.target.value)}
                 className="mt-2 w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-white"
               >
                 {planes.map((item) => (
@@ -197,11 +256,44 @@ export default function CrearPropuestaComercial({
             />
           </label>
 
+          <div className="border border-slate-200 rounded-xl overflow-hidden">
+            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
+              <p className="text-sm font-bold text-slate-700">Vista previa comercial</p>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <p className="text-xs uppercase font-semibold text-blue-600">Tactika Consulting</p>
+                <h3 className="text-xl font-bold text-slate-800 mt-1">{titulo}</h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Preparada para {prospecto.empresa} · {plan}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="rounded-lg border border-slate-200 p-3">
+                  <p className="text-xs text-slate-500">Implementacion</p>
+                  <p className="text-lg font-bold text-slate-800 mt-1">
+                    {formatoCLP(valorImplementacion)}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-slate-200 p-3">
+                  <p className="text-xs text-slate-500">Mensualidad</p>
+                  <p className="text-lg font-bold text-slate-800 mt-1">
+                    {formatoCLP(valorMensual)}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-700">Alcance resumido</p>
+                <p className="text-sm text-slate-500 mt-1 leading-relaxed">{alcance}</p>
+              </div>
+            </div>
+          </div>
+
           <div className="border border-blue-100 bg-blue-50 rounded-xl p-4 flex items-start gap-3">
             <FileText size={18} className="text-blue-700 mt-0.5" />
             <p className="text-sm text-blue-900">
-              Esta version guarda la propuesta en el CRM. La generacion de PDF formal puede quedar
-              como el siguiente paso.
+              Puedes ajustar el texto antes de guardar. Luego la propuesta quedara disponible para
+              descargar en PDF desde la ficha del prospecto.
             </p>
           </div>
 

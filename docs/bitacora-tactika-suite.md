@@ -346,6 +346,33 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-28 - Plantillas y vista previa de propuestas
+
+Objetivo:
+
+- Acelerar la creacion de propuestas comerciales.
+- Evitar redactar desde cero cada alcance.
+- Mejorar la propuesta como documento de venta.
+
+Resultado:
+
+- El formulario de propuesta ahora carga plantillas segun el plan seleccionado:
+  - Diagnostico Empresarial.
+  - Sistema Tactika Base.
+  - Sistema Tactika Profesional.
+  - Sistema Tactika Enterprise.
+  - Proyecto a medida.
+- Cada plantilla completa titulo, valor de implementacion, mensualidad, alcance y condiciones.
+- Los textos siguen siendo editables antes de guardar.
+- Se agrego una vista previa comercial dentro del formulario.
+- El PDF incluye una bajada comercial y un siguiente paso recomendado.
+
+Archivos modificados:
+
+- `src/components/CRM/CrearPropuestaComercial.jsx`
+- `src/services/PropuestaPDFService.js`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

@@ -35,8 +35,16 @@ export function descargarPropuestaPDF(prospecto, propuesta) {
   doc.text(`Fecha: ${fecha}`, 14, 56);
   doc.text(`Estado: ${texto(propuesta.estado)}`, 14, 62);
 
+  doc.setFontSize(10);
+  doc.setTextColor(51, 65, 85);
+  const bajada = doc.splitTextToSize(
+    "Primero entendemos su negocio. Despues disenamos la tecnologia que necesita para ordenar la gestion, mejorar el seguimiento y tomar mejores decisiones.",
+    180
+  );
+  doc.text(bajada, 14, 70);
+
   autoTable(doc, {
-    startY: 72,
+    startY: 84,
     head: [["Dato", "Informacion"]],
     body: [
       ["Empresa", texto(prospecto.empresa)],
@@ -100,6 +108,25 @@ export function descargarPropuestaPDF(prospecto, propuesta) {
   doc.setTextColor(51, 65, 85);
   const condiciones = doc.splitTextToSize(texto(propuesta.condiciones), 180);
   doc.text(condiciones, 14, y);
+  y += condiciones.length * 5 + 12;
+
+  if (y > 250) {
+    doc.addPage();
+    y = 20;
+  }
+
+  doc.setFontSize(13);
+  doc.setTextColor(15, 23, 42);
+  doc.text("Siguiente paso recomendado", 14, y);
+  y += 8;
+
+  doc.setFontSize(10);
+  doc.setTextColor(51, 65, 85);
+  const siguientePaso = doc.splitTextToSize(
+    "Validar el alcance junto al cliente, confirmar prioridades de implementacion y definir fecha de inicio del proyecto.",
+    180
+  );
+  doc.text(siguientePaso, 14, y);
 
   const totalPaginas = doc.getNumberOfPages();
   for (let pagina = 1; pagina <= totalPaginas; pagina++) {
