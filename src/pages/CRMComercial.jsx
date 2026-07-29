@@ -18,6 +18,7 @@ import ProspectoResumenPanel from "../components/CRM/ProspectoResumenPanel";
 import CrearPropuestaComercial from "../components/CRM/CrearPropuestaComercial";
 import SeguimientoPropuestas from "../components/CRM/SeguimientoPropuestas";
 import InicioCRM from "../components/CRM/InicioCRM";
+import CampanasComerciales from "../components/CRM/CampanasComerciales";
 
 import {
   obtenerProspectos,
@@ -383,6 +384,7 @@ export default function CRMComercial() {
     { id: "pipeline", label: "Pipeline" },
     { id: "tareas", label: "Tareas" },
     { id: "propuestas", label: "Propuestas" },
+    { id: "campanas", label: "Campanas" },
     { id: "dashboard", label: "Dashboard" },
   ];
 
@@ -522,6 +524,13 @@ export default function CRMComercial() {
           onDescargarPDF={descargarPropuestaPDF}
           onRegistrarSeguimiento={abrirInteraccion}
           onAbrirProspecto={setProspectoResumen}
+        />
+      )}
+
+      {vista === "campanas" && (
+        <CampanasComerciales
+          prospectos={prospectos}
+          onRegistrarEnvio={guardarInteraccion}
         />
       )}
 

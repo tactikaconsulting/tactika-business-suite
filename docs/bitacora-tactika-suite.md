@@ -554,6 +554,32 @@ Archivos modificados:
 - `src/services/ProspectoService.js`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-29 - Campanas comerciales en CRM
+
+Objetivo:
+
+- Crear una primera version segura para automatizar seguimiento comercial.
+- Programar mensajes por correo o WhatsApp desde el CRM.
+- Mantener revision manual antes de abrir el canal de envio.
+
+Resultado:
+
+- Se agrego la pestaña Campanas al CRM Comercial.
+- Se puede crear una campana con nombre, canal, plantilla, fecha y prospectos seleccionados.
+- El sistema crea mensajes programados para cada prospecto.
+- Cada mensaje puede prepararse por correo o WhatsApp desde el CRM.
+- Al preparar o marcar como enviado, se registra una interaccion comercial y un proximo seguimiento.
+- WhatsApp queda como envio manual para evitar riesgos de bloqueo.
+- El correo queda preparado para una futura integracion con Gmail, Resend o Brevo.
+
+Archivos modificados:
+
+- `src/components/CRM/CampanasComerciales.jsx`
+- `src/services/CampanaComercialService.js`
+- `src/pages/CRMComercial.jsx`
+- `supabase/migrations/202607290001_campanas_comerciales.sql`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
