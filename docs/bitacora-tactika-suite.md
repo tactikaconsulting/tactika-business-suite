@@ -511,6 +511,28 @@ Nota operativa:
 
 - Para activar esta mejora en produccion, desplegar nuevamente la funcion Supabase `agente-venta` y publicar la landing.
 
+### 2026-07-29 - Envio de plantillas por WhatsApp y correo
+
+Objetivo:
+
+- Permitir contactar prospectos desde las plantillas comerciales del CRM.
+- Abrir WhatsApp o correo con el mensaje preparado.
+- Registrar automaticamente la accion en el historial comercial.
+
+Resultado:
+
+- El boton WhatsApp abre el enlace con el mensaje editado.
+- El boton correo prepara un `mailto` con asunto y cuerpo del mensaje.
+- Al abrir WhatsApp o correo, se registra una interaccion comercial.
+- Se programa seguimiento automatico: 2 dias para WhatsApp y 3 dias para correo.
+- El mensaje queda guardado en el detalle de la interaccion.
+
+Archivos modificados:
+
+- `src/components/CRM/PlantillasMensajes.jsx`
+- `src/pages/CRMComercial.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

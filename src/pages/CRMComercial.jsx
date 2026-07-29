@@ -542,6 +542,7 @@ export default function CRMComercial() {
         <PlantillasMensajes
           prospectos={prospectos}
           prospectoInicialId={prospectoAccionId}
+          onRegistrarEnvio={guardarInteraccion}
           onCerrar={() => setMostrarPlantillas(false)}
         />
       )}

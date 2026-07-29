@@ -50,7 +50,23 @@ function crearWhatsAppUrl(prospecto, mensaje) {
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 }
 
-export default function PlantillasMensajes({ prospectos, prospectoInicialId, onCerrar }) {
+function crearCorreoUrl(prospecto, mensaje) {
+  const asunto = `Tactika Consulting - ${prospecto.empresa}`;
+  return `mailto:${prospecto.correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
+}
+
+function sumarDias(dias) {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha.toISOString().slice(0, 10);
+}
+
+export default function PlantillasMensajes({
+  prospectos,
+  prospectoInicialId,
+  onCerrar,
+  onRegistrarEnvio,
+}) {
   const [prospectoId, setProspectoId] = useState(prospectoInicialId || prospectos[0]?.id || "");
   const [plantillaId, setPlantillaId] = useState("primer-contacto");
   const [canal, setCanal] = useState("whatsapp");
@@ -86,6 +102,39 @@ export default function PlantillasMensajes({ prospectos, prospectoInicialId, onC
       timer: 1500,
       showConfirmButton: false,
     });
+  }
+
+  function registrarEnvio(canalSeleccionado) {
+    if (!onRegistrarEnvio || !prospecto) return;
+
+    onRegistrarEnvio({
+      prospectoId: prospecto.id,
+      tipo: canalSeleccionado === "whatsapp" ? "whatsapp" : "correo",
+      titulo:
+        canalSeleccionado === "whatsapp"
+          ? "Mensaje por WhatsApp preparado"
+          : "Correo comercial preparado",
+      resultado: "Mensaje preparado desde plantilla comercial",
+      detalle: mensaje,
+      fechaInteraccion: new Date().toISOString(),
+      proximoSeguimiento: {
+        fechaProximoContacto: sumarDias(canalSeleccionado === "whatsapp" ? 2 : 3),
+        proximoPaso:
+          canalSeleccionado === "whatsapp"
+            ? "Revisar respuesta por WhatsApp"
+            : "Hacer seguimiento del correo enviado",
+      },
+    });
+  }
+
+  function abrirWhatsApp() {
+    window.open(crearWhatsAppUrl(prospecto, mensaje), "_blank", "noopener,noreferrer");
+    registrarEnvio("whatsapp");
+  }
+
+  function prepararCorreo() {
+    window.location.href = crearCorreoUrl(prospecto, mensaje);
+    registrarEnvio("correo");
   }
 
   if (!prospecto) {
@@ -200,7 +249,7 @@ export default function PlantillasMensajes({ prospectos, prospectoInicialId, onC
               </div>
 
               <span className="text-xs text-slate-400">
-                No se envia automaticamente. Solo prepara el mensaje.
+                Abre WhatsApp o correo con el mensaje preparado y registra el seguimiento en CRM.
               </span>
             </div>
 
@@ -256,25 +305,25 @@ export default function PlantillasMensajes({ prospectos, prospectoInicialId, onC
                 </button>
 
                 {canal === "whatsapp" && tieneTelefono && (
-                  <a
-                    href={crearWhatsAppUrl(prospecto, mensaje)}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={abrirWhatsApp}
                     className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 flex items-center gap-2"
                   >
                     <Send size={16} />
                     Abrir WhatsApp
-                  </a>
+                  </button>
                 )}
 
                 {canal === "correo" && tieneCorreo && (
-                  <a
-                    href={`mailto:${prospecto.correo}?subject=${encodeURIComponent(`Tactika Consulting - ${prospecto.empresa}`)}&body=${encodeURIComponent(mensaje)}`}
+                  <button
+                    type="button"
+                    onClick={prepararCorreo}
                     className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
                   >
                     <Send size={16} />
                     Preparar correo
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
