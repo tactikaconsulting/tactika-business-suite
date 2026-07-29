@@ -8,6 +8,7 @@ dist-ssr
 # Variables de entorno (nunca subir claves/API keys)
 .env
 .env.local
+supabase/.temp
 
 # Editor
 .vscode/*

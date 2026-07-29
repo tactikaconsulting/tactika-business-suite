@@ -17,6 +17,15 @@ create index if not exists idx_prospecto_interacciones_fecha
 
 alter table public.prospecto_interacciones enable row level security;
 
+drop policy if exists "Permitir lectura de interacciones autenticadas"
+  on public.prospecto_interacciones;
+drop policy if exists "Permitir creacion de interacciones autenticadas"
+  on public.prospecto_interacciones;
+drop policy if exists "Permitir actualizacion de interacciones autenticadas"
+  on public.prospecto_interacciones;
+drop policy if exists "Permitir eliminacion de interacciones autenticadas"
+  on public.prospecto_interacciones;
+
 create policy "Permitir lectura de interacciones autenticadas"
   on public.prospecto_interacciones
   for select

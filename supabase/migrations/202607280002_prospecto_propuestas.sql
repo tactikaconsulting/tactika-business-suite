@@ -22,6 +22,15 @@ create index if not exists idx_prospecto_propuestas_created_at
 
 alter table public.prospecto_propuestas enable row level security;
 
+drop policy if exists "Permitir lectura de propuestas autenticadas"
+  on public.prospecto_propuestas;
+drop policy if exists "Permitir creacion de propuestas autenticadas"
+  on public.prospecto_propuestas;
+drop policy if exists "Permitir actualizacion de propuestas autenticadas"
+  on public.prospecto_propuestas;
+drop policy if exists "Permitir eliminacion de propuestas autenticadas"
+  on public.prospecto_propuestas;
+
 create policy "Permitir lectura de propuestas autenticadas"
   on public.prospecto_propuestas
   for select

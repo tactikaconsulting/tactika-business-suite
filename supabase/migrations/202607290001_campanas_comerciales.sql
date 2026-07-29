@@ -41,6 +41,23 @@ create index if not exists idx_mensajes_programados_fecha
 alter table public.campanas_comerciales enable row level security;
 alter table public.mensajes_programados enable row level security;
 
+drop policy if exists "Permitir lectura de campanas autenticadas"
+  on public.campanas_comerciales;
+drop policy if exists "Permitir creacion de campanas autenticadas"
+  on public.campanas_comerciales;
+drop policy if exists "Permitir actualizacion de campanas autenticadas"
+  on public.campanas_comerciales;
+drop policy if exists "Permitir eliminacion de campanas autenticadas"
+  on public.campanas_comerciales;
+drop policy if exists "Permitir lectura de mensajes programados autenticados"
+  on public.mensajes_programados;
+drop policy if exists "Permitir creacion de mensajes programados autenticados"
+  on public.mensajes_programados;
+drop policy if exists "Permitir actualizacion de mensajes programados autenticados"
+  on public.mensajes_programados;
+drop policy if exists "Permitir eliminacion de mensajes programados autenticados"
+  on public.mensajes_programados;
+
 create policy "Permitir lectura de campanas autenticadas"
   on public.campanas_comerciales
   for select
