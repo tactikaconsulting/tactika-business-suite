@@ -168,8 +168,53 @@ export async function obtenerHistorial() {
   }));
 }
 
+function limpiarValor(valor) {
+  return String(valor || "").trim();
+}
+
+async function buscarClienteExistente(prospecto) {
+  const criterios = [
+    { columna: "rut", valor: limpiarValor(prospecto.rut) },
+    { columna: "correo", valor: limpiarValor(prospecto.correo) },
+    { columna: "telefono", valor: limpiarValor(prospecto.telefono) },
+    { columna: "empresa", valor: limpiarValor(prospecto.empresa) },
+  ].filter((criterio) => criterio.valor);
+
+  for (const criterio of criterios) {
+    const { data, error } = await supabase
+      .from("clientes")
+      .select("id")
+      .eq(criterio.columna, criterio.valor)
+      .limit(1);
+
+    if (error) {
+      console.error(error);
+      continue;
+    }
+
+    if (data?.length > 0) return data[0].id;
+  }
+
+  return null;
+}
+
 export async function convertirProspectoACliente(prospecto) {
   if (prospecto.clienteId) return prospecto.clienteId;
+
+  const clienteExistenteId = await buscarClienteExistente(prospecto);
+
+  if (clienteExistenteId) {
+    const { error: errorLink } = await supabase
+      .from("prospectos")
+      .update({ cliente_id: clienteExistenteId })
+      .eq("id", prospecto.id);
+
+    if (errorLink) {
+      console.error(errorLink);
+    }
+
+    return clienteExistenteId;
+  }
 
   const { data, error } = await supabase
     .from("clientes")

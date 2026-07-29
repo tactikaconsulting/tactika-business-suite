@@ -235,6 +235,8 @@ export default function CRMComercial() {
       if (r.isConfirmed) {
         try {
           await eliminarProspecto(id);
+          setProspectoResumen(null);
+          setProspectoHistorial(null);
           await cargar();
         } catch (error) {
           Swal.fire({ icon: "error", title: "Error al eliminar", text: error.message });
@@ -589,6 +591,7 @@ export default function CRMComercial() {
             setProspectoResumen(null);
             abrirInteraccion(prospecto);
           }}
+          onEliminar={eliminar}
           onPlantillas={(prospecto) => {
             setProspectoResumen(null);
             abrirPlantillas(prospecto);

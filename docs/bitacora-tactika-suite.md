@@ -533,6 +533,27 @@ Archivos modificados:
 - `src/pages/CRMComercial.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-29 - Eliminacion en ficha CRM y control de duplicados
+
+Objetivo:
+
+- Agregar una opcion visible para eliminar prospectos desde la ficha lateral del CRM.
+- Evitar que un prospecto convertido a cliente cree duplicados si el cliente ya existe.
+
+Resultado:
+
+- La ficha lateral del prospecto ahora muestra un boton Eliminar.
+- Al eliminar desde la ficha, el panel se cierra y el CRM recarga la informacion.
+- La conversion de prospecto a cliente busca coincidencias por RUT, correo, telefono o empresa antes de crear un nuevo cliente.
+- Si encuentra un cliente existente, solo vincula el prospecto a ese cliente.
+
+Archivos modificados:
+
+- `src/components/CRM/ProspectoResumenPanel.jsx`
+- `src/pages/CRMComercial.jsx`
+- `src/services/ProspectoService.js`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

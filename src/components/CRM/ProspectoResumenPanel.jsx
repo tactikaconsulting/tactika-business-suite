@@ -7,6 +7,7 @@ import {
   Mail,
   MessageSquareText,
   Phone,
+  Trash2,
   X,
 } from "lucide-react";
 import IndiceTactikaBadge from "./IndiceTactikaBadge";
@@ -35,6 +36,7 @@ export default function ProspectoResumenPanel({
   onEditar,
   onVerHistorial,
   onRegistrarInteraccion,
+  onEliminar,
   onPlantillas,
   onCrearPropuesta,
   onDescargarPropuesta,
@@ -157,6 +159,13 @@ export default function ProspectoResumenPanel({
             >
               <Edit3 size={16} />
               Editar
+            </button>
+            <button
+              onClick={() => onEliminar(prospecto.id)}
+              className="border border-red-200 rounded-lg p-3 text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 flex items-center gap-2"
+            >
+              <Trash2 size={16} />
+              Eliminar
             </button>
           </div>
 
