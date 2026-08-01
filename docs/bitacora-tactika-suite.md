@@ -622,6 +622,28 @@ Archivos modificados:
 - `supabase/functions/agente-venta/index.ts`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-01 - Agente de venta guiado sin IA
+
+Objetivo:
+
+- Evitar que la captacion de prospectos dependa de una API externa.
+- Dejar funcionando el agente de venta aunque no exista credito o clave activa de IA.
+- Mantener el registro automatico de prospectos en el CRM.
+
+Resultado:
+
+- Se reemplazo la logica con IA por un flujo guiado fijo.
+- El agente pregunta por problema, empresa, comuna, contacto, telefono/correo y trabajadores.
+- El agente solicita autorizacion antes de registrar el prospecto.
+- Si el visitante autoriza, el lead queda guardado en la tabla `prospectos`.
+- Se registra una interaccion comercial en `prospecto_interacciones`.
+- La funcion `agente-venta` fue desplegada nuevamente en Supabase.
+
+Archivos modificados:
+
+- `supabase/functions/agente-venta/index.ts`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
