@@ -138,7 +138,7 @@ serve(async (req) => {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5",
+        model: "claude-sonnet-4-20250514",
         max_tokens: 500,
         system: SYSTEM_PROMPT,
         messages,
@@ -146,6 +146,19 @@ serve(async (req) => {
     });
 
     const data = await aiResponse.json();
+
+    if (!aiResponse.ok) {
+      console.error("Error Anthropic agente-venta", JSON.stringify(data));
+      const mensajeError = data?.error?.message || "No se pudo conectar correctamente con la IA.";
+      return new Response(
+        JSON.stringify({
+          respuesta: `Estoy teniendo un problema tecnico para responder en este momento. Puedes dejarme tu nombre, empresa y telefono, o escribir directo a Claudio por WhatsApp para coordinar el diagnostico. Detalle tecnico: ${mensajeError}`,
+          leadGuardado: false,
+        }),
+        { status: 200, headers: { ...corsHeaders, "content-type": "application/json" } }
+      );
+    }
+
     const texto = data?.content?.[0]?.text ?? "Lo siento, no pude procesar tu mensaje.";
 
     let respuestaVisible = texto;

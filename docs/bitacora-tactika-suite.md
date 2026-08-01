@@ -603,6 +603,25 @@ Archivos modificados:
 - `supabase/functions/agente-venta/index.ts`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-01 - Correccion de error en agente de venta
+
+Objetivo:
+
+- Corregir el error mostrado en la landing cuando el visitante intentaba conversar con el agente.
+- Evitar que el chat responda solo "no pude procesar tu mensaje" sin explicar el problema.
+
+Resultado:
+
+- Se corrigio el nombre del modelo usado por la funcion `agente-venta`.
+- Se agrego una respuesta de respaldo si la IA externa responde con error.
+- Se desplego nuevamente la funcion en Supabase.
+- El agente queda preparado para indicar un detalle tecnico si vuelve a fallar la conexion con la IA.
+
+Archivos modificados:
+
+- `supabase/functions/agente-venta/index.ts`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
