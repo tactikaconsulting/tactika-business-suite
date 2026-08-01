@@ -580,6 +580,29 @@ Archivos modificados:
 - `supabase/migrations/202607290001_campanas_comerciales.sql`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-07-31 - Ajuste del agente de venta en landing
+
+Objetivo:
+
+- Mejorar el agente de venta para que ayude a captar prospectos desde la landing.
+- Cambiar el enfoque desde una conversacion generica hacia un flujo comercial simple.
+- Hacer que el visitante pueda iniciar rapidamente una conversacion sobre clientes, ventas, inventario o diagnostico.
+
+Resultado:
+
+- El chat de la landing ahora muestra opciones rapidas para iniciar la conversacion.
+- El agente se abre de forma proactiva una vez por sesion despues de unos segundos.
+- El mensaje inicial orienta al visitante hacia problemas concretos de gestion.
+- El prompt interno del agente ahora sigue un flujo comercial: detectar problema, ofrecer diagnostico, pedir datos minimos y solicitar autorizacion antes de guardar.
+- La funcion `agente-venta` fue desplegada en Supabase.
+- Los cambios fueron subidos a GitHub para que Vercel actualice la landing.
+
+Archivos modificados:
+
+- `index.html` en landing Tactika.
+- `supabase/functions/agente-venta/index.ts`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
