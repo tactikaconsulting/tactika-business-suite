@@ -644,6 +644,31 @@ Archivos modificados:
 - `supabase/functions/agente-venta/index.ts`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-01 - Modulo de ventas y servicios contratados
+
+Objetivo:
+
+- Agregar control comercial posterior al cierre.
+- Saber que servicio contrato cada cliente y por que valor.
+- Separar el seguimiento de prospectos del control real de ventas.
+
+Resultado:
+
+- Se agrego el modulo Ventas al menu principal.
+- Se creo la tabla `ventas_servicios` en Supabase.
+- Se puede registrar cliente, servicio contratado, modalidad, valor, estado, fecha de contratacion y proximo cobro.
+- Se agregaron indicadores de total vendido, mensualidad activa, pendiente de pago y servicios activos.
+- Se puede editar o eliminar una venta registrada.
+
+Archivos modificados:
+
+- `src/pages/Ventas.jsx`
+- `src/services/VentaServicioService.js`
+- `src/router/AppRouter.jsx`
+- `src/components/layout/Sidebar.jsx`
+- `supabase/migrations/202608010001_ventas_servicios_cliente.sql`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

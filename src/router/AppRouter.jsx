@@ -11,6 +11,7 @@ import PlanAccion from "../pages/PlanAccion";
 import Seguimientos from "../pages/Seguimientos";
 import Reportes from "../pages/Reportes";
 import Configuracion from "../pages/Configuracion";
+import Ventas from "../pages/Ventas";
 
 import GestionPersonal from "../pages/GestionPersonal";
 import MatrizRiesgos from "../pages/MatrizRiesgos";
@@ -29,6 +30,7 @@ export default function AppRouter() {
             <Route path="/diagnosticos" element={<Diagnostico />} />
             <Route path="/planes" element={<PlanAccion />} />
             <Route path="/seguimiento" element={<Seguimientos />} />
+            <Route path="/ventas" element={<Ventas />} />
             <Route path="/reportes" element={<Reportes />} />
             <Route path="/personal" element={<GestionPersonal />} />
             <Route path="/riesgos" element={<MatrizRiesgos />} />

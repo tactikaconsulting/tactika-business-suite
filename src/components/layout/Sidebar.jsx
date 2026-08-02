@@ -7,6 +7,7 @@ import {
   BarChart3,
   Settings,
   Briefcase,
+  DollarSign,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -54,6 +55,12 @@ export default function Sidebar() {
           to="/crm"
           icon={Briefcase}
           text="CRM Comercial"
+        />
+
+        <SidebarItem
+          to="/ventas"
+          icon={DollarSign}
+          text="Ventas"
         />
 
         <SidebarItem
