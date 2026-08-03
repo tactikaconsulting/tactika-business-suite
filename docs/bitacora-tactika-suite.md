@@ -734,6 +734,27 @@ Archivos modificados:
 - `src/components/CRM/InicioCRM.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-02 - Resultados rapidos de contacto en campanas
+
+Objetivo:
+
+- Medir que ocurre despues de preparar o enviar mensajes de campana.
+- Registrar rapidamente si un prospecto respondio, esta interesado, quiere agendar o no contesta.
+- Evitar que el resultado comercial quede fuera del CRM.
+
+Resultado:
+
+- Se agregaron estados visuales para `Interesado`, `Agendar llamada`, `Sin respuesta` y `No interesado`.
+- En cada mensaje programado se agregaron botones de resultado rapido.
+- Al marcar un resultado, se actualiza el estado del mensaje.
+- Tambien se registra una interaccion comercial en el historial del prospecto.
+- Se programa el siguiente seguimiento segun el resultado.
+
+Archivos modificados:
+
+- `src/components/CRM/CampanasComerciales.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

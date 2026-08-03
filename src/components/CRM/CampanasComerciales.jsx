@@ -120,6 +120,9 @@ function estadoClase(estado) {
     Preparado: "bg-amber-50 text-amber-700 border-amber-100",
     Enviado: "bg-green-50 text-green-700 border-green-100",
     Respondio: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    Interesado: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    "Agendar llamada": "bg-indigo-50 text-indigo-700 border-indigo-100",
+    "No interesado": "bg-red-50 text-red-700 border-red-100",
     "Sin respuesta": "bg-slate-50 text-slate-600 border-slate-100",
     Cancelado: "bg-red-50 text-red-700 border-red-100",
   };
@@ -255,7 +258,7 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
     }
   }
 
-  async function registrarMensaje(mensaje, prospecto, estado = "Preparado") {
+  async function registrarMensaje(mensaje, prospecto, estado = "Preparado", opciones = {}) {
     await actualizarEstadoMensajeProgramado(mensaje.id, estado, {
       fechaEnvio: new Date().toISOString(),
     });
@@ -264,18 +267,46 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
       await onRegistrarEnvio({
         prospectoId: prospecto.id,
         tipo: mensaje.canal,
-        titulo: mensaje.canal === "correo" ? "Correo preparado desde campana" : "WhatsApp preparado desde campana",
-        resultado: estado === "Enviado" ? "Marcado como enviado" : "Mensaje preparado desde campana comercial",
+        titulo:
+          opciones.titulo ||
+          (mensaje.canal === "correo"
+            ? "Correo desde campana comercial"
+            : "WhatsApp desde campana comercial"),
+        resultado:
+          opciones.resultado ||
+          (estado === "Enviado" ? "Marcado como enviado" : "Mensaje preparado desde campana comercial"),
         detalle: mensaje.mensaje,
         fechaInteraccion: new Date().toISOString(),
         proximoSeguimiento: {
-          fechaProximoContacto: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
-          proximoPaso: "Revisar respuesta del prospecto",
+          fechaProximoContacto: new Date(Date.now() + (opciones.diasSeguimiento || 3) * 86400000)
+            .toISOString()
+            .slice(0, 10),
+          proximoPaso: opciones.proximoPaso || "Revisar respuesta del prospecto",
         },
       });
     }
 
     await cargar();
+  }
+
+  async function marcarResultado(mensaje, estado, resultado, proximoPaso, diasSeguimiento = 2) {
+    const prospecto = prospectos.find((p) => p.id === mensaje.prospectoId);
+    if (!prospecto) return;
+
+    await registrarMensaje(mensaje, prospecto, estado, {
+      titulo: `Resultado de contacto: ${estado}`,
+      resultado,
+      proximoPaso,
+      diasSeguimiento,
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Resultado registrado",
+      text: `${prospecto.empresa} quedo marcado como ${estado}.`,
+      timer: 1500,
+      showConfirmButton: false,
+    });
   }
 
   async function prepararMensaje(mensaje) {
@@ -533,7 +564,17 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
                 {mensajes.map((mensaje) => {
                   const prospecto = prospectos.find((p) => p.id === mensaje.prospectoId);
                   const puedePreparar =
-                    prospecto && !["Enviado", "Cancelado", "Respondio"].includes(mensaje.estado);
+                    prospecto &&
+                    ![
+                      "Cancelado",
+                      "Respondio",
+                      "Interesado",
+                      "Agendar llamada",
+                      "No interesado",
+                    ].includes(mensaje.estado);
+                  const puedeRegistrarResultado =
+                    prospecto &&
+                    !["Cancelado", "No interesado"].includes(mensaje.estado);
 
                   return (
                     <tr key={mensaje.id} className="border-b align-top hover:bg-slate-50">
@@ -556,33 +597,102 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
                         <p className="line-clamp-3 text-slate-500">{mensaje.mensaje}</p>
                       </td>
                       <td className="p-3">
-                        <div className="flex justify-center gap-2 flex-wrap">
-                          {puedePreparar && (
-                            <button
-                              onClick={() => prepararMensaje(mensaje)}
-                              className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 flex items-center gap-1"
-                            >
-                              <Send size={13} />
-                              Preparar
-                            </button>
-                          )}
-                          {puedePreparar && (
-                            <button
-                              onClick={() => marcarEnviado(mensaje)}
-                              className="px-3 py-1.5 rounded-md border border-green-200 text-green-700 bg-green-50 text-xs font-semibold hover:bg-green-100 flex items-center gap-1"
-                            >
-                              <CheckCircle2 size={13} />
-                              Enviado
-                            </button>
-                          )}
-                          {!["Cancelado", "Enviado", "Respondio"].includes(mensaje.estado) && (
-                            <button
-                              onClick={() => cancelarMensaje(mensaje)}
-                              className="px-3 py-1.5 rounded-md border border-red-200 text-red-700 bg-red-50 text-xs font-semibold hover:bg-red-100 flex items-center gap-1"
-                            >
-                              <XCircle size={13} />
-                              Cancelar
-                            </button>
+                        <div className="space-y-2">
+                          <div className="flex justify-center gap-2 flex-wrap">
+                            {puedePreparar && (
+                              <button
+                                onClick={() => prepararMensaje(mensaje)}
+                                className="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 flex items-center gap-1"
+                              >
+                                <Send size={13} />
+                                Preparar
+                              </button>
+                            )}
+                            {puedePreparar && (
+                              <button
+                                onClick={() => marcarEnviado(mensaje)}
+                                className="px-3 py-1.5 rounded-md border border-green-200 text-green-700 bg-green-50 text-xs font-semibold hover:bg-green-100 flex items-center gap-1"
+                              >
+                                <CheckCircle2 size={13} />
+                                Enviado
+                              </button>
+                            )}
+                            {![
+                              "Cancelado",
+                              "Respondio",
+                              "Interesado",
+                              "Agendar llamada",
+                              "No interesado",
+                            ].includes(mensaje.estado) && (
+                              <button
+                                onClick={() => cancelarMensaje(mensaje)}
+                                className="px-3 py-1.5 rounded-md border border-red-200 text-red-700 bg-red-50 text-xs font-semibold hover:bg-red-100 flex items-center gap-1"
+                              >
+                                <XCircle size={13} />
+                                Cancelar
+                              </button>
+                            )}
+                          </div>
+
+                          {puedeRegistrarResultado && (
+                            <div className="flex justify-center gap-1.5 flex-wrap border-t border-slate-100 pt-2">
+                              <button
+                                onClick={() =>
+                                  marcarResultado(
+                                    mensaje,
+                                    "Interesado",
+                                    "Respondio interesado",
+                                    "Coordinar llamada breve para diagnostico",
+                                    1
+                                  )
+                                }
+                                className="px-2.5 py-1 rounded-md border border-emerald-200 bg-emerald-50 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100"
+                              >
+                                Interesado
+                              </button>
+                              <button
+                                onClick={() =>
+                                  marcarResultado(
+                                    mensaje,
+                                    "Agendar llamada",
+                                    "Solicita o acepta llamada",
+                                    "Agendar llamada de 15 minutos",
+                                    1
+                                  )
+                                }
+                                className="px-2.5 py-1 rounded-md border border-indigo-200 bg-indigo-50 text-[11px] font-semibold text-indigo-700 hover:bg-indigo-100"
+                              >
+                                Agendar
+                              </button>
+                              <button
+                                onClick={() =>
+                                  marcarResultado(
+                                    mensaje,
+                                    "Sin respuesta",
+                                    "No respondio el mensaje",
+                                    "Hacer seguimiento suave",
+                                    2
+                                  )
+                                }
+                                className="px-2.5 py-1 rounded-md border border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 hover:bg-slate-100"
+                              >
+                                No respondio
+                              </button>
+                              <button
+                                onClick={() =>
+                                  marcarResultado(
+                                    mensaje,
+                                    "No interesado",
+                                    "Indica que no esta interesado",
+                                    "No insistir por ahora",
+                                    30
+                                  )
+                                }
+                                className="px-2.5 py-1 rounded-md border border-red-200 bg-red-50 text-[11px] font-semibold text-red-700 hover:bg-red-100"
+                              >
+                                No interesado
+                              </button>
+                            </div>
                           )}
                         </div>
                       </td>
