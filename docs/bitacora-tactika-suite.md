@@ -669,6 +669,27 @@ Archivos modificados:
 - `supabase/migrations/202608010001_ventas_servicios_cliente.sql`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-02 - Kit comercial inicial para captacion
+
+Objetivo:
+
+- Pasar de construir producto a preparar la captacion de clientes.
+- Mejorar el mensaje de la landing para vender el diagnostico como puerta de entrada.
+- Crear una propuesta comercial corta para enviar por WhatsApp o correo.
+
+Resultado:
+
+- Se ajusto la landing para partir desde el dolor del cliente: empresas que dependen de WhatsApp, Excel y memoria.
+- Se reforzo el llamado principal a agendar el Diagnostico Empresarial Tactika de $29.990.
+- Se agrego una franja con lo que incluye el diagnostico: reunion inicial, problemas criticos, plan de accion y sistema recomendado.
+- Se preparo una propuesta comercial PDF de 2 paginas con problema, Metodo Tactika, oferta de entrada, precios y siguiente paso.
+
+Archivos modificados o creados:
+
+- Landing: `index.html` en el repositorio `tactika-landing-repo`
+- Propuesta PDF: `Propuesta_Comercial_Tactika_Diagnostico.pdf`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
