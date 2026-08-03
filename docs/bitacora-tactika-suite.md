@@ -712,6 +712,28 @@ Archivos modificados:
 - `src/components/CRM/CampanasComerciales.jsx`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-02 - Panel diario de trabajo comercial
+
+Objetivo:
+
+- Convertir el inicio del CRM en una lista diaria de acciones.
+- Mostrar que mensajes de campana hay que preparar hoy.
+- Evitar que los seguimientos y propuestas pendientes dependan de la memoria.
+
+Resultado:
+
+- Se conectaron los mensajes programados de campanas al inicio del CRM.
+- Se agrego el indicador `Mensajes por preparar`.
+- Se agrego el bloque `Mensajes para preparar hoy`.
+- Se mantiene acceso directo hacia la pestaña Campanas para revisar y preparar cada mensaje.
+- Se agrego un bloque de alertas comerciales para propuestas sin respuesta.
+
+Archivos modificados:
+
+- `src/pages/CRMComercial.jsx`
+- `src/components/CRM/InicioCRM.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.

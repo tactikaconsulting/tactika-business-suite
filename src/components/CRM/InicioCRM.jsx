@@ -3,6 +3,7 @@ import {
   ArrowRight,
   CalendarClock,
   FileText,
+  Megaphone,
   MessageSquareText,
   Target,
 } from "lucide-react";
@@ -28,6 +29,11 @@ function diasDesde(fecha) {
   const hoy = inicioDia(new Date());
   const base = inicioDia(`${fecha}T00:00:00`);
   return Math.floor((hoy - base) / (1000 * 60 * 60 * 24));
+}
+
+function esHoyOVencido(fecha) {
+  if (!fecha) return false;
+  return inicioDia(fecha).getTime() <= inicioDia(new Date()).getTime();
 }
 
 function MiniCard({ icon: Icon, label, valor, detalle, variante = "default" }) {
@@ -70,6 +76,7 @@ function ListaSimple({ titulo, vacio, items, renderItem, accion }) {
 export default function InicioCRM({
   prospectos,
   propuestas,
+  mensajesProgramados = [],
   onAbrirProspecto,
   onRegistrarInteraccion,
   onCrearPropuesta,
@@ -88,6 +95,12 @@ export default function InicioCRM({
   const propuestasPendientes = propuestas
     .filter((p) => p.estado === "Enviada" && diasDesde(p.fechaEnvio || p.createdAt?.slice(0, 10)) >= 3)
     .slice(0, 5);
+
+  const mensajesParaHoy = mensajesProgramados
+    .filter((m) => ["Programado", "Preparado", "Sin respuesta"].includes(m.estado))
+    .filter((m) => esHoyOVencido(m.fechaProgramada))
+    .sort((a, b) => new Date(a.fechaProgramada) - new Date(b.fechaProgramada))
+    .slice(0, 6);
 
   const oportunidadesMayorValor = [...activos]
     .sort((a, b) => Number(b.valorEstimado || 0) - Number(a.valorEstimado || 0))
@@ -143,20 +156,65 @@ export default function InicioCRM({
           detalle="accion hoy"
         />
         <MiniCard
+          icon={Megaphone}
+          label="Mensajes por preparar"
+          valor={mensajesParaHoy.length}
+          detalle="campanas"
+        />
+        <MiniCard
           icon={FileText}
           label="Propuestas enviadas"
           valor={formatoCLP(montoPropuestas)}
           detalle="pendiente decision"
         />
-        <MiniCard
-          icon={AlertTriangle}
-          label="Propuestas sin respuesta"
-          valor={propuestasPendientes.length}
-          detalle="3 dias o mas"
-        />
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <ListaSimple
+          titulo="Mensajes para preparar hoy"
+          vacio="No hay mensajes de campana para preparar hoy."
+          items={mensajesParaHoy}
+          accion={
+            <button
+              type="button"
+              onClick={() => onIrA("campanas")}
+              className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1"
+            >
+              Campanas <ArrowRight size={13} />
+            </button>
+          }
+          renderItem={(mensaje) => {
+            const prospecto = prospectos.find((p) => p.id === mensaje.prospectoId);
+            return (
+              <div key={mensaje.id} className="border border-blue-100 bg-blue-50 rounded-lg p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-800">
+                      {prospecto?.empresa || "Prospecto no encontrado"}
+                    </p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      {mensaje.canal} · {new Date(mensaje.fechaProgramada).toLocaleString("es-CL", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-2 line-clamp-2">{mensaje.mensaje}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onIrA("campanas")}
+                    className="shrink-0 px-3 py-1.5 rounded-md border border-blue-200 bg-white text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                  >
+                    Preparar
+                  </button>
+                </div>
+              </div>
+            );
+          }}
+        />
+
         <ListaSimple
           titulo="Prospectos prioritarios"
           vacio="No hay prospectos activos para priorizar."
@@ -290,6 +348,39 @@ export default function InicioCRM({
               </div>
             </div>
           )}
+        />
+
+        <ListaSimple
+          titulo="Alertas comerciales"
+          vacio="No hay alertas comerciales pendientes."
+          items={propuestasPendientes}
+          accion={
+            <button
+              type="button"
+              onClick={() => onIrA("propuestas")}
+              className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1"
+            >
+              Revisar <ArrowRight size={13} />
+            </button>
+          }
+          renderItem={(propuesta) => {
+            const prospecto = prospectos.find((p) => p.id === propuesta.prospectoId);
+            return (
+              <div key={`alerta-${propuesta.id}`} className="border border-red-100 bg-red-50 rounded-lg p-3">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={16} className="text-red-600 mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Propuesta sin respuesta
+                    </p>
+                    <p className="text-xs text-red-700 mt-1">
+                      {prospecto?.empresa || "Prospecto no encontrado"} · 3 dias o mas
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          }}
         />
       </section>
     </div>

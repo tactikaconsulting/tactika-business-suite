@@ -39,6 +39,7 @@ import {
   obtenerPropuestasComerciales,
 } from "../services/PropuestaComercialService";
 import { descargarPropuestaPDF } from "../services/PropuestaPDFService";
+import { obtenerMensajesProgramados } from "../services/CampanaComercialService";
 
 const columnasImportacion = [
   { clave: "empresa", etiqueta: "Empresa", requerido: true },
@@ -59,6 +60,7 @@ export default function CRMComercial() {
   const [historial, setHistorial] = useState([]);
   const [interacciones, setInteracciones] = useState([]);
   const [propuestas, setPropuestas] = useState([]);
+  const [mensajesProgramados, setMensajesProgramados] = useState([]);
   const [prospectoEditar, setProspectoEditar] = useState(null);
   const [prospectoHistorial, setProspectoHistorial] = useState(null);
   const [prospectoResumen, setProspectoResumen] = useState(null);
@@ -74,16 +76,24 @@ export default function CRMComercial() {
   }, []);
 
   async function cargar() {
-    const [dataProspectos, dataHistorial, dataInteracciones, dataPropuestas] = await Promise.all([
+    const [
+      dataProspectos,
+      dataHistorial,
+      dataInteracciones,
+      dataPropuestas,
+      dataMensajesProgramados,
+    ] = await Promise.all([
       obtenerProspectos(),
       obtenerHistorial(),
       obtenerInteraccionesComerciales(),
       obtenerPropuestasComerciales(),
+      obtenerMensajesProgramados(),
     ]);
     setProspectos(dataProspectos);
     setHistorial(dataHistorial);
     setInteracciones(dataInteracciones);
     setPropuestas(dataPropuestas);
+    setMensajesProgramados(dataMensajesProgramados);
   }
 
   async function guardar(datos) {
@@ -464,6 +474,7 @@ export default function CRMComercial() {
         <InicioCRM
           prospectos={prospectos}
           propuestas={propuestas}
+          mensajesProgramados={mensajesProgramados}
           onAbrirProspecto={setProspectoResumen}
           onRegistrarInteraccion={abrirInteraccion}
           onCrearPropuesta={abrirPropuesta}
