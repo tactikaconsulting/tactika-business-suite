@@ -8,7 +8,14 @@ const plantillas = [
     nombre: "Primer contacto",
     descripcion: "Mensaje breve para iniciar una conversacion sin vender de inmediato.",
     generar: (p) =>
-      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, soy Claudio Urra de Tactika Consulting. Estamos conversando con empresas${p.giro ? ` del rubro ${p.giro}` : ""} para conocer como estan gestionando sus clientes, procesos y seguimiento comercial. Me gustaria coordinar una conversacion breve de 15 minutos para entender como trabajan hoy y ver si podemos aportar valor mediante un diagnostico empresarial.`,
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, soy Claudio Urra de Tactika Consulting.\n\nEstoy contactando a empresas${p.giro ? ` del rubro ${p.giro}` : ""} porque estamos ayudando a pymes a ordenar clientes, ventas, tareas y seguimiento cuando todo esta repartido entre WhatsApp, Excel o planillas.\n\nPartimos con un diagnostico empresarial simple para detectar que procesos se pueden mejorar y si tiene sentido implementar un sistema adaptado.\n\n¿Con quien podria conversar 10 minutos para contarle mejor?`,
+  },
+  {
+    id: "respuesta-interesado",
+    nombre: "Respuesta a interesado",
+    descripcion: "Para responder cuando el prospecto muestra interes.",
+    generar: () =>
+      `Perfecto. La idea no es venderte un sistema de entrada.\n\nPrimero hacemos un diagnostico para entender como trabajan hoy, que les esta quitando tiempo y que se puede ordenar. Despues, si vemos que podemos aportar valor, te presentamos una propuesta con una solucion adaptada a tu empresa.\n\n¿Te acomoda que coordinemos una llamada breve manana?`,
   },
   {
     id: "seguimiento-llamada",
@@ -19,10 +26,10 @@ const plantillas = [
   },
   {
     id: "envio-propuesta",
-    nombre: "Envio de propuesta",
-    descripcion: "Para acompanar una propuesta comercial ya enviada.",
+    nombre: "Envio PDF comercial",
+    descripcion: "Para acompanar el PDF comercial de Tactika.",
     generar: (p) =>
-      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, te envio la propuesta de Tactika Consulting para ${p.empresa}. La idea es partir con un diagnostico empresarial y luego, si hace sentido para ustedes, implementar una solucion de gestion adaptada a su forma de trabajar. Quedo atento a tus comentarios para revisar dudas o ajustar el alcance.`,
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, te comparto una presentacion breve de Tactika Consulting para que veas como trabajamos.\n\nLa idea es simple: primero diagnosticamos como funciona ${p.empresa}, luego detectamos oportunidades de mejora y, si tiene sentido, implementamos un sistema adaptado a su operacion.\n\nDespues de que la revises, podemos coordinar una llamada corta para resolver dudas.`,
   },
   {
     id: "recordatorio-propuesta",

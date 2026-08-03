@@ -22,20 +22,58 @@ const plantillasCampana = [
   {
     id: "primer-contacto",
     nombre: "Primer contacto",
+    descripcion: "Dia 1 - Abrir conversacion sin presionar.",
     generar: (p) =>
-      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, soy Claudio Urra de Tactika Consulting. Estamos conversando con empresas${p.giro ? ` del rubro ${p.giro}` : ""} para conocer como estan gestionando clientes, procesos y seguimiento comercial. Me gustaria coordinar una conversacion breve de 15 minutos para entender como trabajan hoy y ver si podemos aportar valor mediante un diagnostico empresarial.`,
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, soy Claudio Urra de Tactika Consulting.\n\nEstoy contactando a empresas${p.giro ? ` del rubro ${p.giro}` : ""} porque estamos ayudando a pymes a ordenar clientes, ventas, tareas y seguimiento cuando todo esta repartido entre WhatsApp, Excel o planillas.\n\nPartimos con un diagnostico empresarial simple para detectar que procesos se pueden mejorar y si tiene sentido implementar un sistema adaptado.\n\n¿Con quien podria conversar 10 minutos para contarle mejor?`,
   },
   {
     id: "invitacion-diagnostico",
     nombre: "Invitacion a diagnostico",
+    descripcion: "Dia 2 - Proponer reunion breve.",
     generar: (p) =>
-      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, en Tactika ayudamos a pymes como ${p.empresa} a ordenar procesos, seguimiento comercial e informacion clave. Podemos partir con un diagnostico breve para detectar oportunidades de mejora y definir un plan accionable. ¿Te acomoda coordinar 15 minutos esta semana?`,
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, te escribo nuevamente por Tactika Consulting.\n\nLa idea no es venderte un sistema de entrada. Primero hacemos un diagnostico para entender como trabajan hoy, que les esta quitando tiempo y que se puede ordenar.\n\n¿Te acomoda coordinar una llamada breve de 15 minutos esta semana?`,
+  },
+  {
+    id: "envio-pdf",
+    nombre: "Envio PDF comercial",
+    descripcion: "Dia 3 - Enviar presentacion si hubo interes.",
+    generar: (p) =>
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, te comparto una presentacion breve de Tactika Consulting para que veas como trabajamos.\n\nPrimero diagnosticamos como funciona ${p.empresa}, luego detectamos oportunidades de mejora y, si tiene sentido, implementamos un sistema adaptado a su operacion.\n\nDespues de que la revises, podemos coordinar una llamada corta para resolver dudas.`,
   },
   {
     id: "seguimiento",
     nombre: "Seguimiento",
+    descripcion: "Dia 5 - Revisar respuesta sin presionar.",
     generar: (p) =>
-      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, retomo contacto por Tactika Consulting. Queria saber si sigue siendo prioridad revisar oportunidades para mejorar la gestion de ${p.empresa}. Si te parece, puedo enviarte una propuesta simple para partir con un diagnostico empresarial.`,
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, ¿como estas? Te escribo para saber si pudiste revisar la informacion de Tactika Consulting.\n\nSi ordenar clientes, ventas o seguimiento sigue siendo tema para ${p.empresa}, podemos coordinar una conversacion breve y ver si el diagnostico empresarial les sirve.`,
+  },
+  {
+    id: "cierre-suave",
+    nombre: "Cierre suave",
+    descripcion: "Dia 7 - Cerrar o dejar para mas adelante.",
+    generar: (p) =>
+      `Hola${p.contactoNombre ? ` ${p.contactoNombre}` : ""}, ultimo mensaje para no insistir de mas.\n\nSi ahora no es prioridad revisar la gestion de ${p.empresa}, no hay problema. Puedo dejarlo para mas adelante.\n\nY si si les interesa ordenar clientes, ventas o procesos, coordinamos una llamada corta y vemos si el diagnostico Tactika tiene sentido.`,
+  },
+];
+
+const flujosCampana = [
+  {
+    id: "diagnostico-pymes-7-dias",
+    nombre: "Campana Diagnostico Pymes - 7 dias",
+    descripcion: "Secuencia manual para iniciar contacto, hacer seguimiento y cerrar sin presionar.",
+    pasos: [
+      { dias: 0, plantillaId: "primer-contacto", etiqueta: "Dia 1 - Primer contacto" },
+      { dias: 1, plantillaId: "invitacion-diagnostico", etiqueta: "Dia 2 - Llamada breve" },
+      { dias: 3, plantillaId: "envio-pdf", etiqueta: "Dia 3 - Enviar PDF si hay interes" },
+      { dias: 5, plantillaId: "seguimiento", etiqueta: "Dia 5 - Seguimiento" },
+      { dias: 7, plantillaId: "cierre-suave", etiqueta: "Dia 7 - Cierre suave" },
+    ],
+  },
+  {
+    id: "mensaje-unico",
+    nombre: "Mensaje unico",
+    descripcion: "Crea un solo mensaje programado por prospecto.",
+    pasos: [],
   },
 ];
 
@@ -58,6 +96,12 @@ function fechaInputManana() {
   fecha.setDate(fecha.getDate() + 1);
   fecha.setHours(9, 30, 0, 0);
   return fecha.toISOString().slice(0, 16);
+}
+
+function sumarDiasFecha(fechaBase, dias) {
+  const fecha = new Date(fechaBase);
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha.toISOString();
 }
 
 function formatoFecha(fecha) {
@@ -88,13 +132,19 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
   const [mensajes, setMensajes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState("");
-  const [nombre, setNombre] = useState("Prospeccion inicial Tactika");
-  const [canal, setCanal] = useState("correo");
+  const [nombre, setNombre] = useState("Campana Diagnostico Pymes - Primer Contacto");
+  const [canal, setCanal] = useState("whatsapp");
+  const [flujoId, setFlujoId] = useState("diagnostico-pymes-7-dias");
   const [plantillaId, setPlantillaId] = useState("primer-contacto");
   const [fechaProgramada, setFechaProgramada] = useState(fechaInputManana());
   const [seleccionados, setSeleccionados] = useState({});
 
   const plantilla = plantillasCampana.find((p) => p.id === plantillaId) || plantillasCampana[0];
+  const flujo = flujosCampana.find((f) => f.id === flujoId) || flujosCampana[0];
+  const pasosFlujo =
+    flujoId === "mensaje-unico"
+      ? [{ dias: 0, plantillaId, etiqueta: "Mensaje unico" }]
+      : flujo.pasos;
   const prospectosValidos = prospectos.filter((p) =>
     canal === "correo" ? p.correo : limpiarTelefono(p.telefono)
   );
@@ -157,21 +207,29 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
       return;
     }
 
-    const mensajesCampana = prospectosSeleccionados.map((prospecto) => ({
-      prospectoId: prospecto.id,
-      canal,
-      asunto: `Tactika Consulting - ${prospecto.empresa}`,
-      mensaje: plantilla.generar(prospecto),
-      estado: "Programado",
-      fechaProgramada: new Date(fechaProgramada).toISOString(),
-    }));
+    const fechaBase = new Date(fechaProgramada);
+    const mensajesCampana = prospectosSeleccionados.flatMap((prospecto) =>
+      pasosFlujo.map((paso) => {
+        const plantillaPaso =
+          plantillasCampana.find((p) => p.id === paso.plantillaId) || plantilla;
+
+        return {
+          prospectoId: prospecto.id,
+          canal,
+          asunto: `Tactika Consulting - ${prospecto.empresa}`,
+          mensaje: plantillaPaso.generar(prospecto),
+          estado: "Programado",
+          fechaProgramada: sumarDiasFecha(fechaBase, paso.dias),
+        };
+      })
+    );
 
     try {
       await crearCampanaConMensajes(
         {
           nombre,
           canal,
-          plantilla: plantillaId,
+          plantilla: flujoId === "mensaje-unico" ? plantillaId : flujoId,
           estado: "Programada",
           fechaProgramada: new Date(fechaProgramada).toISOString(),
         },
@@ -184,7 +242,7 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
       Swal.fire({
         icon: "success",
         title: "Campana programada",
-        text: `Se dejaron ${mensajesCampana.length} mensajes listos para revision.`,
+        text: `Se dejaron ${mensajesCampana.length} mensajes listos para revision manual.`,
         timer: 1800,
         showConfirmButton: false,
       });
@@ -323,19 +381,56 @@ export default function CampanasComerciales({ prospectos, onRegistrarEnvio }) {
             </div>
 
             <label className="block">
-              <span className="text-xs font-semibold text-slate-500 uppercase">Plantilla</span>
+              <span className="text-xs font-semibold text-slate-500 uppercase">Tipo de campana</span>
               <select
-                value={plantillaId}
-                onChange={(e) => setPlantillaId(e.target.value)}
+                value={flujoId}
+                onChange={(e) => setFlujoId(e.target.value)}
                 className="mt-2 w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-white"
               >
-                {plantillasCampana.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nombre}
+                {flujosCampana.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.nombre}
                   </option>
                 ))}
               </select>
+              <span className="block mt-2 text-xs text-slate-400">{flujo.descripcion}</span>
             </label>
+
+            {flujoId === "mensaje-unico" && (
+              <label className="block">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Plantilla</span>
+                <select
+                  value={plantillaId}
+                  onChange={(e) => setPlantillaId(e.target.value)}
+                  className="mt-2 w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-white"
+                >
+                  {plantillasCampana.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-900">
+              <p className="font-semibold mb-2">Secuencia programada</p>
+              <div className="space-y-2">
+                {pasosFlujo.map((paso) => {
+                  const plantillaPaso =
+                    plantillasCampana.find((p) => p.id === paso.plantillaId) || plantilla;
+                  return (
+                    <div key={`${paso.plantillaId}-${paso.dias}`} className="flex justify-between gap-3">
+                      <span>{paso.etiqueta}</span>
+                      <span className="font-semibold">{plantillaPaso.nombre}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-3 text-xs text-blue-700">
+                Esto no envia mensajes solo. Quedan listos para preparar, revisar y abrir WhatsApp o correo.
+              </p>
+            </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
               <p className="font-semibold text-slate-800 mb-2">Regla de seguridad</p>

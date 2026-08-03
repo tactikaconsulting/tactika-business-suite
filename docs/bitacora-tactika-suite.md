@@ -690,6 +690,28 @@ Archivos modificados o creados:
 - Propuesta PDF: `Propuesta_Comercial_Tactika_Diagnostico.pdf`
 - `docs/bitacora-tactika-suite.md`
 
+### 2026-08-02 - Campana estandar de captacion CRM
+
+Objetivo:
+
+- Convertir las plantillas comerciales en un flujo diario para captar clientes.
+- Evitar envios automaticos sin revision.
+- Dejar una campana base para prospectos que tienen telefono o correo.
+
+Resultado:
+
+- Se mejoraron las plantillas de mensajes del CRM con un discurso mas claro: WhatsApp, Excel, planillas, diagnostico y sistema adaptado.
+- Se agrego una campana estandar llamada `Campana Diagnostico Pymes - 7 dias`.
+- La campana programa mensajes para dia 1, dia 2, dia 3, dia 5 y dia 7.
+- Los mensajes quedan en estado programado y deben prepararse manualmente antes de abrir WhatsApp o correo.
+- Se mantiene la regla de seguridad: no hay envio masivo automatico.
+
+Archivos modificados:
+
+- `src/components/CRM/PlantillasMensajes.jsx`
+- `src/components/CRM/CampanasComerciales.jsx`
+- `docs/bitacora-tactika-suite.md`
+
 ## Pendientes tecnicos
 
 - Revisar errores existentes de `npm run lint`.
