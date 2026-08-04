@@ -5,6 +5,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { nombreTipoUsuario } from "../../utils/permisosUsuario";
 
 export default function Topbar() {
   const { perfil, cerrarSesion } = useAuth();
@@ -38,7 +39,7 @@ export default function Topbar() {
             </p>
 
             <p className="text-sm text-gray-500 capitalize">
-              {perfil?.rol || "..."}
+              {nombreTipoUsuario(perfil)}
             </p>
 
           </div>

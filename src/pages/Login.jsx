@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabase";
+import { esUsuarioCliente } from "../utils/permisosUsuario";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,7 +20,14 @@ export default function Login() {
 
     try {
       await iniciarSesion(email, password);
-      navigate("/");
+      const { data: authData } = await supabase.auth.getUser();
+      const { data: perfil } = await supabase
+        .from("perfiles")
+        .select("tipo_usuario")
+        .eq("id", authData?.user?.id)
+        .single();
+
+      navigate(esUsuarioCliente(perfil) ? "/portal-cliente" : "/");
     } catch (err) {
       setError("Correo o contraseña incorrectos.");
     } finally {

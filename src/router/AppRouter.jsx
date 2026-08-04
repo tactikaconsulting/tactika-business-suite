@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 import RutaProtegida from "../components/RutaProtegida";
+import RutaInternaTactika from "../components/RutaInternaTactika";
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
@@ -28,20 +29,23 @@ export default function AppRouter() {
 
         <Route element={<RutaProtegida />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/clientes" element={<Clientes />} />
-            <Route path="/diagnosticos" element={<Diagnostico />} />
-            <Route path="/planes" element={<PlanAccion />} />
-            <Route path="/seguimiento" element={<Seguimientos />} />
-            <Route path="/ventas" element={<Ventas />} />
-            <Route path="/reportes" element={<Reportes />} />
-            <Route path="/personal" element={<GestionPersonal />} />
-            <Route path="/riesgos" element={<MatrizRiesgos />} />
-            <Route path="/prospeccion-ia" element={<ProspeccionIA />} />
-            <Route path="/crm" element={<CRMComercial />} /> {/* ⬅ NUEVO */}
-            <Route path="/implementaciones" element={<Implementaciones />} />
             <Route path="/portal-cliente" element={<PortalCliente />} />
-            <Route path="/configuracion" element={<Configuracion />} />
+
+            <Route element={<RutaInternaTactika />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/clientes" element={<Clientes />} />
+              <Route path="/diagnosticos" element={<Diagnostico />} />
+              <Route path="/planes" element={<PlanAccion />} />
+              <Route path="/seguimiento" element={<Seguimientos />} />
+              <Route path="/ventas" element={<Ventas />} />
+              <Route path="/reportes" element={<Reportes />} />
+              <Route path="/personal" element={<GestionPersonal />} />
+              <Route path="/riesgos" element={<MatrizRiesgos />} />
+              <Route path="/prospeccion-ia" element={<ProspeccionIA />} />
+              <Route path="/crm" element={<CRMComercial />} /> {/* ⬅ NUEVO */}
+              <Route path="/implementaciones" element={<Implementaciones />} />
+              <Route path="/configuracion" element={<Configuracion />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

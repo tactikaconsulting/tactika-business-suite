@@ -15,8 +15,13 @@ import {
 
 import Logo from "./Logo";
 import SidebarItem from "./SidebarItem";
+import { useAuth } from "../../context/AuthContext";
+import { esUsuarioCliente } from "../../utils/permisosUsuario";
 
 export default function Sidebar() {
+  const { perfil } = useAuth();
+  const usuarioCliente = esUsuarioCliente(perfil);
+
   return (
     <aside className="w-72 bg-slate-900 min-h-screen flex flex-col shadow-xl">
 
@@ -24,53 +29,57 @@ export default function Sidebar() {
 
       <nav className="flex-1 mt-6 space-y-1">
 
-        <SidebarItem
-          to="/"
-          icon={LayoutDashboard}
-          text="Dashboard"
-        />
+        {!usuarioCliente && (
+          <>
+            <SidebarItem
+              to="/"
+              icon={LayoutDashboard}
+              text="Dashboard"
+            />
 
-        <SidebarItem
-          to="/clientes"
-          icon={Users}
-          text="Clientes"
-        />
+            <SidebarItem
+              to="/clientes"
+              icon={Users}
+              text="Clientes"
+            />
 
-        <SidebarItem
-          to="/diagnosticos"
-          icon={ClipboardCheck}
-          text="Diagnósticos"
-        />
+            <SidebarItem
+              to="/diagnosticos"
+              icon={ClipboardCheck}
+              text="Diagnósticos"
+            />
 
-        <SidebarItem
-          to="/planes"
-          icon={Target}
-          text="Planes de Acción"
-        />
+            <SidebarItem
+              to="/planes"
+              icon={Target}
+              text="Planes de Acción"
+            />
 
-        <SidebarItem
-          to="/seguimiento"
-          icon={CalendarCheck}
-          text="Seguimiento"
-        />
+            <SidebarItem
+              to="/seguimiento"
+              icon={CalendarCheck}
+              text="Seguimiento"
+            />
 
-        <SidebarItem
-          to="/prospeccion-ia"
-          icon={Sparkles}
-          text="Prospección IA"
-        />
+            <SidebarItem
+              to="/prospeccion-ia"
+              icon={Sparkles}
+              text="Prospección IA"
+            />
 
-        <SidebarItem
-          to="/crm"
-          icon={Briefcase}
-          text="CRM Comercial"
-        />
+            <SidebarItem
+              to="/crm"
+              icon={Briefcase}
+              text="CRM Comercial"
+            />
 
-        <SidebarItem
-          to="/implementaciones"
-          icon={Rocket}
-          text="Implementaciones"
-        />
+            <SidebarItem
+              to="/implementaciones"
+              icon={Rocket}
+              text="Implementaciones"
+            />
+          </>
+        )}
 
         <SidebarItem
           to="/portal-cliente"
@@ -78,23 +87,27 @@ export default function Sidebar() {
           text="Portal Cliente"
         />
 
-        <SidebarItem
-          to="/ventas"
-          icon={DollarSign}
-          text="Ventas"
-        />
+        {!usuarioCliente && (
+          <>
+            <SidebarItem
+              to="/ventas"
+              icon={DollarSign}
+              text="Ventas"
+            />
 
-        <SidebarItem
-          to="/reportes"
-          icon={BarChart3}
-          text="Reportes"
-        />
+            <SidebarItem
+              to="/reportes"
+              icon={BarChart3}
+              text="Reportes"
+            />
 
-        <SidebarItem
-          to="/configuracion"
-          icon={Settings}
-          text="Configuración"
-        />
+            <SidebarItem
+              to="/configuracion"
+              icon={Settings}
+              text="Configuración"
+            />
+          </>
+        )}
 
       </nav>
 
