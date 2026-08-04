@@ -1,5 +1,10 @@
-import { useState } from "react";
-import { FileText, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ClipboardCheck, FileText, Sparkles, X } from "lucide-react";
+import Swal from "sweetalert2";
+import {
+  crearBorradorPropuestaDesdeDiagnostico,
+  prospectoTieneDiagnosticoComercial,
+} from "../../services/PropuestaDesdeDiagnosticoService";
 
 const planes = [
   "Diagnostico Empresarial",
@@ -84,6 +89,13 @@ export default function CrearPropuestaComercial({
   const [fechaEnvio, setFechaEnvio] = useState(new Date().toISOString().slice(0, 10));
 
   const prospecto = prospectos.find((p) => p.id === prospectoId) || prospectos[0];
+  const tieneDiagnostico = prospectoTieneDiagnosticoComercial(prospecto);
+
+  useEffect(() => {
+    if (!prospectoInicialId || !prospecto || !tieneDiagnostico) return;
+    aplicarDiagnostico(prospecto, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function aplicarPlantilla(nuevoPlan) {
     const plantilla = plantillasPorPlan[nuevoPlan];
@@ -93,6 +105,27 @@ export default function CrearPropuestaComercial({
     setValorMensual(plantilla.mensualidad);
     setAlcance(plantilla.alcance);
     setCondiciones(plantilla.condiciones);
+  }
+
+  function aplicarDiagnostico(prospectoObjetivo = prospecto, mostrarAviso = true) {
+    if (!prospectoObjetivo) return;
+    const borrador = crearBorradorPropuestaDesdeDiagnostico(prospectoObjetivo);
+    setTitulo(borrador.titulo);
+    setPlan(borrador.plan);
+    setValorImplementacion(String(borrador.valorImplementacion));
+    setValorMensual(String(borrador.valorMensual));
+    setAlcance(borrador.alcance);
+    setCondiciones(borrador.condiciones);
+
+    if (mostrarAviso) {
+      Swal.fire({
+        icon: "success",
+        title: "Propuesta preparada",
+        text: "Se uso el diagnostico comercial del prospecto como base.",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+    }
   }
 
   function guardar(e) {
@@ -161,6 +194,48 @@ export default function CrearPropuestaComercial({
               ))}
             </select>
           </label>
+
+          {tieneDiagnostico ? (
+            <div className="border border-blue-100 bg-blue-50 rounded-xl p-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-start">
+              <div className="flex items-start gap-3">
+                <ClipboardCheck size={20} className="text-blue-700 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-blue-950">Diagnostico comercial disponible</p>
+                  <p className="text-sm text-blue-900 mt-1 leading-relaxed">
+                    Este prospecto ya tiene problema, dolor, necesidad o valor estimado registrado.
+                    Puedes convertir esos datos en una propuesta lista para ajustar y enviar.
+                  </p>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-blue-900">
+                    <span className="rounded-lg bg-white/70 border border-blue-100 p-2">
+                      Problema: {prospecto.problemaDetectado || "Sin detalle"}
+                    </span>
+                    <span className="rounded-lg bg-white/70 border border-blue-100 p-2">
+                      Valor: {formatoCLP(prospecto.valorEstimado || 0)}
+                    </span>
+                    <span className="rounded-lg bg-white/70 border border-blue-100 p-2">
+                      Cierre: {Number(prospecto.probabilidadCierre || 0)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => aplicarDiagnostico()}
+                className="px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
+              >
+                <Sparkles size={16} />
+                Usar diagnostico
+              </button>
+            </div>
+          ) : (
+            <div className="border border-amber-100 bg-amber-50 rounded-xl p-4 flex items-start gap-3">
+              <ClipboardCheck size={18} className="text-amber-700 mt-0.5" />
+              <p className="text-sm text-amber-900">
+                Este prospecto aun no tiene diagnostico comercial. Puedes guardar la propuesta manualmente
+                o volver a la ficha y usar el boton Diagnostico para preparar una propuesta mas precisa.
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block">
