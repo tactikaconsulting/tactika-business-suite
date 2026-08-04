@@ -156,6 +156,35 @@ function contiene(valor, busqueda) {
   return normalizar(valor).includes(normalizar(busqueda));
 }
 
+function coincideRubro(empresa, rubro) {
+  const rubroNormalizado = normalizar(rubro);
+  if (!rubroNormalizado) return true;
+
+  const textoEmpresa = normalizar(
+    [
+      empresa.empresa,
+      empresa.giro,
+      empresa.problemaDetectado,
+      empresa.necesidad,
+    ].join(" ")
+  );
+
+  if (textoEmpresa.includes(rubroNormalizado)) return true;
+
+  const gruposRelacionados = [
+    ["constructora", "construccion", "obra", "obras", "inmobiliaria"],
+    ["comida rapida", "restaurante", "sandwich", "burger", "pollos"],
+    ["ferreteria", "comercio", "inventario", "stock"],
+    ["taller", "mecanico", "moto", "automotriz"],
+  ];
+
+  return gruposRelacionados.some(
+    (grupo) =>
+      grupo.some((palabra) => rubroNormalizado.includes(palabra)) &&
+      grupo.some((palabra) => textoEmpresa.includes(palabra))
+  );
+}
+
 function comunasComoLista(comunas) {
   return String(comunas || "")
     .split(/,|\n/)
@@ -170,7 +199,7 @@ export function buscarEmpresasSimuladas(filtros) {
 
   return empresasBase
     .filter((empresa) => {
-      const cumpleRubro = contiene(empresa.giro, filtros.rubro);
+      const cumpleRubro = coincideRubro(empresa, filtros.rubro);
       const cumpleRegion = contiene(empresa.region, filtros.region);
       const cumpleComuna =
         comunas.length === 0 || comunas.includes(normalizar(empresa.comuna));
