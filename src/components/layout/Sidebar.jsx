@@ -10,6 +10,7 @@ import {
   DollarSign,
   Sparkles,
   Rocket,
+  MonitorSmartphone,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -69,6 +70,12 @@ export default function Sidebar() {
           to="/implementaciones"
           icon={Rocket}
           text="Implementaciones"
+        />
+
+        <SidebarItem
+          to="/portal-cliente"
+          icon={MonitorSmartphone}
+          text="Portal Cliente"
         />
 
         <SidebarItem

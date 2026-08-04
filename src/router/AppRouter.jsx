@@ -14,6 +14,7 @@ import Configuracion from "../pages/Configuracion";
 import Ventas from "../pages/Ventas";
 import ProspeccionIA from "../pages/ProspeccionIA";
 import Implementaciones from "../pages/Implementaciones";
+import PortalCliente from "../pages/PortalCliente";
 
 import GestionPersonal from "../pages/GestionPersonal";
 import MatrizRiesgos from "../pages/MatrizRiesgos";
@@ -39,6 +40,7 @@ export default function AppRouter() {
             <Route path="/prospeccion-ia" element={<ProspeccionIA />} />
             <Route path="/crm" element={<CRMComercial />} /> {/* ⬅ NUEVO */}
             <Route path="/implementaciones" element={<Implementaciones />} />
+            <Route path="/portal-cliente" element={<PortalCliente />} />
             <Route path="/configuracion" element={<Configuracion />} />
           </Route>
         </Route>
