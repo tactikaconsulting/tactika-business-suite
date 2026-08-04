@@ -83,6 +83,12 @@ export default function Sidebar() {
             />
 
             <SidebarItem
+              to="/objetivos-mensuales"
+              icon={Target}
+              text="Objetivos"
+            />
+
+            <SidebarItem
               to="/prospeccion-ia"
               icon={Sparkles}
               text="Prospección IA"

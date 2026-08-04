@@ -36,12 +36,12 @@ function aColumnasDB(resultado, userId) {
   };
 }
 
-export async function obtenerResultadosDiarios() {
+export async function obtenerResultadosDiarios(limite = 30) {
   const { data, error } = await supabase
     .from("resultados_diarios")
     .select("*")
     .order("fecha", { ascending: false })
-    .limit(30);
+    .limit(limite);
 
   if (error) {
     console.error(error);

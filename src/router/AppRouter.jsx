@@ -17,6 +17,7 @@ import Ventas from "../pages/Ventas";
 import Agenda from "../pages/Agenda";
 import ResultadosDiarios from "../pages/ResultadosDiarios";
 import SeguimientoSemanal from "../pages/SeguimientoSemanal";
+import ObjetivosMensuales from "../pages/ObjetivosMensuales";
 import ProspeccionIA from "../pages/ProspeccionIA";
 import Implementaciones from "../pages/Implementaciones";
 import PortalCliente from "../pages/PortalCliente";
@@ -45,6 +46,7 @@ export default function AppRouter() {
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/resultados" element={<ResultadosDiarios />} />
               <Route path="/seguimiento-semanal" element={<SeguimientoSemanal />} />
+              <Route path="/objetivos-mensuales" element={<ObjetivosMensuales />} />
               <Route path="/ventas" element={<Ventas />} />
               <Route path="/reportes" element={<Reportes />} />
               <Route path="/personal" element={<GestionPersonal />} />
