@@ -12,6 +12,7 @@ import Seguimientos from "../pages/Seguimientos";
 import Reportes from "../pages/Reportes";
 import Configuracion from "../pages/Configuracion";
 import Ventas from "../pages/Ventas";
+import ProspeccionIA from "../pages/ProspeccionIA";
 
 import GestionPersonal from "../pages/GestionPersonal";
 import MatrizRiesgos from "../pages/MatrizRiesgos";
@@ -34,6 +35,7 @@ export default function AppRouter() {
             <Route path="/reportes" element={<Reportes />} />
             <Route path="/personal" element={<GestionPersonal />} />
             <Route path="/riesgos" element={<MatrizRiesgos />} />
+            <Route path="/prospeccion-ia" element={<ProspeccionIA />} />
             <Route path="/crm" element={<CRMComercial />} /> {/* ⬅ NUEVO */}
             <Route path="/configuracion" element={<Configuracion />} />
           </Route>

@@ -99,6 +99,53 @@ export async function crearProspecto(prospecto) {
   }
 }
 
+export async function buscarProspectoExistente(prospecto) {
+  const criterios = [
+    { columna: "rut", valor: limpiarValor(prospecto.rut) },
+    { columna: "correo", valor: limpiarValor(prospecto.correo) },
+    { columna: "telefono", valor: limpiarValor(prospecto.telefono) },
+    { columna: "empresa", valor: limpiarValor(prospecto.empresa) },
+  ].filter((criterio) => criterio.valor);
+
+  for (const criterio of criterios) {
+    const { data, error } = await supabase
+      .from("prospectos")
+      .select("*")
+      .eq(criterio.columna, criterio.valor)
+      .limit(1);
+
+    if (error) {
+      console.error(error);
+      continue;
+    }
+
+    if (data?.length > 0) return aProspecto(data[0]);
+  }
+
+  return null;
+}
+
+export async function crearProspectoSeguro(prospecto) {
+  const existente = await buscarProspectoExistente(prospecto);
+
+  if (existente) {
+    return { prospecto: existente, creado: false };
+  }
+
+  const { data, error } = await supabase
+    .from("prospectos")
+    .insert([aColumnasDB(prospecto)])
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return { prospecto: aProspecto(data), creado: true };
+}
+
 export async function actualizarProspecto(id, prospecto) {
   const { error } = await supabase
     .from("prospectos")

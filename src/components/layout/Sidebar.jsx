@@ -8,6 +8,7 @@ import {
   Settings,
   Briefcase,
   DollarSign,
+  Sparkles,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -49,6 +50,12 @@ export default function Sidebar() {
           to="/seguimiento"
           icon={CalendarCheck}
           text="Seguimiento"
+        />
+
+        <SidebarItem
+          to="/prospeccion-ia"
+          icon={Sparkles}
+          text="Prospección IA"
         />
 
         <SidebarItem
