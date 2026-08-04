@@ -8,6 +8,63 @@ const modulosIniciales = [
   "Reportes",
 ];
 
+export const catalogoModulosTactika = [
+  {
+    modulo: "CRM Comercial",
+    categoria: "Comercial",
+    descripcion: "Prospectos, pipeline, propuestas, plantillas y seguimiento comercial.",
+    planes: ["Base", "Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Diagnostico",
+    categoria: "Consultoria",
+    descripcion: "Evaluacion empresarial, pilares de gestion e informe de oportunidades.",
+    planes: ["Base", "Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Planes de Accion",
+    categoria: "Consultoria",
+    descripcion: "Acciones, responsables, prioridades y fechas de mejora.",
+    planes: ["Base", "Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Seguimiento",
+    categoria: "Operacion",
+    descripcion: "Tareas, recordatorios y control de avances del cliente.",
+    planes: ["Base", "Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Reportes",
+    categoria: "Gestion",
+    descripcion: "Informes, exportaciones y vista ejecutiva de resultados.",
+    planes: ["Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Ventas",
+    categoria: "Gestion",
+    descripcion: "Servicios contratados, valores, pagos y suscripciones.",
+    planes: ["Profesional", "Enterprise"],
+  },
+  {
+    modulo: "Prospeccion IA",
+    categoria: "Comercial",
+    descripcion: "Busqueda de oportunidades, priorizacion y mensajes comerciales.",
+    planes: ["Enterprise"],
+  },
+  {
+    modulo: "Inventario",
+    categoria: "Futuro",
+    descripcion: "Control de productos, stock, compras y rotacion.",
+    planes: ["Enterprise"],
+  },
+  {
+    modulo: "RRHH",
+    categoria: "Futuro",
+    descripcion: "Colaboradores, asistencia, documentos y gestion interna.",
+    planes: ["Enterprise"],
+  },
+];
+
 const tareasBase = [
   {
     titulo: "Reunion de inicio con cliente",
@@ -106,6 +163,13 @@ function aModulo(fila) {
     fechaActivacion: fila.fecha_activacion,
     observaciones: fila.observaciones,
   };
+}
+
+export function modulosSugeridosPorPlan(plan) {
+  if (!plan) return [];
+  return catalogoModulosTactika
+    .filter((item) => item.planes.includes(plan))
+    .map((item) => item.modulo);
 }
 
 async function obtenerProyectoExistente(clienteId) {
@@ -239,7 +303,7 @@ export async function crearImplementacionInicial({ clienteId, prospecto }) {
       cliente_id: clienteId,
       modulo,
       estado: "Activo",
-      plan: "Diagnostico",
+      plan: "Base",
       observaciones: "Modulo inicial activado automaticamente.",
     })),
     { onConflict: "cliente_id,modulo" }
@@ -333,6 +397,50 @@ export async function actualizarImplementacion(id, datos) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function obtenerModulosCliente(clienteId) {
+  if (!clienteId) return [];
+
+  const { data, error } = await supabase
+    .from("modulos_cliente")
+    .select("*")
+    .eq("cliente_id", clienteId)
+    .order("modulo", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return data.map(aModulo);
+}
+
+export async function guardarConfiguracionModulosCliente({
+  clienteId,
+  plan,
+  modulosActivos,
+  observaciones,
+}) {
+  if (!clienteId) throw new Error("Selecciona un cliente.");
+
+  const seleccion = new Set(modulosActivos || []);
+  const registros = catalogoModulosTactika.map((item) => ({
+    cliente_id: clienteId,
+    modulo: item.modulo,
+    estado: seleccion.has(item.modulo) ? "Activo" : "Inactivo",
+    plan: plan || "Base",
+    observaciones: observaciones || "",
+  }));
+
+  const { error } = await supabase
+    .from("modulos_cliente")
+    .upsert(registros, { onConflict: "cliente_id,modulo" });
 
   if (error) {
     console.error(error);
