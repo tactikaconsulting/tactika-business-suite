@@ -4,12 +4,14 @@ import {
   AlertTriangle,
   Briefcase,
   CalendarDays,
+  CalendarPlus,
   Clock3,
   DollarSign,
   ExternalLink,
 } from "lucide-react";
 import Swal from "sweetalert2";
 
+import { descargarRecordatorioICS } from "../services/CalendarioService";
 import { obtenerAgendaOperativa } from "../services/AgendaService";
 
 function hoyClave() {
@@ -108,13 +110,23 @@ function EventoAgenda({ evento }) {
             Responsable: {evento.responsable || "Sin responsable"} · Prioridad: {evento.prioridad}
           </p>
         </div>
-        <Link
-          to={evento.ruta}
-          className="shrink-0 border border-slate-200 hover:bg-slate-50 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1"
-        >
-          Abrir
-          <ExternalLink size={13} />
-        </Link>
+        <div className="shrink-0 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => descargarRecordatorioICS(evento)}
+            className="border border-blue-100 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-2 text-xs font-bold text-blue-700 flex items-center gap-1"
+          >
+            Calendario
+            <CalendarPlus size={13} />
+          </button>
+          <Link
+            to={evento.ruta}
+            className="border border-slate-200 hover:bg-slate-50 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1"
+          >
+            Abrir
+            <ExternalLink size={13} />
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -278,6 +290,10 @@ export default function Agenda() {
             <p>
               3. Cierra mirando <span className="font-bold text-white">Semana</span> para preparar
               propuestas, implementaciones y seguimientos.
+            </p>
+            <p>
+              4. Usa <span className="font-bold text-white">Calendario</span> para descargar un
+              recordatorio e importarlo a Google Calendar, Apple Calendar u Outlook.
             </p>
           </div>
         </aside>
