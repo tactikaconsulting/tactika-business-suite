@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { Briefcase, CalendarCheck, CheckCircle2, FileText, Layers3, Rocket } from "lucide-react";
+import {
+  Briefcase,
+  CalendarCheck,
+  CheckCircle2,
+  Copy,
+  Download,
+  FileText,
+  Layers3,
+  Mail,
+  MessageCircle,
+  Rocket,
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 import { obtenerClientes } from "../services/ClienteService";
@@ -7,6 +18,12 @@ import {
   obtenerClienteIdPortalAsignado,
   obtenerResumenPortalCliente,
 } from "../services/PortalClienteService";
+import {
+  crearLinkCorreoPortal,
+  crearLinkWhatsAppPortal,
+  crearMensajePortalCliente,
+  descargarResumenPortalPDF,
+} from "../services/PortalEntregablesService";
 import { useAuth } from "../context/AuthContext";
 
 const formatoCLP = new Intl.NumberFormat("es-CL", {
@@ -100,6 +117,33 @@ export default function PortalCliente() {
     }
   }
 
+  async function copiarResumenCliente() {
+    try {
+      await navigator.clipboard.writeText(crearMensajePortalCliente(resumen));
+      Swal.fire({
+        icon: "success",
+        title: "Resumen copiado",
+        text: "Ya puedes pegarlo en WhatsApp, correo o una propuesta.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo copiar",
+        text: "Puedes usar WhatsApp o correo directo desde los botones.",
+      });
+    }
+  }
+
+  function abrirWhatsAppCliente() {
+    window.open(crearLinkWhatsAppPortal(resumen), "_blank", "noopener,noreferrer");
+  }
+
+  function abrirCorreoCliente() {
+    window.location.href = crearLinkCorreoPortal(resumen);
+  }
+
   const metricas = useMemo(() => {
     const serviciosActivos = resumen?.servicios?.filter((item) =>
       ["Activo", "Pagado"].includes(item.estado)
@@ -150,22 +194,24 @@ export default function PortalCliente() {
           </div>
 
           {esTactika && (
-            <div className="min-w-72">
-              <label className="text-xs font-semibold text-slate-500 uppercase">
-                Vista previa como cliente
-              </label>
-              <select
-                value={clienteId}
-                onChange={(e) => setClienteId(e.target.value)}
-                className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
-              >
-                <option value="">Seleccionar cliente</option>
-                {clientes.map((cliente) => (
-                  <option key={cliente.id} value={cliente.id}>
-                    {cliente.nombre}
-                  </option>
-                ))}
-              </select>
+            <div className="min-w-72 space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase">
+                  Vista previa como cliente
+                </label>
+                <select
+                  value={clienteId}
+                  onChange={(e) => setClienteId(e.target.value)}
+                  className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                >
+                  <option value="">Seleccionar cliente</option>
+                  {clientes.map((cliente) => (
+                    <option key={cliente.id} value={cliente.id}>
+                      {cliente.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
         </div>
@@ -180,6 +226,50 @@ export default function PortalCliente() {
         </section>
       ) : (
         <>
+          <section className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-lg font-bold text-slate-800">Entregables para cliente</h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Descarga o comparte un resumen ejecutivo del avance actual.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => descargarResumenPortalPDF(resumen)}
+                className="min-h-10 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+              >
+                <Download size={16} />
+                Descargar PDF
+              </button>
+              <button
+                type="button"
+                onClick={copiarResumenCliente}
+                className="min-h-10 border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+              >
+                <Copy size={16} />
+                Copiar resumen
+              </button>
+              <button
+                type="button"
+                onClick={abrirWhatsAppCliente}
+                className="min-h-10 border border-green-200 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+              >
+                <MessageCircle size={16} />
+                WhatsApp
+              </button>
+              <button
+                type="button"
+                onClick={abrirCorreoCliente}
+                className="min-h-10 border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+              >
+                <Mail size={16} />
+                Correo
+              </button>
+            </div>
+          </section>
+
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             <KpiPortal
               icon={Rocket}
