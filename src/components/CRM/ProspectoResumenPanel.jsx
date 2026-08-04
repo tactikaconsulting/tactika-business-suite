@@ -1,6 +1,7 @@
 import {
   CalendarClock,
   CheckCircle2,
+  ClipboardCheck,
   Edit3,
   FileText,
   History,
@@ -39,6 +40,7 @@ export default function ProspectoResumenPanel({
   onEliminar,
   onPlantillas,
   onCrearPropuesta,
+  onDiagnosticoComercial,
   onDescargarPropuesta,
   onReprogramar,
   onCambiarEstadoRapido,
@@ -138,6 +140,13 @@ export default function ProspectoResumenPanel({
             >
               <FileText size={16} />
               Plantillas
+            </button>
+            <button
+              onClick={() => onDiagnosticoComercial(prospecto)}
+              className="border border-blue-200 rounded-lg p-3 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 flex items-center gap-2"
+            >
+              <ClipboardCheck size={16} />
+              Diagnostico
             </button>
             <button
               onClick={() => onCrearPropuesta(prospecto)}

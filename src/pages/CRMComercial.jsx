@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, MessageSquareText, Search, Sparkles } from "lucide-react";
+import { ClipboardCheck, FileText, MessageSquareText, Search, Sparkles } from "lucide-react";
 import Swal from "sweetalert2";
 
 import ProspectoForm from "../components/CRM/ProspectoForm";
@@ -19,6 +19,7 @@ import CrearPropuestaComercial from "../components/CRM/CrearPropuestaComercial";
 import SeguimientoPropuestas from "../components/CRM/SeguimientoPropuestas";
 import InicioCRM from "../components/CRM/InicioCRM";
 import CampanasComerciales from "../components/CRM/CampanasComerciales";
+import DiagnosticoComercialRapido from "../components/CRM/DiagnosticoComercialRapido";
 
 import {
   obtenerProspectos,
@@ -70,6 +71,7 @@ export default function CRMComercial() {
   const [mostrarPlantillas, setMostrarPlantillas] = useState(false);
   const [mostrarInteraccion, setMostrarInteraccion] = useState(false);
   const [mostrarPropuesta, setMostrarPropuesta] = useState(false);
+  const [mostrarDiagnosticoComercial, setMostrarDiagnosticoComercial] = useState(false);
 
   useEffect(() => {
     cargar();
@@ -174,6 +176,30 @@ export default function CRMComercial() {
     }
   }
 
+  async function guardarDiagnosticoComercial(id, datos) {
+    try {
+      const prospectoAnterior = prospectos.find((p) => p.id === id);
+      await actualizarProspecto(id, datos);
+
+      if (prospectoAnterior && datos.estado !== prospectoAnterior.estado) {
+        await cambiarEstadoProspecto(id, prospectoAnterior.estado, datos.estado);
+      }
+
+      await cargar();
+      setMostrarDiagnosticoComercial(false);
+
+      Swal.fire({
+        icon: "success",
+        title: "Diagnostico guardado",
+        text: "La ficha comercial del prospecto quedo actualizada.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "Error al guardar diagnostico", text: error.message });
+    }
+  }
+
   async function reprogramarSeguimiento(prospecto, fechaProximoContacto) {
     try {
       await actualizarProspecto(prospecto.id, {
@@ -275,6 +301,11 @@ export default function CRMComercial() {
   function abrirPropuesta(prospecto) {
     setProspectoAccionId(prospecto.id);
     setMostrarPropuesta(true);
+  }
+
+  function abrirDiagnosticoComercial(prospecto) {
+    setProspectoAccionId(prospecto?.id || null);
+    setMostrarDiagnosticoComercial(true);
   }
 
   async function guardarPropuesta(propuesta) {
@@ -434,6 +465,14 @@ export default function CRMComercial() {
             </button>
 
             <button
+              onClick={() => abrirDiagnosticoComercial(null)}
+              className="min-h-10 px-3.5 py-2 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-2"
+            >
+              <ClipboardCheck size={16} />
+              Diagnostico
+            </button>
+
+            <button
               onClick={() => setMostrarEnriquecimiento(true)}
               className="min-h-10 px-3.5 py-2 border border-blue-200 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition flex items-center gap-2"
             >
@@ -587,6 +626,15 @@ export default function CRMComercial() {
         />
       )}
 
+      {mostrarDiagnosticoComercial && (
+        <DiagnosticoComercialRapido
+          prospectos={prospectos}
+          prospectoInicialId={prospectoAccionId}
+          onGuardar={guardarDiagnosticoComercial}
+          onCerrar={() => setMostrarDiagnosticoComercial(false)}
+        />
+      )}
+
       {prospectoHistorial && (
         <ProspectoHistorialPanel
           prospecto={prospectoHistorial}
@@ -619,6 +667,10 @@ export default function CRMComercial() {
           onCrearPropuesta={(prospecto) => {
             setProspectoResumen(null);
             abrirPropuesta(prospecto);
+          }}
+          onDiagnosticoComercial={(prospecto) => {
+            setProspectoResumen(null);
+            abrirDiagnosticoComercial(prospecto);
           }}
           onDescargarPropuesta={descargarPropuestaPDF}
           onReprogramar={reprogramarSeguimiento}
