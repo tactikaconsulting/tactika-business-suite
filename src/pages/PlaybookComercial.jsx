@@ -80,10 +80,10 @@ export default function PlaybookComercial() {
             </p>
           </div>
           <Link
-            to="/crm"
+            to="/kit-comercial"
             className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-4 py-2 text-sm font-bold"
           >
-            Ir al CRM
+            Abrir Kit Comercial
           </Link>
         </div>
       </section>
