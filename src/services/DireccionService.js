@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import { obtenerClientes } from "./ClienteService";
 import { obtenerImplementacionesCliente } from "./ImplementacionService";
 import { obtenerProspectos } from "./ProspectoService";
+import { obtenerResultadosDiarios } from "./ResultadosDiariosService";
 import { obtenerVentasServicios } from "./VentaServicioService";
 
 function inicioDia() {
@@ -58,12 +59,13 @@ async function obtenerBitacoraReciente() {
 }
 
 export async function obtenerPanelDireccion() {
-  const [clientes, prospectos, implementaciones, ventas, bitacora] = await Promise.all([
+  const [clientes, prospectos, implementaciones, ventas, bitacora, resultados] = await Promise.all([
     obtenerClientes(),
     obtenerProspectos(),
     obtenerImplementacionesCliente(),
     obtenerVentasServicios(),
     obtenerBitacoraReciente(),
+    obtenerResultadosDiarios(),
   ]);
 
   const tareas = implementaciones.flatMap((proyecto) =>
@@ -84,6 +86,16 @@ export async function obtenerPanelDireccion() {
   const mensualidadActiva = ventas
     .filter((venta) => venta.modalidad === "Mensual" && ["Pagado", "Activo"].includes(venta.estado))
     .reduce((sum, venta) => sum + Number(venta.valor || 0), 0);
+  const resultadosSemana = resultados.slice(0, 7);
+  const totalContactadosSemana = resultadosSemana.reduce(
+    (sum, item) => sum + Number(item.prospectosContactados || 0),
+    0
+  );
+  const totalReunionesSemana = resultadosSemana.reduce(
+    (sum, item) => sum + Number(item.reunionesAgendadas || 0),
+    0
+  );
+  const ultimoResultado = resultados[0] || null;
 
   return {
     clientes,
@@ -91,6 +103,7 @@ export async function obtenerPanelDireccion() {
     implementaciones,
     ventas,
     bitacora,
+    resultados,
     metricas: {
       clientesActivos: clientes.filter((cliente) => cliente.estado === "Activo").length,
       prospectosAbiertos: prospectos.filter((prospecto) => prospecto.estado !== "Cliente").length,
@@ -100,6 +113,8 @@ export async function obtenerPanelDireccion() {
       ventasPendientes: ventasPendientes.reduce((sum, venta) => sum + Number(venta.valor || 0), 0),
       totalVendido: ventasPagadas.reduce((sum, venta) => sum + Number(venta.valor || 0), 0),
       mensualidadActiva,
+      contactadosSemana: totalContactadosSemana,
+      reunionesSemana: totalReunionesSemana,
     },
     prioridades: {
       tareasVencidas: tareas
@@ -111,6 +126,7 @@ export async function obtenerPanelDireccion() {
       ventasPendientes: ventasPendientes.slice(0, 6),
       implementacionesActivas: implementacionesActivas.slice(0, 6),
       bitacora: bitacora.slice(0, 6),
+      ultimoResultado,
     },
   };
 }

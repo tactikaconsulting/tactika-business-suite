@@ -5,6 +5,7 @@ import {
   Target,
   CalendarCheck,
   CalendarDays,
+  TrendingUp,
   BarChart3,
   Settings,
   Briefcase,
@@ -66,6 +67,12 @@ export default function Sidebar() {
               to="/agenda"
               icon={CalendarDays}
               text="Agenda"
+            />
+
+            <SidebarItem
+              to="/resultados"
+              icon={TrendingUp}
+              text="Resultados"
             />
 
             <SidebarItem

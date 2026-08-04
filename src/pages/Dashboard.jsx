@@ -208,9 +208,52 @@ export default function Dashboard() {
           valor={formatoCLP.format(panel?.metricas.ventasPendientes || 0)}
           detalle="Ventas registradas sin pago"
         />
+        <KpiDireccion
+          icon={Users}
+          titulo="Contactados semana"
+          valor={panel?.metricas.contactadosSemana || 0}
+          detalle="Segun resultados diarios"
+        />
+        <KpiDireccion
+          icon={CalendarClock}
+          titulo="Reuniones semana"
+          valor={panel?.metricas.reunionesSemana || 0}
+          detalle="Agendadas desde prospeccion"
+        />
       </section>
 
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <ListaDireccion
+          titulo="Ultimo cierre diario"
+          descripcion="Resultado comercial registrado mas reciente."
+          accion={
+            <Link to="/resultados" className="text-sm font-bold text-blue-700">
+              Ver resultados
+            </Link>
+          }
+        >
+          {!panel?.prioridades.ultimoResultado ? (
+            <Vacio texto="Aun no hay cierre diario registrado." />
+          ) : (
+            <div className="p-4">
+              <p className="font-bold text-sm text-slate-800">
+                {panel.prioridades.ultimoResultado.fecha}
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                Contactados: {panel.prioridades.ultimoResultado.prospectosContactados} ·
+                Respuestas: {panel.prioridades.ultimoResultado.respuestasRecibidas} · Reuniones:{" "}
+                {panel.prioridades.ultimoResultado.reunionesAgendadas} · Ventas:{" "}
+                {panel.prioridades.ultimoResultado.ventasCerradas}
+              </p>
+              {panel.prioridades.ultimoResultado.aprendizajes && (
+                <p className="text-xs text-blue-700 mt-2">
+                  Aprendizaje: {panel.prioridades.ultimoResultado.aprendizajes}
+                </p>
+              )}
+            </div>
+          )}
+        </ListaDireccion>
+
         <ListaDireccion
           titulo="Tareas vencidas"
           descripcion="Compromisos de implementacion que debes resolver primero."

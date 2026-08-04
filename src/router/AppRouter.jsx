@@ -15,6 +15,7 @@ import Reportes from "../pages/Reportes";
 import Configuracion from "../pages/Configuracion";
 import Ventas from "../pages/Ventas";
 import Agenda from "../pages/Agenda";
+import ResultadosDiarios from "../pages/ResultadosDiarios";
 import ProspeccionIA from "../pages/ProspeccionIA";
 import Implementaciones from "../pages/Implementaciones";
 import PortalCliente from "../pages/PortalCliente";
@@ -41,6 +42,7 @@ export default function AppRouter() {
               <Route path="/planes" element={<PlanAccion />} />
               <Route path="/seguimiento" element={<Seguimientos />} />
               <Route path="/agenda" element={<Agenda />} />
+              <Route path="/resultados" element={<ResultadosDiarios />} />
               <Route path="/ventas" element={<Ventas />} />
               <Route path="/reportes" element={<Reportes />} />
               <Route path="/personal" element={<GestionPersonal />} />
