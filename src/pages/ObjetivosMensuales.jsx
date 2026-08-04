@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   AlertTriangle,
   CalendarRange,
@@ -393,10 +394,18 @@ export default function ObjetivosMensuales() {
           <section className="bg-amber-50 border border-amber-100 rounded-xl p-5">
             <div className="flex gap-3">
               <AlertTriangle className="text-amber-700 mt-0.5" size={18} />
-              <p className="text-sm text-amber-900">
-                Este tablero es para tomar decisiones, no solo mirar numeros. Si el mes no avanza,
-                se ajusta canal, mensaje, oferta o cantidad de contactos.
-              </p>
+              <div>
+                <p className="text-sm text-amber-900">
+                  Este tablero es para tomar decisiones, no solo mirar numeros. Si el mes no avanza,
+                  se ajusta canal, mensaje, oferta o cantidad de contactos.
+                </p>
+                <Link
+                  to="/decisiones"
+                  className="inline-flex mt-3 text-sm font-bold text-amber-900 underline"
+                >
+                  Abrir tablero de decisiones
+                </Link>
+              </div>
             </div>
           </section>
         </div>

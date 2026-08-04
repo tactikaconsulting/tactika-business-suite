@@ -237,6 +237,9 @@ export default function Dashboard() {
               <Link to="/objetivos-mensuales" className="text-sm font-bold text-slate-700">
                 Ver mes
               </Link>
+              <Link to="/decisiones" className="text-sm font-bold text-slate-700">
+                Decidir
+              </Link>
             </div>
           }
         >

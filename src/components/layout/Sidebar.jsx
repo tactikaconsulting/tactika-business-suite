@@ -14,6 +14,7 @@ import {
   Sparkles,
   Rocket,
   MonitorSmartphone,
+  Lightbulb,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -86,6 +87,12 @@ export default function Sidebar() {
               to="/objetivos-mensuales"
               icon={Target}
               text="Objetivos"
+            />
+
+            <SidebarItem
+              to="/decisiones"
+              icon={Lightbulb}
+              text="Decisiones"
             />
 
             <SidebarItem
