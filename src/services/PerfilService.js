@@ -57,3 +57,25 @@ export async function quitarAccesoCliente(perfilId) {
     throw error;
   }
 }
+
+export async function invitarUsuarioCliente({ nombre, email, clienteId, tipoUsuario }) {
+  const { data, error } = await supabase.functions.invoke("invitar-usuario-cliente", {
+    body: {
+      nombre,
+      email,
+      clienteId,
+      tipoUsuario,
+    },
+  });
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  if (data?.error) {
+    throw new Error(data.error);
+  }
+
+  return data;
+}

@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Sparkles,
   UserCog,
+  UserPlus,
   Users,
 } from "lucide-react";
 import Swal from "sweetalert2";
@@ -19,6 +20,7 @@ import {
 } from "../services/ImplementacionService";
 import {
   asignarUsuarioCliente,
+  invitarUsuarioCliente,
   nombreTipoUsuario,
   obtenerPerfilesAccesoCliente,
   quitarAccesoCliente,
@@ -42,6 +44,13 @@ export default function Configuracion() {
   const [clienteAccesoId, setClienteAccesoId] = useState("");
   const [tipoAcceso, setTipoAcceso] = useState("cliente_admin");
   const [cargandoPerfiles, setCargandoPerfiles] = useState(false);
+  const [invitacion, setInvitacion] = useState({
+    nombre: "",
+    email: "",
+    clienteId: "",
+    tipoUsuario: "cliente_admin",
+  });
+  const [enviandoInvitacion, setEnviandoInvitacion] = useState(false);
 
   useEffect(() => {
     cargarClientes();
@@ -178,6 +187,36 @@ export default function Configuracion() {
       });
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo quitar acceso", text: error.message });
+    }
+  }
+
+  async function enviarInvitacionCliente() {
+    setEnviandoInvitacion(true);
+    try {
+      const respuesta = await invitarUsuarioCliente(invitacion);
+      await cargarPerfiles();
+      setInvitacion({
+        nombre: "",
+        email: "",
+        clienteId: "",
+        tipoUsuario: "cliente_admin",
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Invitación enviada",
+        text: respuesta?.message || "El usuario cliente fue invitado correctamente.",
+        timer: 2200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo enviar la invitación",
+        text: error.message,
+      });
+    } finally {
+      setEnviandoInvitacion(false);
     }
   }
 
@@ -431,8 +470,84 @@ export default function Configuracion() {
           </button>
         </div>
 
-        <div className="p-5 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6">
-          <div className="space-y-4">
+        <div className="p-5 grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6">
+          <div className="space-y-5">
+            <div className="border border-blue-100 bg-blue-50 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <UserPlus size={17} className="text-blue-700" />
+                <h3 className="font-bold text-slate-800">Invitar nuevo usuario cliente</h3>
+              </div>
+
+              <label className="block">
+                <span className="text-sm font-semibold text-slate-700">Nombre</span>
+                <input
+                  type="text"
+                  value={invitacion.nombre}
+                  onChange={(e) => setInvitacion({ ...invitacion, nombre: e.target.value })}
+                  placeholder="Ej: Juan Pérez"
+                  className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-semibold text-slate-700">Correo</span>
+                <input
+                  type="email"
+                  value={invitacion.email}
+                  onChange={(e) => setInvitacion({ ...invitacion, email: e.target.value })}
+                  placeholder="cliente@empresa.cl"
+                  className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-semibold text-slate-700">Empresa cliente</span>
+                <select
+                  value={invitacion.clienteId}
+                  onChange={(e) => setInvitacion({ ...invitacion, clienteId: e.target.value })}
+                  className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                >
+                  <option value="">Seleccionar cliente</option>
+                  {clientes.map((cliente) => (
+                    <option key={cliente.id} value={cliente.id}>
+                      {cliente.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-semibold text-slate-700">Tipo de acceso</span>
+                <select
+                  value={invitacion.tipoUsuario}
+                  onChange={(e) =>
+                    setInvitacion({ ...invitacion, tipoUsuario: e.target.value })
+                  }
+                  className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                >
+                  <option value="cliente_admin">Cliente Admin</option>
+                  <option value="cliente_usuario">Cliente Usuario</option>
+                </select>
+              </label>
+
+              <button
+                type="button"
+                onClick={enviarInvitacionCliente}
+                disabled={
+                  enviandoInvitacion ||
+                  !invitacion.nombre ||
+                  !invitacion.email ||
+                  !invitacion.clienteId
+                }
+                className="w-full min-h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2"
+              >
+                <UserPlus size={16} />
+                {enviandoInvitacion ? "Enviando invitación..." : "Invitar usuario cliente"}
+              </button>
+            </div>
+
+            <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+              <h3 className="font-bold text-slate-800">Asignar usuario existente</h3>
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Usuario</span>
               <select
@@ -485,10 +600,11 @@ export default function Configuracion() {
             >
               Asignar acceso al portal
             </button>
+            </div>
 
             <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-900">
-              Esta fase administra usuarios que ya existen en la tabla de perfiles. La creación de
-              cuentas nuevas quedará para una fase posterior con invitación segura.
+              La invitación crea el usuario en Supabase, le envía acceso por correo y lo deja
+              conectado al portal del cliente seleccionado.
             </div>
           </div>
 
