@@ -11,7 +11,9 @@ import {
   Layers3,
   Mail,
   MessageCircle,
+  Plus,
   Rocket,
+  Trash2,
 } from "lucide-react";
 import Swal from "sweetalert2";
 
@@ -22,6 +24,10 @@ import {
   crearMensajePortalCliente,
   descargarResumenPortalPDF,
 } from "../services/PortalEntregablesService";
+import {
+  crearDocumentoCliente,
+  eliminarDocumentoCliente,
+} from "../services/DocumentoClienteService";
 
 const formatoCLP = new Intl.NumberFormat("es-CL", {
   style: "currency",
@@ -74,6 +80,14 @@ export default function Cliente360() {
   const navigate = useNavigate();
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [documento, setDocumento] = useState({
+    titulo: "",
+    tipo: "Informe",
+    url: "",
+    descripcion: "",
+    visibleCliente: true,
+    fechaDocumento: new Date().toISOString().slice(0, 10),
+  });
 
   useEffect(() => {
     cargar();
@@ -102,6 +116,59 @@ export default function Cliente360() {
       });
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo copiar" });
+    }
+  }
+
+  async function guardarDocumento(e) {
+    e.preventDefault();
+
+    if (!documento.titulo) {
+      Swal.fire({ icon: "warning", title: "Indica el nombre del documento" });
+      return;
+    }
+
+    try {
+      await crearDocumentoCliente({
+        ...documento,
+        clienteId,
+      });
+      setDocumento({
+        titulo: "",
+        tipo: "Informe",
+        url: "",
+        descripcion: "",
+        visibleCliente: true,
+        fechaDocumento: new Date().toISOString().slice(0, 10),
+      });
+      await cargar();
+      Swal.fire({
+        icon: "success",
+        title: "Documento registrado",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo guardar", text: error.message });
+    }
+  }
+
+  async function eliminarDocumento(documentoCliente) {
+    const respuesta = await Swal.fire({
+      title: "¿Eliminar documento?",
+      text: documentoCliente.titulo,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!respuesta.isConfirmed) return;
+
+    try {
+      await eliminarDocumentoCliente(documentoCliente.id);
+      await cargar();
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo eliminar", text: error.message });
     }
   }
 
@@ -374,6 +441,161 @@ export default function Cliente360() {
                     </span>
                   ))
               )}
+            </div>
+          </section>
+
+          <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800">Documentos del cliente</h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Registra contratos, propuestas, informes, links de Drive o respaldos del proyecto.
+              </p>
+            </div>
+
+            <div className="p-5 grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-5">
+              <form onSubmit={guardarDocumento} className="border border-slate-200 rounded-xl p-4 space-y-3">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <Plus size={16} />
+                  Nuevo documento
+                </h3>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Nombre</span>
+                  <input
+                    type="text"
+                    value={documento.titulo}
+                    onChange={(e) => setDocumento({ ...documento, titulo: e.target.value })}
+                    placeholder="Ej: Contrato de implementación"
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">Tipo</span>
+                    <select
+                      value={documento.tipo}
+                      onChange={(e) => setDocumento({ ...documento, tipo: e.target.value })}
+                      className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                    >
+                      <option>Informe</option>
+                      <option>Contrato</option>
+                      <option>Propuesta</option>
+                      <option>Diagnostico</option>
+                      <option>Excel</option>
+                      <option>Otro</option>
+                    </select>
+                  </label>
+
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">Fecha</span>
+                    <input
+                      type="date"
+                      value={documento.fechaDocumento}
+                      onChange={(e) =>
+                        setDocumento({ ...documento, fechaDocumento: e.target.value })
+                      }
+                      className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                    />
+                  </label>
+                </div>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Link del archivo</span>
+                  <input
+                    type="url"
+                    value={documento.url}
+                    onChange={(e) => setDocumento({ ...documento, url: e.target.value })}
+                    placeholder="https://drive.google.com/..."
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Observaciones</span>
+                  <textarea
+                    value={documento.descripcion}
+                    onChange={(e) => setDocumento({ ...documento, descripcion: e.target.value })}
+                    placeholder="Breve contexto del documento."
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm min-h-20"
+                  />
+                </label>
+
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={documento.visibleCliente}
+                    onChange={(e) =>
+                      setDocumento({ ...documento, visibleCliente: e.target.checked })
+                    }
+                  />
+                  Visible en Portal Cliente
+                </label>
+
+                <button
+                  type="submit"
+                  className="w-full min-h-10 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+                >
+                  Guardar documento
+                </button>
+              </form>
+
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="grid grid-cols-[1fr_120px_110px_auto] gap-3 bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-500">
+                  <span>Documento</span>
+                  <span>Tipo</span>
+                  <span>Visibilidad</span>
+                  <span>Acción</span>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {(resumen.documentos || []).length === 0 ? (
+                    <p className="p-5 text-sm text-slate-500">Sin documentos registrados.</p>
+                  ) : (
+                    resumen.documentos.map((item) => (
+                      <div
+                        key={item.id}
+                        className="grid grid-cols-1 md:grid-cols-[1fr_120px_110px_auto] gap-3 px-4 py-3 text-sm items-center"
+                      >
+                        <div>
+                          <p className="font-bold text-slate-800">{item.titulo}</p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {item.fechaDocumento || "Sin fecha"} · {item.descripcion || "Sin observaciones"}
+                          </p>
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-blue-600 hover:underline mt-1 inline-flex"
+                            >
+                              Abrir documento
+                            </a>
+                          )}
+                        </div>
+                        <span className="text-slate-600">{item.tipo}</span>
+                        <span
+                          className={`w-fit border rounded-full px-2.5 py-1 text-xs font-bold ${
+                            item.visibleCliente
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-slate-50 text-slate-600 border-slate-200"
+                          }`}
+                        >
+                          {item.visibleCliente ? "Cliente" : "Interno"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => eliminarDocumento(item)}
+                          className="justify-self-start md:justify-self-end border border-red-100 text-red-600 hover:bg-red-50 rounded-lg px-3 py-2 text-xs font-bold transition flex items-center gap-1"
+                        >
+                          <Trash2 size={13} />
+                          Eliminar
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           </section>
         </div>

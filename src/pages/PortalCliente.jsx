@@ -393,6 +393,52 @@ export default function PortalCliente() {
             </div>
           </section>
 
+          <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <FileText size={18} />
+                Documentos compartidos
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Archivos, informes y respaldos disponibles para este proyecto.
+              </p>
+            </div>
+
+            <div className="divide-y divide-slate-100">
+              {(resumen.documentos || []).length === 0 ? (
+                <p className="p-5 text-sm text-slate-500">Sin documentos compartidos.</p>
+              ) : (
+                resumen.documentos.map((documento) => (
+                  <div key={documento.id} className="p-4 flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-bold text-sm text-slate-800">{documento.titulo}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {documento.tipo} · {documento.fechaDocumento || "Sin fecha"}
+                      </p>
+                      {documento.descripcion && (
+                        <p className="text-xs text-slate-400 mt-1">{documento.descripcion}</p>
+                      )}
+                    </div>
+                    {documento.url ? (
+                      <a
+                        href={documento.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="shrink-0 border border-blue-100 bg-blue-50 text-blue-700 rounded-lg px-3 py-2 text-xs font-bold hover:bg-blue-100"
+                      >
+                        Abrir
+                      </a>
+                    ) : (
+                      <span className="shrink-0 border border-slate-200 text-slate-400 rounded-lg px-3 py-2 text-xs font-bold">
+                        Sin link
+                      </span>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+
           <section className="bg-slate-900 text-white rounded-xl p-5 shadow-sm flex items-center justify-between gap-4 flex-wrap">
             <div>
               <h2 className="text-lg font-bold">Acompañamiento Táctika</h2>

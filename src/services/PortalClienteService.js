@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { obtenerDocumentosCliente } from "./DocumentoClienteService";
 import { obtenerModulosCliente } from "./ImplementacionService";
 
 const rolesTactika = ["admin_tactika", "consultor_tactika"];
@@ -84,6 +85,12 @@ function aPlan(fila) {
   };
 }
 
+function documentosVisibles(documentos, perfil) {
+  const esTactika = rolesTactika.includes(perfil?.tipo_usuario);
+  if (esTactika) return documentos;
+  return documentos.filter((documento) => documento.visibleCliente);
+}
+
 async function obtenerPerfilActual() {
   const { data: authData, error: errorAuth } = await supabase.auth.getUser();
   if (errorAuth || !authData?.user?.id) return null;
@@ -123,6 +130,7 @@ export async function obtenerClienteIdPortalAsignado() {
 }
 
 export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
+  const perfil = await obtenerPerfilActual();
   const clienteId = await resolverClienteAutorizado(clienteIdSolicitado);
   if (!clienteId) return null;
 
@@ -133,6 +141,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
     { data: tareas, error: errorTareas },
     { data: ventas, error: errorVentas },
     { data: planes, error: errorPlanes },
+    documentos,
     modulos,
   ] = await Promise.all([
     supabase.from("clientes").select("*").eq("id", clienteId).single(),
@@ -163,6 +172,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
       .select("*")
       .eq("cliente_id", clienteId)
       .order("created_at", { ascending: false }),
+    obtenerDocumentosCliente(clienteId),
     obtenerModulosCliente(clienteId),
   ]);
 
@@ -187,6 +197,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
     tareas: (tareas || []).map(aTarea),
     servicios: (ventas || []).map(aVenta),
     planTrabajo: (planes || []).map(aPlan),
+    documentos: documentosVisibles(documentos || [], perfil),
     modulos,
   };
 }

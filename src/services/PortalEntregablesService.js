@@ -171,6 +171,22 @@ export function descargarResumenPortalPDF(resumen) {
     });
   }
 
+  if ((resumen?.documentos || []).length > 0) {
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 10,
+      head: [["Documento", "Tipo", "Fecha", "Visibilidad"]],
+      body: resumen.documentos.map((documento) => [
+        documento.titulo,
+        texto(documento.tipo),
+        texto(documento.fechaDocumento),
+        documento.visibleCliente ? "Cliente" : "Interno",
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [15, 23, 42] },
+      styles: { fontSize: 8 },
+    });
+  }
+
   const totalPaginas = doc.getNumberOfPages();
   for (let pagina = 1; pagina <= totalPaginas; pagina++) {
     doc.setPage(pagina);
