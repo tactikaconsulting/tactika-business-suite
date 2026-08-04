@@ -227,9 +227,14 @@ export default function Dashboard() {
           titulo="Ultimo cierre diario"
           descripcion="Resultado comercial registrado mas reciente."
           accion={
-            <Link to="/resultados" className="text-sm font-bold text-blue-700">
-              Ver resultados
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link to="/resultados" className="text-sm font-bold text-blue-700">
+                Ver resultados
+              </Link>
+              <Link to="/seguimiento-semanal" className="text-sm font-bold text-slate-700">
+                Ver semana
+              </Link>
+            </div>
           }
         >
           {!panel?.prioridades.ultimoResultado ? (

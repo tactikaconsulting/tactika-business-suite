@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   CalendarDays,
   TrendingUp,
+  LineChart,
   BarChart3,
   Settings,
   Briefcase,
@@ -73,6 +74,12 @@ export default function Sidebar() {
               to="/resultados"
               icon={TrendingUp}
               text="Resultados"
+            />
+
+            <SidebarItem
+              to="/seguimiento-semanal"
+              icon={LineChart}
+              text="Semana Comercial"
             />
 
             <SidebarItem

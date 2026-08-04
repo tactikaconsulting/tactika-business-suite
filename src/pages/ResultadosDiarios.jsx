@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   BarChart3,
   CalendarCheck,
@@ -377,6 +378,12 @@ export default function ResultadosDiarios() {
           pocas respuestas, ajustamos mensaje. Si tienes respuestas pero pocas reuniones, ajustamos
           oferta. Si tienes reuniones pero no ventas, ajustamos propuesta y precio.
         </p>
+        <Link
+          to="/seguimiento-semanal"
+          className="inline-flex mt-4 bg-white text-slate-900 hover:bg-slate-100 px-4 py-2 rounded-lg text-sm font-bold"
+        >
+          Revisar seguimiento semanal
+        </Link>
       </section>
     </div>
   );
