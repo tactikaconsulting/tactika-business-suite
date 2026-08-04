@@ -83,8 +83,8 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
       <div className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-2 text-sm text-blue-900">
         <Sparkles size={16} className="mt-0.5 shrink-0" />
         <p>
-          La IA real se conectara despues. Por ahora este modulo valida el flujo comercial:
-          encontrar, revisar, guardar en CRM y contactar.
+          Modo exploracion comercial: busca oportunidades de ejemplo, revisa datos y guarda
+          prospectos en el CRM antes de contactar.
         </p>
       </div>
     </section>
