@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { calcularIndiceTactika } from "./IndiceTactika";
+import { crearImplementacionInicial } from "./ImplementacionService";
 
 function aColumnasDB(p) {
   return {
@@ -260,6 +261,8 @@ export async function convertirProspectoACliente(prospecto) {
       console.error(errorLink);
     }
 
+    await crearImplementacionInicial({ clienteId: clienteExistenteId, prospecto });
+
     return clienteExistenteId;
   }
 
@@ -293,6 +296,8 @@ export async function convertirProspectoACliente(prospecto) {
   if (errorLink) {
     console.error(errorLink);
   }
+
+  await crearImplementacionInicial({ clienteId: nuevoClienteId, prospecto });
 
   return nuevoClienteId;
 }

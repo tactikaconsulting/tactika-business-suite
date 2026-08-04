@@ -9,6 +9,7 @@ import {
   Briefcase,
   DollarSign,
   Sparkles,
+  Rocket,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -62,6 +63,12 @@ export default function Sidebar() {
           to="/crm"
           icon={Briefcase}
           text="CRM Comercial"
+        />
+
+        <SidebarItem
+          to="/implementaciones"
+          icon={Rocket}
+          text="Implementaciones"
         />
 
         <SidebarItem
