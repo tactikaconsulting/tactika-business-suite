@@ -245,6 +245,13 @@ export default function DecisionesComerciales() {
                 <span className="text-sm font-bold text-slate-700">Objetivos mensuales</span>
                 <CheckCircle2 size={16} />
               </Link>
+              <Link
+                to="/playbook"
+                className="flex items-center justify-between border border-slate-200 rounded-lg p-3 hover:bg-slate-50"
+              >
+                <span className="text-sm font-bold text-slate-700">Playbook comercial</span>
+                <MessageCircle size={16} />
+              </Link>
             </div>
           </section>
 

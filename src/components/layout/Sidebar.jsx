@@ -15,6 +15,7 @@ import {
   Rocket,
   MonitorSmartphone,
   Lightbulb,
+  BookOpenText,
 } from "lucide-react";
 
 import Logo from "./Logo";
@@ -93,6 +94,12 @@ export default function Sidebar() {
               to="/decisiones"
               icon={Lightbulb}
               text="Decisiones"
+            />
+
+            <SidebarItem
+              to="/playbook"
+              icon={BookOpenText}
+              text="Playbook"
             />
 
             <SidebarItem
