@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   Target,
   CalendarCheck,
+  CalendarDays,
   BarChart3,
   Settings,
   Briefcase,
@@ -59,6 +60,12 @@ export default function Sidebar() {
               to="/seguimiento"
               icon={CalendarCheck}
               text="Seguimiento"
+            />
+
+            <SidebarItem
+              to="/agenda"
+              icon={CalendarDays}
+              text="Agenda"
             />
 
             <SidebarItem
