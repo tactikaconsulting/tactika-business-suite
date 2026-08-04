@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Briefcase,
   CalendarCheck,
+  Clock3,
   Copy,
   DollarSign,
   ExternalLink,
@@ -24,6 +25,10 @@ import {
   crearMensajePortalCliente,
   descargarResumenPortalPDF,
 } from "../services/PortalEntregablesService";
+import {
+  crearEventoBitacoraCliente,
+  eliminarEventoBitacoraCliente,
+} from "../services/BitacoraClienteService";
 import {
   crearDocumentoCliente,
   eliminarDocumentoCliente,
@@ -75,6 +80,20 @@ function texto(valor, fallback = "-") {
   return valor || fallback;
 }
 
+function fechaHoraInput() {
+  const ahora = new Date();
+  ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+  return ahora.toISOString().slice(0, 16);
+}
+
+function fechaVisible(valor) {
+  if (!valor) return "Sin fecha";
+  return new Date(valor).toLocaleString("es-CL", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
 export default function Cliente360() {
   const { clienteId } = useParams();
   const navigate = useNavigate();
@@ -87,6 +106,16 @@ export default function Cliente360() {
     descripcion: "",
     visibleCliente: true,
     fechaDocumento: new Date().toISOString().slice(0, 10),
+  });
+  const [eventoBitacora, setEventoBitacora] = useState({
+    tipo: "reunion",
+    titulo: "",
+    detalle: "",
+    resultado: "",
+    proximoPaso: "",
+    responsable: "Claudio Urra",
+    visibleCliente: false,
+    fechaEvento: fechaHoraInput(),
   });
 
   useEffect(() => {
@@ -166,6 +195,61 @@ export default function Cliente360() {
 
     try {
       await eliminarDocumentoCliente(documentoCliente.id);
+      await cargar();
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo eliminar", text: error.message });
+    }
+  }
+
+  async function guardarEventoBitacora(e) {
+    e.preventDefault();
+
+    if (!eventoBitacora.titulo) {
+      Swal.fire({ icon: "warning", title: "Indica el titulo del registro" });
+      return;
+    }
+
+    try {
+      await crearEventoBitacoraCliente({
+        ...eventoBitacora,
+        clienteId,
+      });
+      setEventoBitacora({
+        tipo: "reunion",
+        titulo: "",
+        detalle: "",
+        resultado: "",
+        proximoPaso: "",
+        responsable: "Claudio Urra",
+        visibleCliente: false,
+        fechaEvento: fechaHoraInput(),
+      });
+      await cargar();
+      Swal.fire({
+        icon: "success",
+        title: "Bitacora registrada",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo guardar", text: error.message });
+    }
+  }
+
+  async function eliminarEventoBitacora(evento) {
+    const respuesta = await Swal.fire({
+      title: "¿Eliminar registro?",
+      text: evento.titulo,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!respuesta.isConfirmed) return;
+
+    try {
+      await eliminarEventoBitacoraCliente(evento.id);
       await cargar();
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo eliminar", text: error.message });
@@ -441,6 +525,208 @@ export default function Cliente360() {
                     </span>
                   ))
               )}
+            </div>
+          </section>
+
+          <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Clock3 size={18} />
+                Bitacora operativa
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Registra reuniones, llamadas, acuerdos, problemas y proximos pasos del cliente.
+              </p>
+            </div>
+
+            <div className="p-5 grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-5">
+              <form onSubmit={guardarEventoBitacora} className="border border-slate-200 rounded-xl p-4 space-y-3">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <Plus size={16} />
+                  Nuevo registro
+                </h3>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">Tipo</span>
+                    <select
+                      value={eventoBitacora.tipo}
+                      onChange={(e) =>
+                        setEventoBitacora({ ...eventoBitacora, tipo: e.target.value })
+                      }
+                      className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                    >
+                      <option value="reunion">Reunion</option>
+                      <option value="llamada">Llamada</option>
+                      <option value="whatsapp">WhatsApp</option>
+                      <option value="correo">Correo</option>
+                      <option value="acuerdo">Acuerdo</option>
+                      <option value="problema">Problema</option>
+                      <option value="decision">Decision</option>
+                      <option value="nota">Nota</option>
+                    </select>
+                  </label>
+
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">Fecha</span>
+                    <input
+                      type="datetime-local"
+                      value={eventoBitacora.fechaEvento}
+                      onChange={(e) =>
+                        setEventoBitacora({ ...eventoBitacora, fechaEvento: e.target.value })
+                      }
+                      className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                    />
+                  </label>
+                </div>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Titulo</span>
+                  <input
+                    type="text"
+                    value={eventoBitacora.titulo}
+                    onChange={(e) =>
+                      setEventoBitacora({ ...eventoBitacora, titulo: e.target.value })
+                    }
+                    placeholder="Ej: Reunion de levantamiento"
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Detalle</span>
+                  <textarea
+                    value={eventoBitacora.detalle}
+                    onChange={(e) =>
+                      setEventoBitacora({ ...eventoBitacora, detalle: e.target.value })
+                    }
+                    placeholder="Que se converso o que ocurrio."
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm min-h-20"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Resultado</span>
+                  <input
+                    type="text"
+                    value={eventoBitacora.resultado}
+                    onChange={(e) =>
+                      setEventoBitacora({ ...eventoBitacora, resultado: e.target.value })
+                    }
+                    placeholder="Ej: Cliente confirma interes"
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Proximo paso</span>
+                  <input
+                    type="text"
+                    value={eventoBitacora.proximoPaso}
+                    onChange={(e) =>
+                      setEventoBitacora({ ...eventoBitacora, proximoPaso: e.target.value })
+                    }
+                    placeholder="Ej: Enviar propuesta el viernes"
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Responsable</span>
+                  <input
+                    type="text"
+                    value={eventoBitacora.responsable}
+                    onChange={(e) =>
+                      setEventoBitacora({ ...eventoBitacora, responsable: e.target.value })
+                    }
+                    className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={eventoBitacora.visibleCliente}
+                    onChange={(e) =>
+                      setEventoBitacora({
+                        ...eventoBitacora,
+                        visibleCliente: e.target.checked,
+                      })
+                    }
+                  />
+                  Visible en Portal Cliente
+                </label>
+
+                <button
+                  type="submit"
+                  className="w-full min-h-10 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+                >
+                  Guardar bitacora
+                </button>
+              </form>
+
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="grid grid-cols-[120px_1fr_120px_auto] gap-3 bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-500">
+                  <span>Tipo</span>
+                  <span>Registro</span>
+                  <span>Visibilidad</span>
+                  <span>Accion</span>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {(resumen.bitacora || []).length === 0 ? (
+                    <p className="p-5 text-sm text-slate-500">Sin registros de bitacora.</p>
+                  ) : (
+                    resumen.bitacora.map((item) => (
+                      <div
+                        key={item.id}
+                        className="grid grid-cols-1 md:grid-cols-[120px_1fr_120px_auto] gap-3 px-4 py-3 text-sm items-start"
+                      >
+                        <span className="w-fit bg-slate-50 text-slate-700 border border-slate-200 rounded-full px-2.5 py-1 text-xs font-bold capitalize">
+                          {item.tipo}
+                        </span>
+                        <div>
+                          <p className="font-bold text-slate-800">{item.titulo}</p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {fechaVisible(item.fechaEvento)} · Responsable:{" "}
+                            {texto(item.responsable, "Sin responsable")}
+                          </p>
+                          {item.detalle && (
+                            <p className="text-xs text-slate-500 mt-2">{item.detalle}</p>
+                          )}
+                          {item.resultado && (
+                            <p className="text-xs text-slate-600 mt-2">
+                              <span className="font-bold">Resultado:</span> {item.resultado}
+                            </p>
+                          )}
+                          {item.proximoPaso && (
+                            <p className="text-xs text-blue-700 mt-1">
+                              <span className="font-bold">Proximo paso:</span> {item.proximoPaso}
+                            </p>
+                          )}
+                        </div>
+                        <span
+                          className={`w-fit border rounded-full px-2.5 py-1 text-xs font-bold ${
+                            item.visibleCliente
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-slate-50 text-slate-600 border-slate-200"
+                          }`}
+                        >
+                          {item.visibleCliente ? "Cliente" : "Interno"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => eliminarEventoBitacora(item)}
+                          className="justify-self-start md:justify-self-end border border-red-100 text-red-600 hover:bg-red-50 rounded-lg px-3 py-2 text-xs font-bold transition flex items-center gap-1"
+                        >
+                          <Trash2 size={13} />
+                          Eliminar
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
           </section>
 

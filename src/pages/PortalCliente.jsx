@@ -4,6 +4,7 @@ import {
   Briefcase,
   CalendarCheck,
   CheckCircle2,
+  Clock3,
   Copy,
   Download,
   FileText,
@@ -68,6 +69,14 @@ function estadoClase(estado) {
   }
   if (estado === "En proceso") return "bg-blue-50 text-blue-700 border-blue-200";
   return "bg-slate-50 text-slate-600 border-slate-200";
+}
+
+function fechaVisible(valor) {
+  if (!valor) return "Sin fecha";
+  return new Date(valor).toLocaleString("es-CL", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }
 
 export default function PortalCliente() {
@@ -433,6 +442,48 @@ export default function PortalCliente() {
                         Sin link
                       </span>
                     )}
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+
+          <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Clock3 size={18} />
+                Bitacora compartida
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Avances, acuerdos y proximos pasos compartidos por Tactika Consulting.
+              </p>
+            </div>
+
+            <div className="divide-y divide-slate-100">
+              {(resumen.bitacora || []).length === 0 ? (
+                <p className="p-5 text-sm text-slate-500">Sin registros compartidos.</p>
+              ) : (
+                resumen.bitacora.slice(0, 8).map((evento) => (
+                  <div key={evento.id} className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-bold text-sm text-slate-800">{evento.titulo}</p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {fechaVisible(evento.fechaEvento)} · {evento.tipo}
+                        </p>
+                        {evento.detalle && (
+                          <p className="text-xs text-slate-500 mt-2">{evento.detalle}</p>
+                        )}
+                        {evento.proximoPaso && (
+                          <p className="text-xs text-blue-700 mt-2">
+                            Proximo paso: {evento.proximoPaso}
+                          </p>
+                        )}
+                      </div>
+                      <span className="shrink-0 border border-blue-100 bg-blue-50 text-blue-700 rounded-full px-2.5 py-1 text-xs font-bold capitalize">
+                        {evento.tipo}
+                      </span>
+                    </div>
                   </div>
                 ))
               )}

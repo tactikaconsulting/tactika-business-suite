@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { obtenerBitacoraCliente } from "./BitacoraClienteService";
 import { obtenerDocumentosCliente } from "./DocumentoClienteService";
 import { obtenerModulosCliente } from "./ImplementacionService";
 
@@ -91,6 +92,12 @@ function documentosVisibles(documentos, perfil) {
   return documentos.filter((documento) => documento.visibleCliente);
 }
 
+function bitacoraVisible(bitacora, perfil) {
+  const esTactika = rolesTactika.includes(perfil?.tipo_usuario);
+  if (esTactika) return bitacora;
+  return bitacora.filter((evento) => evento.visibleCliente);
+}
+
 async function obtenerPerfilActual() {
   const { data: authData, error: errorAuth } = await supabase.auth.getUser();
   if (errorAuth || !authData?.user?.id) return null;
@@ -142,6 +149,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
     { data: ventas, error: errorVentas },
     { data: planes, error: errorPlanes },
     documentos,
+    bitacora,
     modulos,
   ] = await Promise.all([
     supabase.from("clientes").select("*").eq("id", clienteId).single(),
@@ -173,6 +181,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
       .eq("cliente_id", clienteId)
       .order("created_at", { ascending: false }),
     obtenerDocumentosCliente(clienteId),
+    obtenerBitacoraCliente(clienteId),
     obtenerModulosCliente(clienteId),
   ]);
 
@@ -198,6 +207,7 @@ export async function obtenerResumenPortalCliente(clienteIdSolicitado) {
     servicios: (ventas || []).map(aVenta),
     planTrabajo: (planes || []).map(aPlan),
     documentos: documentosVisibles(documentos || [], perfil),
+    bitacora: bitacoraVisible(bitacora || [], perfil),
     modulos,
   };
 }

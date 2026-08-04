@@ -22,6 +22,11 @@ function fechaActual() {
   return new Date().toLocaleDateString("es-CL");
 }
 
+function fechaVisible(valor) {
+  if (!valor) return "-";
+  return new Date(valor).toLocaleDateString("es-CL");
+}
+
 function modulosActivos(resumen) {
   return (resumen?.modulos || []).filter((item) => item.estado === "Activo");
 }
@@ -39,6 +44,7 @@ export function crearMensajePortalCliente(resumen) {
   const implementacion = resumen?.implementacion;
   const pendientes = tareasPendientes(resumen);
   const modulos = modulosActivos(resumen);
+  const ultimoEvento = resumen?.bitacora?.[0];
 
   const proximasTareas = pendientes
     .slice(0, 3)
@@ -54,6 +60,7 @@ export function crearMensajePortalCliente(resumen) {
     `Tareas pendientes: ${pendientes.length}`,
     "",
     proximasTareas ? `Proximos pasos:\n${proximasTareas}` : "No hay tareas pendientes registradas.",
+    ultimoEvento?.proximoPaso ? `\nUltimo acuerdo: ${ultimoEvento.proximoPaso}` : "",
     "",
     "Quedo atento para coordinar el siguiente avance.",
     "Claudio Urra - Tactika Consulting",
@@ -183,6 +190,22 @@ export function descargarResumenPortalPDF(resumen) {
       ]),
       theme: "grid",
       headStyles: { fillColor: [15, 23, 42] },
+      styles: { fontSize: 8 },
+    });
+  }
+
+  if ((resumen?.bitacora || []).length > 0) {
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 10,
+      head: [["Fecha", "Tipo", "Registro", "Proximo paso"]],
+      body: resumen.bitacora.slice(0, 8).map((evento) => [
+        fechaVisible(evento.fechaEvento),
+        texto(evento.tipo),
+        texto(evento.titulo),
+        texto(evento.proximoPaso),
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: [37, 99, 235] },
       styles: { fontSize: 8 },
     });
   }
