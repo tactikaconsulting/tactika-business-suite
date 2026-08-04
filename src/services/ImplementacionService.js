@@ -386,6 +386,53 @@ export async function actualizarEstadoTareaImplementacion(id, estado) {
   }
 }
 
+export async function crearTareaImplementacionCliente({
+  implementacionId,
+  clienteId,
+  titulo,
+  descripcion,
+  responsable,
+  prioridad = "Media",
+  fechaLimite,
+}) {
+  if (!implementacionId || !clienteId) {
+    throw new Error("Falta la implementacion del cliente para crear la tarea.");
+  }
+
+  const { data: ultimaTarea, error: errorUltimaTarea } = await supabase
+    .from("implementacion_tareas")
+    .select("orden")
+    .eq("implementacion_id", implementacionId)
+    .order("orden", { ascending: false })
+    .limit(1);
+
+  if (errorUltimaTarea) {
+    console.error(errorUltimaTarea);
+    throw errorUltimaTarea;
+  }
+
+  const orden = Number(ultimaTarea?.[0]?.orden || 0) + 1;
+
+  const { error } = await supabase.from("implementacion_tareas").insert([
+    {
+      implementacion_id: implementacionId,
+      cliente_id: clienteId,
+      titulo,
+      descripcion,
+      responsable,
+      prioridad,
+      estado: "Pendiente",
+      fecha_limite: fechaLimite || null,
+      orden,
+    },
+  ]);
+
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export async function actualizarImplementacion(id, datos) {
   const { error } = await supabase
     .from("implementaciones_cliente")

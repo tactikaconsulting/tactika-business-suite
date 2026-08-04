@@ -30,6 +30,10 @@ import {
   eliminarEventoBitacoraCliente,
 } from "../services/BitacoraClienteService";
 import {
+  actualizarEstadoTareaImplementacion,
+  crearTareaImplementacionCliente,
+} from "../services/ImplementacionService";
+import {
   crearDocumentoCliente,
   eliminarDocumentoCliente,
 } from "../services/DocumentoClienteService";
@@ -116,6 +120,11 @@ export default function Cliente360() {
     responsable: "Claudio Urra",
     visibleCliente: false,
     fechaEvento: fechaHoraInput(),
+  });
+  const [compromiso, setCompromiso] = useState({
+    crearTarea: true,
+    prioridad: "Media",
+    fechaLimite: "",
   });
 
   useEffect(() => {
@@ -209,11 +218,39 @@ export default function Cliente360() {
       return;
     }
 
+    if (compromiso.crearTarea && !eventoBitacora.proximoPaso) {
+      Swal.fire({
+        icon: "warning",
+        title: "Indica el proximo paso",
+        text: "Para crear una tarea automatica necesitamos saber que compromiso queda pendiente.",
+      });
+      return;
+    }
+
     try {
       await crearEventoBitacoraCliente({
         ...eventoBitacora,
         clienteId,
       });
+
+      if (compromiso.crearTarea && eventoBitacora.proximoPaso && resumen?.implementacion?.id) {
+        await crearTareaImplementacionCliente({
+          implementacionId: resumen?.implementacion?.id,
+          clienteId,
+          titulo: eventoBitacora.proximoPaso,
+          descripcion: [
+            eventoBitacora.titulo ? `Origen: ${eventoBitacora.titulo}` : "",
+            eventoBitacora.detalle,
+            eventoBitacora.resultado ? `Resultado: ${eventoBitacora.resultado}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          responsable: eventoBitacora.responsable,
+          prioridad: compromiso.prioridad,
+          fechaLimite: compromiso.fechaLimite,
+        });
+      }
+
       setEventoBitacora({
         tipo: "reunion",
         titulo: "",
@@ -224,15 +261,38 @@ export default function Cliente360() {
         visibleCliente: false,
         fechaEvento: fechaHoraInput(),
       });
+      setCompromiso({
+        crearTarea: true,
+        prioridad: "Media",
+        fechaLimite: "",
+      });
       await cargar();
       Swal.fire({
         icon: "success",
-        title: "Bitacora registrada",
+        title:
+          compromiso.crearTarea && eventoBitacora.proximoPaso && resumen?.implementacion?.id
+            ? "Bitacora y tarea registradas"
+            : "Bitacora registrada",
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo guardar", text: error.message });
+    }
+  }
+
+  async function cambiarEstadoTarea(tarea, estado) {
+    try {
+      await actualizarEstadoTareaImplementacion(tarea.id, estado);
+      await cargar();
+      Swal.fire({
+        icon: "success",
+        title: "Tarea actualizada",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo actualizar", text: error.message });
     }
   }
 
@@ -461,14 +521,40 @@ export default function Cliente360() {
                         <div>
                           <p className="font-bold text-sm text-slate-800">{tarea.titulo}</p>
                           <p className="text-xs text-slate-500 mt-1">{tarea.descripcion}</p>
+                          <p className="text-xs text-slate-400 mt-2">
+                            Responsable: {texto(tarea.responsable, "Sin responsable")} · Fecha:{" "}
+                            {texto(tarea.fechaLimite, "Sin fecha")} · Prioridad: {tarea.prioridad}
+                          </p>
                         </div>
-                        <span
-                          className={`border rounded-full px-2 py-1 text-xs font-bold ${estadoClase(
-                            tarea.estado
-                          )}`}
-                        >
-                          {tarea.estado}
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span
+                            className={`border rounded-full px-2 py-1 text-xs font-bold ${estadoClase(
+                              tarea.estado
+                            )}`}
+                          >
+                            {tarea.estado}
+                          </span>
+                          <div className="flex flex-wrap justify-end gap-1">
+                            {tarea.estado !== "En proceso" && (
+                              <button
+                                type="button"
+                                onClick={() => cambiarEstadoTarea(tarea, "En proceso")}
+                                className="border border-blue-100 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md px-2 py-1 text-[11px] font-bold"
+                              >
+                                En proceso
+                              </button>
+                            )}
+                            {tarea.estado !== "Completado" && (
+                              <button
+                                type="button"
+                                onClick={() => cambiarEstadoTarea(tarea, "Completado")}
+                                className="border border-green-100 text-green-700 bg-green-50 hover:bg-green-100 rounded-md px-2 py-1 text-[11px] font-bold"
+                              >
+                                Completar
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -630,6 +716,58 @@ export default function Cliente360() {
                     className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
                   />
                 </label>
+
+                <div className="border border-blue-100 bg-blue-50 rounded-xl p-3 space-y-3">
+                  <label className="flex items-start gap-2 text-sm text-blue-900">
+                    <input
+                      type="checkbox"
+                      checked={compromiso.crearTarea}
+                      onChange={(e) =>
+                        setCompromiso({ ...compromiso, crearTarea: e.target.checked })
+                      }
+                      className="mt-1"
+                    />
+                    <span>Crear tarea automatica con el proximo paso.</span>
+                  </label>
+
+                  {compromiso.crearTarea && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block">
+                        <span className="text-xs font-semibold text-blue-900">Prioridad</span>
+                        <select
+                          value={compromiso.prioridad}
+                          onChange={(e) =>
+                            setCompromiso({ ...compromiso, prioridad: e.target.value })
+                          }
+                          className="mt-1 w-full border border-blue-100 rounded-lg p-2 text-sm bg-white"
+                        >
+                          <option>Alta</option>
+                          <option>Media</option>
+                          <option>Baja</option>
+                        </select>
+                      </label>
+
+                      <label className="block">
+                        <span className="text-xs font-semibold text-blue-900">Fecha limite</span>
+                        <input
+                          type="date"
+                          value={compromiso.fechaLimite}
+                          onChange={(e) =>
+                            setCompromiso({ ...compromiso, fechaLimite: e.target.value })
+                          }
+                          className="mt-1 w-full border border-blue-100 rounded-lg p-2 text-sm bg-white"
+                        />
+                      </label>
+                    </div>
+                  )}
+
+                  {!resumen?.implementacion?.id && compromiso.crearTarea && (
+                    <p className="text-xs text-amber-700">
+                      Este cliente aun no tiene implementacion creada. Se guardara la bitacora, pero
+                      la tarea necesita una implementacion activa.
+                    </p>
+                  )}
+                </div>
 
                 <label className="block">
                   <span className="text-sm font-semibold text-slate-700">Responsable</span>
