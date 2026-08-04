@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ClienteForm from "../components/Clientes/ClienteForm";
 import ImportarArchivo from "../components/Shared/ImportarArchivo";
 import Swal from "sweetalert2";
@@ -140,6 +141,12 @@ export default function Clientes() {
                   <td className="p-3">{c.contacto}</td>
                   <td className="p-3">{c.estado}</td>
                   <td className="p-3 space-x-2">
+                    <Link
+                      className="text-slate-700 hover:underline font-medium"
+                      to={`/clientes/${c.id}`}
+                    >
+                      Ficha 360
+                    </Link>
                     <button
                       className="text-blue-600 hover:underline"
                       onClick={() => setClienteEditar(c)}

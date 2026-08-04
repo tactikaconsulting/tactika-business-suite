@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Briefcase,
   CalendarCheck,
@@ -71,6 +72,7 @@ function estadoClase(estado) {
 
 export default function PortalCliente() {
   const { perfil } = useAuth();
+  const [searchParams] = useSearchParams();
   const [clientes, setClientes] = useState([]);
   const [clienteId, setClienteId] = useState("");
   const [resumen, setResumen] = useState(null);
@@ -91,10 +93,11 @@ export default function PortalCliente() {
     setCargando(true);
     try {
       const clienteAsignado = await obtenerClienteIdPortalAsignado();
+      const clienteUrl = searchParams.get("cliente");
       if (esTactika) {
         const dataClientes = await obtenerClientes();
         setClientes(dataClientes);
-        setClienteId(clienteAsignado || dataClientes[0]?.id || "");
+        setClienteId(clienteUrl || clienteAsignado || dataClientes[0]?.id || "");
       } else {
         setClienteId(clienteAsignado || "");
       }

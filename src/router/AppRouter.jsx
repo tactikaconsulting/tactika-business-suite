@@ -7,6 +7,7 @@ import RutaInternaTactika from "../components/RutaInternaTactika";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Clientes from "../pages/Clientes";
+import Cliente360 from "../pages/Cliente360";
 import Diagnostico from "../pages/Diagnostico";
 import PlanAccion from "../pages/PlanAccion";
 import Seguimientos from "../pages/Seguimientos";
@@ -34,6 +35,7 @@ export default function AppRouter() {
             <Route element={<RutaInternaTactika />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/clientes" element={<Clientes />} />
+              <Route path="/clientes/:clienteId" element={<Cliente360 />} />
               <Route path="/diagnosticos" element={<Diagnostico />} />
               <Route path="/planes" element={<PlanAccion />} />
               <Route path="/seguimiento" element={<Seguimientos />} />
