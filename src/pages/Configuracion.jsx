@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Layers3, Settings, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Layers3,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  UserCog,
+  Users,
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 import { obtenerClientes } from "../services/ClienteService";
@@ -9,6 +17,12 @@ import {
   modulosSugeridosPorPlan,
   obtenerModulosCliente,
 } from "../services/ImplementacionService";
+import {
+  asignarUsuarioCliente,
+  nombreTipoUsuario,
+  obtenerPerfilesAccesoCliente,
+  quitarAccesoCliente,
+} from "../services/PerfilService";
 
 const planes = ["Base", "Profesional", "Enterprise"];
 
@@ -23,9 +37,15 @@ export default function Configuracion() {
   const [modulosActivos, setModulosActivos] = useState([]);
   const [observaciones, setObservaciones] = useState("");
   const [cargandoModulos, setCargandoModulos] = useState(false);
+  const [perfiles, setPerfiles] = useState([]);
+  const [perfilId, setPerfilId] = useState("");
+  const [clienteAccesoId, setClienteAccesoId] = useState("");
+  const [tipoAcceso, setTipoAcceso] = useState("cliente_admin");
+  const [cargandoPerfiles, setCargandoPerfiles] = useState(false);
 
   useEffect(() => {
     cargarClientes();
+    cargarPerfiles();
   }, []);
 
   useEffect(() => {
@@ -35,6 +55,22 @@ export default function Configuracion() {
   async function cargarClientes() {
     const data = await obtenerClientes();
     setClientes(data);
+  }
+
+  async function cargarPerfiles() {
+    setCargandoPerfiles(true);
+    try {
+      const data = await obtenerPerfilesAccesoCliente();
+      setPerfiles(data);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudieron cargar usuarios",
+        text: error.message,
+      });
+    } finally {
+      setCargandoPerfiles(false);
+    }
   }
 
   async function cargarModulosCliente(id) {
@@ -95,6 +131,53 @@ export default function Configuracion() {
       });
     } catch (error) {
       Swal.fire({ icon: "error", title: "No se pudo guardar", text: error.message });
+    }
+  }
+
+  async function guardarAccesoCliente() {
+    try {
+      await asignarUsuarioCliente({
+        perfilId,
+        tipoUsuario: tipoAcceso,
+        clienteId: clienteAccesoId,
+      });
+
+      await cargarPerfiles();
+      Swal.fire({
+        icon: "success",
+        title: "Acceso asignado",
+        text: "El usuario quedó vinculado al portal de ese cliente.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo asignar acceso", text: error.message });
+    }
+  }
+
+  async function quitarAcceso(perfil) {
+    const respuesta = await Swal.fire({
+      title: "¿Quitar acceso cliente?",
+      text: `${perfil.nombre} dejará de estar vinculado a ${perfil.clienteNombre || "un cliente"}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Quitar acceso",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!respuesta.isConfirmed) return;
+
+    try {
+      await quitarAccesoCliente(perfil.id);
+      await cargarPerfiles();
+      Swal.fire({
+        icon: "success",
+        title: "Acceso quitado",
+        timer: 1600,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({ icon: "error", title: "No se pudo quitar acceso", text: error.message });
     }
   }
 
@@ -321,6 +404,145 @@ export default function Configuracion() {
                 </button>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2">
+              <UserCog size={19} className="text-blue-600" />
+              <h2 className="text-xl font-bold text-slate-800">Accesos de Cliente</h2>
+            </div>
+            <p className="text-sm text-slate-500 mt-1">
+              Asigna usuarios existentes al portal de una empresa sin entrar a Supabase.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={cargarPerfiles}
+            disabled={cargandoPerfiles}
+            className="min-h-10 border border-slate-200 hover:bg-slate-50 disabled:opacity-60 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2"
+          >
+            <Users size={16} />
+            Actualizar usuarios
+          </button>
+        </div>
+
+        <div className="p-5 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6">
+          <div className="space-y-4">
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Usuario</span>
+              <select
+                value={perfilId}
+                onChange={(e) => setPerfilId(e.target.value)}
+                className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+              >
+                <option value="">Seleccionar usuario</option>
+                {perfiles.map((perfil) => (
+                  <option key={perfil.id} value={perfil.id}>
+                    {perfil.nombre} - {nombreTipoUsuario(perfil.tipoUsuario)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Empresa cliente</span>
+              <select
+                value={clienteAccesoId}
+                onChange={(e) => setClienteAccesoId(e.target.value)}
+                className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+              >
+                <option value="">Seleccionar cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Tipo de acceso</span>
+              <select
+                value={tipoAcceso}
+                onChange={(e) => setTipoAcceso(e.target.value)}
+                className="mt-1 w-full border border-slate-200 rounded-lg p-2.5 text-sm"
+              >
+                <option value="cliente_admin">Cliente Admin</option>
+                <option value="cliente_usuario">Cliente Usuario</option>
+              </select>
+            </label>
+
+            <button
+              type="button"
+              onClick={guardarAccesoCliente}
+              disabled={!perfilId || !clienteAccesoId}
+              className="w-full min-h-10 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+            >
+              Asignar acceso al portal
+            </button>
+
+            <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-900">
+              Esta fase administra usuarios que ya existen en la tabla de perfiles. La creación de
+              cuentas nuevas quedará para una fase posterior con invitación segura.
+            </div>
+          </div>
+
+          <div className="border border-slate-200 rounded-xl overflow-hidden">
+            <div className="grid grid-cols-[1.3fr_1fr_1fr_auto] gap-3 bg-slate-50 px-4 py-3 text-xs font-bold uppercase text-slate-500">
+              <span>Usuario</span>
+              <span>Acceso</span>
+              <span>Cliente asignado</span>
+              <span>Acción</span>
+            </div>
+
+            <div className="divide-y divide-slate-100">
+              {perfiles.length === 0 && (
+                <div className="px-4 py-8 text-center text-sm text-slate-400">
+                  No hay usuarios disponibles para mostrar.
+                </div>
+              )}
+
+              {perfiles.map((perfil) => {
+                const esCliente =
+                  perfil.tipoUsuario === "cliente_admin" ||
+                  perfil.tipoUsuario === "cliente_usuario";
+
+                return (
+                  <div
+                    key={perfil.id}
+                    className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1fr_auto] gap-3 px-4 py-3 text-sm items-center"
+                  >
+                    <div>
+                      <p className="font-bold text-slate-800">{perfil.nombre}</p>
+                      <p className="text-xs text-slate-400">{perfil.rol || "Sin rol interno"}</p>
+                    </div>
+                    <span
+                      className={`w-fit rounded-full px-2.5 py-1 text-xs font-bold ${
+                        esCliente
+                          ? "bg-blue-50 text-blue-700 border border-blue-100"
+                          : "bg-slate-100 text-slate-500 border border-slate-200"
+                      }`}
+                    >
+                      {nombreTipoUsuario(perfil.tipoUsuario)}
+                    </span>
+                    <p className="text-slate-600">{perfil.clienteNombre || "Sin cliente"}</p>
+                    <button
+                      type="button"
+                      onClick={() => quitarAcceso(perfil)}
+                      disabled={!esCliente}
+                      className="justify-self-start md:justify-self-end border border-red-100 text-red-600 disabled:text-slate-300 disabled:border-slate-100 disabled:bg-slate-50 hover:bg-red-50 rounded-lg px-3 py-2 text-xs font-bold transition"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
