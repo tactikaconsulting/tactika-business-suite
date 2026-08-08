@@ -100,6 +100,19 @@ export default function ProspeccionIA() {
     }
   }
 
+  function marcarContactada(empresa) {
+    setEmpresas((actuales) =>
+      actuales.map((item) =>
+        item.idTemporal === empresa.idTemporal
+          ? { ...item, estadoProspeccion: "Contactada" }
+          : item
+      )
+    );
+    setRespuestaIA(
+      `${empresa.empresa} fue marcada como contactada. Siguiente paso sugerido: si responde, guardala en CRM y agenda diagnostico; si no responde, intenta un seguimiento en 48 horas.`
+    );
+  }
+
   function consultarIA(pregunta) {
     const texto = pregunta?.trim();
     if (!texto) return;
@@ -254,6 +267,7 @@ export default function ProspeccionIA() {
         empresas={empresas}
         agregandoId={agregandoId}
         onAgregar={agregarAlCRM}
+        onMarcarContactada={marcarContactada}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
