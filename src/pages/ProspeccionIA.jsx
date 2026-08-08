@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarClock, Megaphone, Route, ShieldCheck, Sparkles } from "lucide-react";
+import { CalendarClock, Megaphone, Plus, Route, ShieldCheck, Sparkles } from "lucide-react";
 import Swal from "sweetalert2";
 
 import BuscadorProspectos from "../components/ProspeccionIA/BuscadorProspectos";
@@ -28,6 +28,20 @@ export default function ProspeccionIA() {
   const [agregandoId, setAgregandoId] = useState(null);
   const [preguntaIA, setPreguntaIA] = useState("");
   const [respuestaIA, setRespuestaIA] = useState("");
+  const [empresaManual, setEmpresaManual] = useState({
+    empresa: "",
+    giro: "Constructora",
+    comuna: "Buin",
+    region: "Region Metropolitana",
+    telefono: "",
+    correo: "",
+    sitioWeb: "",
+    numTrabajadores: "",
+    problemaDetectado: "Gestion manual con Excel, WhatsApp o informacion dispersa.",
+    dolorPrincipal: "Necesita identificar que proceso conviene ordenar primero.",
+    necesidad: "Evaluacion gratuita y diagnostico para definir sistema a medida.",
+    estadoProspeccion: "Encontrada",
+  });
 
   useEffect(() => {
     cargarProspectos();
@@ -92,6 +106,31 @@ export default function ProspeccionIA() {
     setRespuestaIA(generarRespuestaIAComercial(texto, prospectos, empresas));
   }
 
+  function actualizarEmpresaManual(campo, valor) {
+    setEmpresaManual((actual) => ({ ...actual, [campo]: valor }));
+  }
+
+  function agregarEmpresaManual(evento) {
+    evento.preventDefault();
+    const nombre = empresaManual.empresa.trim();
+    if (!nombre) return;
+
+    const nuevaEmpresa = {
+      ...empresaManual,
+      empresa: nombre,
+      numTrabajadores: Number(empresaManual.numTrabajadores || 0),
+      idTemporal: `manual-${Date.now()}`,
+      potencial: 68,
+      estadoProspeccion: "Encontrada",
+    };
+
+    setEmpresas((actuales) => [nuevaEmpresa, ...actuales]);
+    setRespuestaIA(
+      `${nuevaEmpresa.empresa} fue agregada a la lista de revision. Si el contacto es publico y el dolor parece real, agregala al CRM y usa la IA Comercial para preparar el primer mensaje.`
+    );
+    setEmpresaManual((actual) => ({ ...actual, empresa: "", telefono: "", correo: "", sitioWeb: "" }));
+  }
+
   const metricas = useMemo(() => {
     const guardados = prospectos.filter((p) => p.origen === "Prospeccion IA").length;
     const conCorreo = empresas.filter((e) => e.correo).length;
@@ -112,11 +151,11 @@ export default function ProspeccionIA() {
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase text-blue-600">Tactika Suite</p>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mt-1">
-              Prospección IA
+              Agente de ventas
             </h1>
             <p className="text-sm text-slate-500 mt-1 max-w-3xl">
-              Motor comercial para encontrar empresas, revisarlas, guardarlas como prospectos y
-              preparar el primer contacto desde Tactika Consulting.
+              Herramienta interna para buscar empresas, revisar datos publicos, guardarlas como
+              prospectos y preparar el primer contacto desde Tactika Consulting.
             </p>
           </div>
 
@@ -152,6 +191,64 @@ export default function ProspeccionIA() {
       </div>
 
       <BuscadorProspectos filtros={filtros} onChange={setFiltros} onBuscar={buscar} />
+
+      <section className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-xs font-semibold uppercase text-blue-600">Registro manual</p>
+            <h2 className="text-xl font-bold text-slate-800 mt-1">Empresa encontrada en busqueda real</h2>
+            <p className="text-sm text-slate-500 mt-1 max-w-2xl">
+              Copia solo datos publicos de Google, Maps, Instagram o el sitio de la empresa. Luego
+              revisa el dolor probable antes de agregarla al CRM.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={agregarEmpresaManual} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-5">
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Empresa</span>
+            <input value={empresaManual.empresa} onChange={(e) => actualizarEmpresaManual("empresa", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" required />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Rubro</span>
+            <input value={empresaManual.giro} onChange={(e) => actualizarEmpresaManual("giro", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Comuna</span>
+            <input value={empresaManual.comuna} onChange={(e) => actualizarEmpresaManual("comuna", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Trabajadores</span>
+            <input type="number" value={empresaManual.numTrabajadores} onChange={(e) => actualizarEmpresaManual("numTrabajadores", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Telefono publico</span>
+            <input value={empresaManual.telefono} onChange={(e) => actualizarEmpresaManual("telefono", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-sm font-semibold text-slate-700">Correo publico</span>
+            <input value={empresaManual.correo} onChange={(e) => actualizarEmpresaManual("correo", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5 xl:col-span-2">
+            <span className="text-sm font-semibold text-slate-700">Web / Instagram</span>
+            <input value={empresaManual.sitioWeb} onChange={(e) => actualizarEmpresaManual("sitioWeb", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5 md:col-span-2">
+            <span className="text-sm font-semibold text-slate-700">Dolor probable</span>
+            <input value={empresaManual.dolorPrincipal} onChange={(e) => actualizarEmpresaManual("dolorPrincipal", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <label className="space-y-1.5 md:col-span-2">
+            <span className="text-sm font-semibold text-slate-700">Necesidad posible</span>
+            <input value={empresaManual.necesidad} onChange={(e) => actualizarEmpresaManual("necesidad", e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300" />
+          </label>
+          <div className="md:col-span-2 xl:col-span-4">
+            <button type="submit" className="min-h-10 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-semibold transition inline-flex items-center gap-2">
+              <Plus size={16} />
+              Agregar a revision
+            </button>
+          </div>
+        </form>
+      </section>
 
       <EmpresasEncontradasTable
         empresas={empresas}

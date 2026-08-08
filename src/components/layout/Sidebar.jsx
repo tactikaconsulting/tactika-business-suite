@@ -112,7 +112,7 @@ export default function Sidebar() {
             <SidebarItem
               to="/prospeccion-ia"
               icon={Sparkles}
-              text="Prospección IA"
+              text="Agente Ventas"
             />
 
             <SidebarItem

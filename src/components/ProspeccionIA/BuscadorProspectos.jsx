@@ -1,6 +1,9 @@
-import { Search, Sparkles } from "lucide-react";
+import { ExternalLink, Search, Sparkles } from "lucide-react";
+import { generarEnlacesBusquedaProspectos } from "../../services/ProspeccionIAService";
 
 export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
+  const enlacesBusqueda = generarEnlacesBusquedaProspectos(filtros);
+
   function actualizar(campo, valor) {
     onChange({ ...filtros, [campo]: valor });
   }
@@ -12,8 +15,8 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
           <p className="text-xs font-semibold uppercase text-blue-600">Motor de prospeccion</p>
           <h2 className="text-xl font-bold text-slate-800 mt-1">Buscador de Prospectos</h2>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-            Busca empresas por rubro, comuna y necesidad comercial. Esta primera version usa datos
-            simulados y deja lista la arquitectura para fuentes publicas.
+            Busca empresas por rubro, comuna y necesidad comercial. El modulo muestra ejemplos y
+            tambien abre busquedas reales para revisar datos publicos antes de guardar en CRM.
           </p>
         </div>
 
@@ -83,9 +86,29 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
       <div className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-2 text-sm text-blue-900">
         <Sparkles size={16} className="mt-0.5 shrink-0" />
         <p>
-          Modo exploracion comercial: busca oportunidades de ejemplo, revisa datos y guarda
-          prospectos en el CRM antes de contactar.
+          Modo interno: abre busquedas reales, copia datos publicos y guarda solo prospectos
+          revisados. No envia mensajes automaticamente.
         </p>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+        {enlacesBusqueda.map((enlace) => (
+          <a
+            key={enlace.label}
+            href={enlace.url}
+            target="_blank"
+            rel="noreferrer"
+            className="border border-slate-200 rounded-xl p-3 bg-slate-50 hover:bg-white hover:border-blue-200 transition group"
+          >
+            <span className="flex items-center justify-between gap-2 text-sm font-bold text-slate-800">
+              {enlace.label}
+              <ExternalLink size={14} className="text-slate-400 group-hover:text-blue-600" />
+            </span>
+            <span className="block text-xs text-slate-500 mt-1 leading-relaxed">
+              {enlace.descripcion}
+            </span>
+          </a>
+        ))}
       </div>
     </section>
   );

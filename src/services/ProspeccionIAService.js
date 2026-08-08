@@ -224,6 +224,43 @@ export function buscarEmpresasSimuladas(filtros) {
     }));
 }
 
+export function generarEnlacesBusquedaProspectos(filtros) {
+  const rubro = String(filtros.rubro || "pyme").trim();
+  const comunas = comunasComoLista(filtros.comunas);
+  const comunaPrincipal = comunas[0] || "buin";
+  const region = String(filtros.region || "Region Metropolitana").trim();
+  const palabrasClave = String(filtros.palabrasClave || "contacto WhatsApp").trim();
+  const terminoBase = `${rubro} ${comunaPrincipal} ${region}`;
+
+  return [
+    {
+      label: "Google: contacto y WhatsApp",
+      descripcion: "Busca empresas con datos publicos de contacto.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`${terminoBase} ${palabrasClave}`)}`,
+    },
+    {
+      label: "Google Maps: empresas cercanas",
+      descripcion: "Abre el mapa para revisar negocios reales y telefonos publicos.",
+      url: `https://www.google.com/maps/search/${encodeURIComponent(terminoBase)}`,
+    },
+    {
+      label: "Instagram: negocios activos",
+      descripcion: "Encuentra cuentas con actividad reciente y WhatsApp visible.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`site:instagram.com ${terminoBase}`)}`,
+    },
+    {
+      label: "Facebook: paginas y publicaciones",
+      descripcion: "Encuentra paginas locales y grupos donde aparezcan empresas.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`site:facebook.com ${terminoBase}`)}`,
+    },
+    {
+      label: "Directorios web",
+      descripcion: "Busca sitios o directorios con correos publicos del rubro.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`${terminoBase} correo contacto empresa`)}`,
+    },
+  ];
+}
+
 export async function agregarEmpresaEncontradaAlCRM(empresa) {
   return crearProspectoSeguro({
     empresa: empresa.empresa,
