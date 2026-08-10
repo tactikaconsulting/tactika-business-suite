@@ -1,7 +1,9 @@
 import { ExternalLink, Search, Sparkles } from "lucide-react";
 import { generarEnlacesBusquedaProspectos } from "../../services/ProspeccionIAService";
 
-export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
+const cantidades = ["10", "25", "50", "100"];
+
+export default function BuscadorProspectos({ filtros, onChange, onBuscar, buscando = false }) {
   const enlacesBusqueda = generarEnlacesBusquedaProspectos(filtros);
 
   function actualizar(campo, valor) {
@@ -15,18 +17,19 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
           <p className="text-xs font-semibold uppercase text-blue-600">Motor de prospeccion</p>
           <h2 className="text-xl font-bold text-slate-800 mt-1">Buscador de Prospectos</h2>
           <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-            Busca empresas por rubro, comuna y necesidad comercial. El modulo muestra ejemplos y
-            tambien abre busquedas reales para revisar datos publicos antes de guardar en CRM.
+            Busca empresas reales por rubro y comuna usando Google Places. Tambien puedes abrir
+            fuentes publicas para revisar datos antes de guardar en CRM.
           </p>
         </div>
 
         <button
           type="button"
           onClick={onBuscar}
-          className="min-h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition flex items-center gap-2"
+          disabled={buscando}
+          className="min-h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition flex items-center gap-2"
         >
           <Search size={16} />
-          Buscar empresas
+          {buscando ? "Buscando" : "Buscar empresas"}
         </button>
       </div>
 
@@ -72,6 +75,21 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
           />
         </label>
 
+        <label className="space-y-1.5">
+          <span className="text-sm font-semibold text-slate-700">Cantidad</span>
+          <select
+            value={filtros.cantidad || "10"}
+            onChange={(e) => actualizar("cantidad", e.target.value)}
+            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+          >
+            {cantidades.map((cantidad) => (
+              <option key={cantidad} value={cantidad}>
+                {cantidad} prospectos
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="space-y-1.5 md:col-span-2 xl:col-span-5">
           <span className="text-sm font-semibold text-slate-700">Palabras clave</span>
           <input
@@ -86,8 +104,8 @@ export default function BuscadorProspectos({ filtros, onChange, onBuscar }) {
       <div className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-2 text-sm text-blue-900">
         <Sparkles size={16} className="mt-0.5 shrink-0" />
         <p>
-          Modo interno: abre busquedas reales, copia datos publicos y guarda solo prospectos
-          revisados. No envia mensajes automaticamente.
+          Modo interno: busca negocios reales, elimina duplicados y guarda el historial en
+          Supabase antes de convertirlos en prospectos del CRM. No envia mensajes automaticamente.
         </p>
       </div>
 

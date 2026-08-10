@@ -9,7 +9,7 @@ import ProspectosGuardadosPanel from "../components/ProspeccionIA/ProspectosGuar
 import { obtenerProspectos } from "../services/ProspectoService";
 import {
   agregarEmpresaEncontradaAlCRM,
-  buscarEmpresasSimuladas,
+  buscarEmpresasReales,
   generarRespuestaIAComercial,
 } from "../services/ProspeccionIAService";
 
@@ -18,6 +18,7 @@ const filtrosIniciales = {
   comunas: "Buin, Paine, San Bernardo, Maipu, Quilicura, Lampa, Colina",
   region: "Region Metropolitana",
   maxTrabajadores: "50",
+  cantidad: "10",
   palabrasClave: "",
 };
 
@@ -26,6 +27,7 @@ export default function ProspeccionIA() {
   const [empresas, setEmpresas] = useState([]);
   const [prospectos, setProspectos] = useState([]);
   const [agregandoId, setAgregandoId] = useState(null);
+  const [buscando, setBuscando] = useState(false);
   const [preguntaIA, setPreguntaIA] = useState("");
   const [respuestaIA, setRespuestaIA] = useState("");
   const [empresaManual, setEmpresaManual] = useState({
@@ -52,14 +54,30 @@ export default function ProspeccionIA() {
     setProspectos(data);
   }
 
-  function buscar() {
-    const resultados = buscarEmpresasSimuladas(filtros);
-    setEmpresas(resultados);
-    setRespuestaIA(
-      resultados.length > 0
-        ? `Encontramos ${resultados.length} empresas simuladas. Revisa potencial, contacto y problema probable antes de agregarlas al CRM.`
-        : "No encontramos empresas con esos filtros. Prueba ampliar comunas o quitar palabras clave."
-    );
+  async function buscar() {
+    setBuscando(true);
+    setRespuestaIA("Buscando empresas reales en fuentes publicas. Esto puede tardar unos segundos.");
+
+    try {
+      const resultado = await buscarEmpresasReales(filtros);
+      const resultados = resultado.empresas || [];
+      setEmpresas(resultados);
+      setRespuestaIA(
+        resultados.length > 0
+          ? `Encontramos ${resultados.length} empresas reales desde ${resultado.fuente || "fuentes publicas"}. La IA solo analizara estos resultados encontrados; no inventara empresas.`
+          : "No encontramos empresas reales con esos filtros. Prueba ampliar comunas, bajar la cantidad o usar un rubro mas general."
+      );
+    } catch (error) {
+      setEmpresas([]);
+      setRespuestaIA(error.message);
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo buscar",
+        text: error.message,
+      });
+    } finally {
+      setBuscando(false);
+    }
   }
 
   async function agregarAlCRM(empresa) {
@@ -146,12 +164,12 @@ export default function ProspeccionIA() {
 
   const metricas = useMemo(() => {
     const guardados = prospectos.filter((p) => p.origen === "Prospeccion IA").length;
-    const conCorreo = empresas.filter((e) => e.correo).length;
+    const conTelefono = empresas.filter((e) => e.telefono).length;
     const altoPotencial = empresas.filter((e) => Number(e.potencial) >= 70).length;
 
     return [
       { label: "Empresas encontradas", value: empresas.length, hint: "Busqueda actual" },
-      { label: "Con correo publico", value: conCorreo, hint: "Listas para correo" },
+      { label: "Con telefono", value: conTelefono, hint: "Listas para contacto" },
       { label: "Alto potencial", value: altoPotencial, hint: "Prioridad comercial" },
       { label: "Guardadas en CRM", value: guardados, hint: "Origen Prospeccion IA" },
     ];
@@ -203,7 +221,12 @@ export default function ProspeccionIA() {
         ))}
       </div>
 
-      <BuscadorProspectos filtros={filtros} onChange={setFiltros} onBuscar={buscar} />
+      <BuscadorProspectos
+        filtros={filtros}
+        onChange={setFiltros}
+        onBuscar={buscar}
+        buscando={buscando}
+      />
 
       <section className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
         <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -313,7 +336,7 @@ export default function ProspeccionIA() {
         <ShieldCheck size={18} className="mt-0.5 shrink-0" />
         <p>
           Version segura: no envia mensajes automaticamente, no consulta datos privados y no guarda
-          empresas encontradas hasta que presionas Agregar al CRM.
+          empresas en el CRM hasta que presionas Agregar al CRM. La busqueda usa fuentes reales.
         </p>
       </section>
     </div>

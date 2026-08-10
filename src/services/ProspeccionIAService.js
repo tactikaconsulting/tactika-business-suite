@@ -1,147 +1,5 @@
+import { supabase } from "../lib/supabase";
 import { crearProspectoSeguro } from "./ProspectoService";
-
-const empresasBase = [
-  {
-    empresa: "Constructora Los Aromos",
-    giro: "Construccion",
-    comuna: "Buin",
-    region: "Region Metropolitana",
-    telefono: "+56 9 8123 4501",
-    correo: "contacto@losaromos.cl",
-    sitioWeb: "https://losaromos.cl",
-    numTrabajadores: 28,
-    problemaDetectado: "Control de obras, cotizaciones y documentacion dispersa.",
-    dolorPrincipal: "Falta de seguimiento centralizado para proyectos y clientes.",
-    necesidad: "Ordenar prospectos, propuestas, tareas y documentos.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Inmobiliaria Valle Maipo",
-    giro: "Inmobiliaria",
-    comuna: "Paine",
-    region: "Region Metropolitana",
-    telefono: "+56 2 2830 1122",
-    correo: "ventas@vallemaipo.cl",
-    sitioWeb: "https://vallemaipo.cl",
-    numTrabajadores: 16,
-    problemaDetectado: "Leads digitales sin trazabilidad comercial.",
-    dolorPrincipal: "Pierden oportunidades por falta de seguimiento.",
-    necesidad: "CRM, agenda de visitas y control de propuestas.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Taller MotoExpress",
-    giro: "Taller mecanico",
-    comuna: "San Bernardo",
-    region: "Region Metropolitana",
-    telefono: "+56 9 6450 7781",
-    correo: "servicio@motoexpress.cl",
-    sitioWeb: "",
-    numTrabajadores: 9,
-    problemaDetectado: "Ordenes de trabajo y clientes se gestionan por WhatsApp.",
-    dolorPrincipal: "No existe historial claro de reparaciones y pagos.",
-    necesidad: "Agenda, clientes, ordenes de trabajo y seguimiento.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "MiniMarket El Encuentro",
-    giro: "Comercio minorista",
-    comuna: "Maipu",
-    region: "Region Metropolitana",
-    telefono: "+56 9 7301 4488",
-    correo: "",
-    sitioWeb: "",
-    numTrabajadores: 7,
-    problemaDetectado: "Control de stock manual y poca visibilidad de ventas.",
-    dolorPrincipal: "No sabe con precision que productos rotan mas.",
-    necesidad: "Inventario, ventas, caja y reportes simples.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Restaurante Don Raul",
-    giro: "Restaurante",
-    comuna: "Quilicura",
-    region: "Region Metropolitana",
-    telefono: "+56 9 5644 9012",
-    correo: "reservas@donraul.cl",
-    sitioWeb: "https://donraul.cl",
-    numTrabajadores: 18,
-    problemaDetectado: "Compras, reservas e inventario no estan integrados.",
-    dolorPrincipal: "Dificultad para controlar costos y margen.",
-    necesidad: "Inventario, compras, agenda y reportes de ventas.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Comida Rapida El Maipino",
-    giro: "Comida rapida",
-    comuna: "Maipu",
-    region: "Region Metropolitana",
-    telefono: "+56 9 6220 1455",
-    correo: "contacto@elmaipino.cl",
-    sitioWeb: "",
-    numTrabajadores: 14,
-    problemaDetectado: "Pedidos, caja e inventario se controlan en canales separados.",
-    dolorPrincipal: "No tiene una vista clara de ventas, stock y turnos.",
-    necesidad: "Ventas, inventario, caja, agenda de pedidos y reportes.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Burger Express Buin",
-    giro: "Comida rapida",
-    comuna: "Buin",
-    region: "Region Metropolitana",
-    telefono: "+56 9 5402 7788",
-    correo: "",
-    sitioWeb: "",
-    numTrabajadores: 8,
-    problemaDetectado: "Pedidos por WhatsApp sin control centralizado ni historial de clientes.",
-    dolorPrincipal: "Se pierden pedidos, seguimientos y oportunidades de fidelizacion.",
-    necesidad: "CRM simple, control de pedidos, caja y clientes frecuentes.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Pollos y Sandwiches La Ruta",
-    giro: "Comida rapida",
-    comuna: "San Bernardo",
-    region: "Region Metropolitana",
-    telefono: "+56 9 7011 3902",
-    correo: "ventas@laruta.cl",
-    sitioWeb: "https://laruta.cl",
-    numTrabajadores: 22,
-    problemaDetectado: "Compras, turnos y ventas no se revisan desde un solo panel.",
-    dolorPrincipal: "Dificultad para controlar costos y rendimiento diario.",
-    necesidad: "Inventario, ventas, turnos y dashboard operativo.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Servicios Industriales Norte",
-    giro: "Servicios industriales",
-    comuna: "Lampa",
-    region: "Region Metropolitana",
-    telefono: "+56 9 4332 1870",
-    correo: "operaciones@sinorte.cl",
-    sitioWeb: "https://sinorte.cl",
-    numTrabajadores: 42,
-    problemaDetectado: "Servicios tecnicos sin planificacion visible.",
-    dolorPrincipal: "Seguimiento de contratos y visitas queda repartido en planillas.",
-    necesidad: "CRM B2B, agenda de servicios y reportes.",
-    estadoProspeccion: "Encontrada",
-  },
-  {
-    empresa: "Ferreteria Colina Centro",
-    giro: "Ferreteria",
-    comuna: "Colina",
-    region: "Region Metropolitana",
-    telefono: "+56 2 2890 2244",
-    correo: "",
-    sitioWeb: "",
-    numTrabajadores: 12,
-    problemaDetectado: "Stock y ventas con registros poco conectados.",
-    dolorPrincipal: "Dificultad para detectar quiebres de stock.",
-    necesidad: "Inventario, ventas y compras.",
-    estadoProspeccion: "Encontrada",
-  },
-];
 
 function normalizar(valor) {
   return String(valor || "")
@@ -151,40 +9,6 @@ function normalizar(valor) {
     .trim();
 }
 
-function contiene(valor, busqueda) {
-  if (!busqueda) return true;
-  return normalizar(valor).includes(normalizar(busqueda));
-}
-
-function coincideRubro(empresa, rubro) {
-  const rubroNormalizado = normalizar(rubro);
-  if (!rubroNormalizado) return true;
-
-  const textoEmpresa = normalizar(
-    [
-      empresa.empresa,
-      empresa.giro,
-      empresa.problemaDetectado,
-      empresa.necesidad,
-    ].join(" ")
-  );
-
-  if (textoEmpresa.includes(rubroNormalizado)) return true;
-
-  const gruposRelacionados = [
-    ["constructora", "construccion", "obra", "obras", "inmobiliaria"],
-    ["comida rapida", "restaurante", "sandwich", "burger", "pollos"],
-    ["ferreteria", "comercio", "inventario", "stock"],
-    ["taller", "mecanico", "moto", "automotriz"],
-  ];
-
-  return gruposRelacionados.some(
-    (grupo) =>
-      grupo.some((palabra) => rubroNormalizado.includes(palabra)) &&
-      grupo.some((palabra) => textoEmpresa.includes(palabra))
-  );
-}
-
 function comunasComoLista(comunas) {
   return String(comunas || "")
     .split(/,|\n/)
@@ -192,36 +16,39 @@ function comunasComoLista(comunas) {
     .filter(Boolean);
 }
 
-export function buscarEmpresasSimuladas(filtros) {
-  const comunas = comunasComoLista(filtros.comunas);
-  const palabrasClave = normalizar(filtros.palabrasClave);
-  const maxTrabajadores = Number(filtros.maxTrabajadores || 0);
+export async function buscarEmpresasReales(filtros) {
+  const { data, error } = await supabase.functions.invoke("buscar-prospectos", {
+    body: {
+      rubro: filtros.rubro,
+      comunas: filtros.comunas,
+      region: filtros.region,
+      cantidad: Number(filtros.cantidad || 10),
+      palabrasClave: filtros.palabrasClave,
+    },
+  });
 
-  return empresasBase
-    .filter((empresa) => {
-      const cumpleRubro = coincideRubro(empresa, filtros.rubro);
-      const cumpleRegion = contiene(empresa.region, filtros.region);
-      const cumpleComuna =
-        comunas.length === 0 || comunas.includes(normalizar(empresa.comuna));
-      const cumpleTrabajadores =
-        !maxTrabajadores || Number(empresa.numTrabajadores) <= maxTrabajadores;
-      const textoEmpresa = [
-        empresa.empresa,
-        empresa.giro,
-        empresa.comuna,
-        empresa.problemaDetectado,
-        empresa.necesidad,
-      ].join(" ");
-      const cumplePalabras = !palabrasClave || normalizar(textoEmpresa).includes(palabrasClave);
+  if (error) {
+    throw new Error(error.message || "No se pudo conectar con el buscador de prospectos.");
+  }
 
-      return cumpleRubro && cumpleRegion && cumpleComuna && cumpleTrabajadores && cumplePalabras;
-    })
-    .map((empresa, index) => ({
+  if (data?.error) {
+    throw new Error(data.error);
+  }
+
+  const empresas = Array.isArray(data?.empresas) ? data.empresas : [];
+  return {
+    ...data,
+    empresas: empresas.map((empresa, index) => ({
       ...empresa,
-      idTemporal: `${normalizar(empresa.empresa).replace(/\s+/g, "-")}-${index}`,
-      estadoProspeccion: "Encontrada",
-      potencial: calcularPotencialEmpresa(empresa),
-    }));
+      correo: empresa.correo || "",
+      sitioWeb: empresa.sitioWeb || "",
+      idTemporal:
+        empresa.googlePlaceId ||
+        `${normalizar(empresa.empresa).replace(/\s+/g, "-")}-${index}`,
+      estadoProspeccion: empresa.estadoProspeccion || "Encontrada",
+      potencial: empresa.potencial || calcularPotencialEmpresa(empresa),
+    })),
+  };
 }
 
 export function generarEnlacesBusquedaProspectos(filtros) {
@@ -282,7 +109,10 @@ export async function agregarEmpresaEncontradaAlCRM(empresa) {
     interesAlto: false,
     necesidadUrgente: empresa.potencial >= 70,
     observaciones: [
-      "Empresa encontrada desde Prospeccion IA.",
+      "Empresa real encontrada desde Prospeccion IA.",
+      empresa.fuente ? `Fuente: ${empresa.fuente}` : "",
+      empresa.direccion ? `Direccion: ${empresa.direccion}` : "",
+      empresa.googleMapsUrl ? `Google Maps: ${empresa.googleMapsUrl}` : "",
       empresa.problemaDetectado,
       empresa.necesidad,
     ]
@@ -292,11 +122,14 @@ export async function agregarEmpresaEncontradaAlCRM(empresa) {
 }
 
 export function calcularPotencialEmpresa(empresa) {
-  let puntaje = 20;
+  let puntaje = 35;
+  if (empresa.telefono) puntaje += 20;
   if (!empresa.sitioWeb) puntaje += 10;
   if (!empresa.correo) puntaje += 8;
   if (Number(empresa.numTrabajadores) >= 10) puntaje += 18;
   if (Number(empresa.numTrabajadores) >= 25) puntaje += 12;
+  if (Number(empresa.rating) >= 4) puntaje += 8;
+  if (Number(empresa.userRatingCount) >= 10) puntaje += 7;
   if (empresa.problemaDetectado) puntaje += 20;
   if (empresa.necesidad) puntaje += 12;
   return Math.min(puntaje, 100);

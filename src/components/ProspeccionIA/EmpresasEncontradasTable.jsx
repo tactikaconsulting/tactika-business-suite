@@ -2,8 +2,10 @@ import {
   Building2,
   CheckCircle2,
   Clipboard,
+  ExternalLink,
   Globe,
   Mail,
+  MapPin,
   MessageCircle,
   Phone,
   PlusCircle,
@@ -68,7 +70,7 @@ export default function EmpresasEncontradasTable({
 
       {empresas.length === 0 ? (
         <div className="p-10 text-center text-sm text-slate-400">
-          Ejecuta una busqueda para ver empresas simuladas.
+          Ejecuta una busqueda para ver empresas reales encontradas en fuentes publicas.
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -92,10 +94,28 @@ export default function EmpresasEncontradasTable({
                       <Building2 size={16} className="text-slate-400" />
                       {empresa.empresa}
                     </div>
-                    <p className="text-xs text-slate-500 mt-1 max-w-sm">{empresa.problemaDetectado}</p>
+                    <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                      {empresa.problemaDetectado}
+                    </p>
+                    {empresa.fuente && (
+                      <p className="text-[11px] font-semibold text-blue-600 mt-2">
+                        Fuente: {empresa.fuente}
+                      </p>
+                    )}
                   </td>
+
                   <td className="p-3 text-slate-600">{empresa.giro}</td>
-                  <td className="p-3 text-slate-600">{empresa.comuna}</td>
+
+                  <td className="p-3 text-slate-600">
+                    <div>{empresa.comuna}</div>
+                    {empresa.direccion && (
+                      <p className="text-xs text-slate-500 mt-1 flex gap-1.5 max-w-xs">
+                        <MapPin size={13} className="mt-0.5 shrink-0" />
+                        <span>{empresa.direccion}</span>
+                      </p>
+                    )}
+                  </td>
+
                   <td className="p-3">
                     <div className="space-y-1 text-slate-600">
                       {empresa.telefono && (
@@ -111,18 +131,36 @@ export default function EmpresasEncontradasTable({
                         </p>
                       )}
                       {empresa.sitioWeb && (
-                        <p className="flex items-center gap-1.5">
+                        <a
+                          href={empresa.sitioWeb}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700"
+                        >
                           <Globe size={13} />
-                          {empresa.sitioWeb.replace("https://", "")}
-                        </p>
+                          {empresa.dominio || empresa.sitioWeb.replace("https://", "")}
+                        </a>
+                      )}
+                      {empresa.googleMapsUrl && (
+                        <a
+                          href={empresa.googleMapsUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700"
+                        >
+                          <ExternalLink size={13} />
+                          Ver en Maps
+                        </a>
                       )}
                     </div>
                   </td>
+
                   <td className="p-3">
                     <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-2.5 py-1 text-xs font-bold">
                       {empresa.potencial}/100
                     </span>
                   </td>
+
                   <td className="p-3">
                     <span
                       className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${estadoClase(
@@ -135,6 +173,7 @@ export default function EmpresasEncontradasTable({
                       {empresa.estadoProspeccion}
                     </span>
                   </td>
+
                   <td className="p-3 text-right">
                     <div className="flex flex-col items-end gap-2">
                       <div className="flex justify-end gap-1.5 flex-wrap">
